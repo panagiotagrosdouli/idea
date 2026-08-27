@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import csv
 import json
+from collections.abc import Iterable
 from dataclasses import asdict, replace
 from pathlib import Path
-from typing import Iterable
 
 import numpy as np
 
@@ -13,8 +13,8 @@ from .data.scenario import MotionScenario
 from .data.synthetic import generate_synthetic_scenario
 from .link import LinkModel
 from .metrics import bootstrap_mean_ci, paired_bootstrap_difference
-from .simulation.engine import SimulationOutput, run_simulation
 from .predictors import TrajectoryPredictor
+from .simulation.engine import SimulationOutput, run_simulation
 from .traffic import generate_traffic_trace
 
 
@@ -89,7 +89,9 @@ def summarize_outputs(
 ) -> dict[str, object]:
     grouped: dict[str, list[dict[str, object]]] = {}
     for output in outputs:
-        grouped.setdefault(output.metrics.scheduler, []).append(output.metrics.to_dict())
+        grouped.setdefault(output.metrics.scheduler, []).append(
+            output.metrics.to_dict()
+        )
     summary: dict[str, object] = {
         "config": config.to_dict(),
         "episodes": len({output.metrics.scenario_id for output in outputs}),
@@ -111,9 +113,7 @@ def summarize_outputs(
     baseline = grouped.get("reactive_greedy")
     comparisons: dict[str, object] = {}
     if baseline is not None:
-        baseline_by_scenario = {
-            str(row["scenario_id"]): row for row in baseline
-        }
+        baseline_by_scenario = {str(row["scenario_id"]): row for row in baseline}
         for scheduler, rows in grouped.items():
             if scheduler == "reactive_greedy":
                 continue
@@ -199,7 +199,10 @@ def _plot_summary(summary: dict[str, object], path: Path) -> None:
 
     schedulers = summary["schedulers"]
     names = list(schedulers)
-    short = [name.replace("predictive", "pred.").replace("proportional", "prop.") for name in names]
+    short = [
+        name.replace("predictive", "pred.").replace("proportional", "prop.")
+        for name in names
+    ]
     panels = [
         ("goodput_mbps", "Goodput (Mbps)", False),
         ("packet_delivery_ratio", "Packet delivery ratio", False),
@@ -212,7 +215,10 @@ def _plot_summary(summary: dict[str, object], path: Path) -> None:
         lows = np.asarray([schedulers[name][metric]["low"] for name in names])
         highs = np.asarray([schedulers[name][metric]["high"] for name in names])
         errors = np.vstack([means - lows, highs - means])
-        colors = ["#d97706" if name == "reactive_greedy" else "#2563eb" for name in names]
+        colors = [
+            "#d97706" if name == "reactive_greedy" else "#2563eb"
+            for name in names
+        ]
         axis.bar(np.arange(len(names)), means, yerr=errors, capsize=3, color=colors)
         axis.set_xticks(np.arange(len(names)), short, rotation=28, ha="right")
         axis.set_ylabel(label)
