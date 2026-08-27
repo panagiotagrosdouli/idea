@@ -15,7 +15,9 @@ class TorchCheckpointPredictor:
         try:
             import torch
         except ImportError as exc:  # pragma: no cover
-            raise ImportError("Install the ML extra with: pip install -e '.[ml]'") from exc
+            raise ImportError(
+                "Install the ML extra with: pip install -e '.[ml]'"
+            ) from exc
         from .torch_model import GRUTrajectoryPredictor
 
         self._torch = torch
@@ -37,7 +39,8 @@ class TorchCheckpointPredictor:
         del dt_s
         if horizon_steps != self.horizon_steps:
             raise ValueError(
-                f"Checkpoint horizon is {self.horizon_steps}, requested {horizon_steps}."
+                f"Checkpoint horizon is {self.horizon_steps}, "
+                f"requested {horizon_steps}."
             )
         history = np.asarray(history_xy, dtype=np.float32)
         if history.ndim != 3 or history.shape[-1] != 2:
@@ -47,4 +50,3 @@ class TorchCheckpointPredictor:
             tensor = self._torch.from_numpy(normalized).to(self.device)
             output = self.model(tensor).cpu().numpy()
         return (output * self.scale + self.center).astype(np.float64)
-
