@@ -17,8 +17,8 @@ from .ber import simulate_dbpsk_ber, write_ber_lut
 from .config import load_config
 from .data.training_export import build_relative_motion_training_npz
 from .data.womd_export import load_womd_motion_scenarios
-from .validation import run_validation
 from .experiment_matrix import load_matrix, run_experiment_matrix, write_matrix
+from .validation import run_validation
 
 
 def _write_ablation(rows: list[dict[str, object]], output: Path) -> None:
@@ -127,7 +127,11 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "ber-lut":
-        grid = np.arange(args.snr_min, args.snr_max + 0.5 * args.snr_step, args.snr_step)
+        grid = np.arange(
+            args.snr_min,
+            args.snr_max + 0.5 * args.snr_step,
+            args.snr_step,
+        )
         path = write_ber_lut(
             simulate_dbpsk_ber(grid, bits=args.bits, seed=args.seed), args.output
         )
@@ -159,7 +163,8 @@ def main(argv: list[str] | None = None) -> int:
                 learned_predictor=learned_predictor,
             )
         artifacts = write_benchmark_artifacts(outputs, config, args.output)
-        print(json.dumps({key: str(value) for key, value in artifacts.items()}, indent=2))
+        serialized = {key: str(value) for key, value in artifacts.items()}
+        print(json.dumps(serialized, indent=2))
         return 0
     if args.command == "ablation":
         config = load_config(args.config)
@@ -206,7 +211,8 @@ def main(argv: list[str] | None = None) -> int:
         artifacts = write_matrix(
             run_experiment_matrix(config, matrix_config), args.output
         )
-        print(json.dumps({key: str(value) for key, value in artifacts.items()}, indent=2))
+        serialized = {key: str(value) for key, value in artifacts.items()}
+        print(json.dumps(serialized, indent=2))
         return 0
     raise AssertionError("Unhandled command")
 
