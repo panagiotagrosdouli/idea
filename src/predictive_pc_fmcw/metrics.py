@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass
-from typing import Iterable
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -83,4 +83,3 @@ def paired_bootstrap_difference(
     if first.shape != second.shape:
         raise ValueError("Paired arrays must have identical shapes.")
     return bootstrap_mean_ci(first - second, samples=samples, seed=seed)
-

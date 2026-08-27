@@ -55,7 +55,9 @@ def train_from_npz(
     validation_mask = np.asarray([item in validation_scenarios for item in scenario_id])
     train_mask = ~validation_mask
     if not np.any(train_mask) or not np.any(validation_mask):
-        raise ValueError("Scenario-level split requires at least two distinct scenarios.")
+        raise ValueError(
+            "Scenario-level split requires at least two distinct scenarios."
+        )
 
     center = history[train_mask].mean(axis=(0, 1), keepdims=True)
     scale = history[train_mask].std(axis=(0, 1), keepdims=True)
@@ -160,7 +162,9 @@ def train_from_npz(
             target = future_batch.to(device) * scale_tensor + center_tensor
             predictions.append(predicted.cpu().numpy())
             targets.append(target.cpu().numpy())
-    error = np.linalg.norm(np.concatenate(predictions) - np.concatenate(targets), axis=-1)
+    error = np.linalg.norm(
+        np.concatenate(predictions) - np.concatenate(targets), axis=-1
+    )
     result = TrainingResult(
         checkpoint=str(checkpoint),
         best_epoch=best_epoch,
@@ -174,4 +178,3 @@ def train_from_npz(
         json.dumps(result.__dict__, indent=2), encoding="utf-8"
     )
     return result
-
