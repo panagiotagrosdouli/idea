@@ -13,9 +13,9 @@ from ..metrics import SimulationMetrics, jains_fairness
 from ..predictors import (
     ConstantAccelerationPredictor,
     ConstantVelocityPredictor,
+    TrajectoryPredictor,
     forecast_scenario,
 )
-from ..predictors import TrajectoryPredictor
 from ..scheduling.base import SchedulerContext
 from ..scheduling.policies import build_scheduler
 from ..traffic import PacketQueues, TrafficTrace
@@ -178,7 +178,11 @@ def run_simulation(
             relative_slot, vehicle, : len(attempted)
         ]
         success = uniforms >= float(current["per"][vehicle])
-        failed = [packet for packet, ok in zip(attempted, success, strict=True) if not ok]
+        failed = [
+            packet
+            for packet, ok in zip(attempted, success, strict=True)
+            if not ok
+        ]
         queues.requeue_failed(vehicle, failed)
         successful = [
             packet for packet, ok in zip(attempted, success, strict=True) if ok

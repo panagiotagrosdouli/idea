@@ -15,9 +15,8 @@ class TorchCheckpointPredictor:
         try:
             import torch
         except ImportError as exc:  # pragma: no cover
-            raise ImportError(
-                "Install the ML extra with: pip install -e '.[ml]'"
-            ) from exc
+            message = "Install the ML extra with: pip install -e '.[ml]'"
+            raise ImportError(message) from exc
         from .torch_model import GRUTrajectoryPredictor
 
         self._torch = torch
@@ -38,9 +37,12 @@ class TorchCheckpointPredictor:
     ) -> NDArray[np.float64]:
         del dt_s
         if horizon_steps != self.horizon_steps:
-            raise ValueError(
+            message = (
                 f"Checkpoint horizon is {self.horizon_steps}, "
                 f"requested {horizon_steps}."
+            )
+            raise ValueError(
+                message
             )
         history = np.asarray(history_xy, dtype=np.float32)
         if history.ndim != 3 or history.shape[-1] != 2:

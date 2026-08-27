@@ -162,9 +162,9 @@ def train_from_npz(
             target = future_batch.to(device) * scale_tensor + center_tensor
             predictions.append(predicted.cpu().numpy())
             targets.append(target.cpu().numpy())
-    prediction_array = np.concatenate(predictions)
-    target_array = np.concatenate(targets)
-    error = np.linalg.norm(prediction_array - target_array, axis=-1)
+    error = np.linalg.norm(
+        np.concatenate(predictions) - np.concatenate(targets), axis=-1
+    )
     result = TrainingResult(
         checkpoint=str(checkpoint),
         best_epoch=best_epoch,

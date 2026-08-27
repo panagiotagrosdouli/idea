@@ -9,7 +9,6 @@ from pathlib import Path
 import numpy
 import scipy
 
-
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "artifacts" / "reproducibility_manifest.json"
 INCLUDED_ROOTS = ("src", "tests", "scripts", "configs", "docs", "data/example")
@@ -62,4 +61,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

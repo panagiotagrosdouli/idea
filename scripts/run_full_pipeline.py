@@ -5,7 +5,6 @@ from pathlib import Path
 
 from predictive_pc_fmcw.cli import main
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="configs/default.json")
@@ -25,4 +24,3 @@ if __name__ == "__main__":
             ]
         )
     )
-

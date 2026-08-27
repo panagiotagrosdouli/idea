@@ -11,7 +11,6 @@ from typing import Any
 from .benchmark import run_synthetic_benchmark
 from .config import ExperimentConfig
 
-
 MATRIX_SCHEDULERS = (
     "reactive_greedy",
     "cv_predictive",
@@ -78,7 +77,9 @@ def run_experiment_matrix(
     return rows
 
 
-def write_matrix(rows: list[dict[str, object]], output_dir: str | Path) -> dict[str, Path]:
+def write_matrix(
+    rows: list[dict[str, object]], output_dir: str | Path
+) -> dict[str, Path]:
     if not rows:
         raise ValueError("No experiment-matrix rows to write.")
     output = Path(output_dir)
