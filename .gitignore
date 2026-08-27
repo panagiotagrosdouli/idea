@@ -1,0 +1,36 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+.venv/
+venv/
+dist/
+build/
+pip-build-env-*/
+pip-ephem-wheel-cache-*/
+pip-modern-metadata-*/
+tmp*/
+results/*
+!results/.gitkeep
+data/raw/
+data/cache/
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+# Supplied papers, reports and the large Assignment-1 notebook are retained
+# outside this public repository. Their canonical links are documented under
+# reference/. The implementation and all reproducible summaries remain here.
+reference/**/*.pdf
+reference/**/*.ipynb
+
+# Large raw experiment tables and rendered figures are deterministic build
+# products. Compact summaries/manifests are versioned; `make reproduce`
+# regenerates the complete set locally.
+artifacts/**/*.png
+artifacts/experiment_matrix/experiment_matrix_results.json
+artifacts/experiment_matrix/experiment_matrix_results.csv
+artifacts/horizon_ablation/horizon_ablation.json
+.DS_Store

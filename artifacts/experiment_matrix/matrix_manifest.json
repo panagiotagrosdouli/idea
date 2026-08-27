@@ -1,0 +1,39 @@
+{
+  "rows": 3600,
+  "schedulers": [
+    "cv_predictive",
+    "link_lifetime",
+    "oracle",
+    "predictive_utility",
+    "reactive_greedy"
+  ],
+  "horizons": [
+    3,
+    5,
+    10,
+    20
+  ],
+  "vehicles": [
+    3,
+    5,
+    10
+  ],
+  "offered_load": [
+    0.35,
+    0.55,
+    0.75,
+    0.9
+  ],
+  "slot_duration_s": [
+    0.05,
+    0.1,
+    0.2
+  ],
+  "seeds": [
+    20260827,
+    20260828,
+    20260829,
+    20260830,
+    20260831
+  ]
+}

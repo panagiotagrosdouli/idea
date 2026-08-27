@@ -1,0 +1,185 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+
+import numpy as np
+from numpy.typing import NDArray
+
+from ..config import SchedulerConfig
+from .base import (
+    SchedulerContext,
+    SchedulerDecision,
+    choose_best,
+    eligible_mask,
+)
+
+
+@dataclass
+class RandomScheduler:
+    seed: int
+    name: str = "random"
+    forecast_mode: str = "reactive"
+    _rng: np.random.Generator = field(init=False, repr=False)
+
+    def __post_init__(self) -> None:
+        self._rng = np.random.default_rng(self.seed)
+
+    def select(self, context: SchedulerContext) -> SchedulerDecision:
+        eligible = np.flatnonzero(eligible_mask(context))
+        scores = np.full(context.vehicles, -np.inf)
+        if eligible.size == 0:
+            return SchedulerDecision(None, scores, self.name)
+        scores[eligible] = self._rng.random(eligible.size)
+        vehicle = int(eligible[np.argmax(scores[eligible])])
+        return SchedulerDecision(vehicle, scores, self.name)
+
+
+@dataclass
+class RoundRobinScheduler:
+    name: str = "round_robin"
+    forecast_mode: str = "reactive"
+    _next: int = 0
+
+    def select(self, context: SchedulerContext) -> SchedulerDecision:
+        scores = np.full(context.vehicles, -np.inf)
+        for offset in range(context.vehicles):
+            vehicle = (self._next + offset) % context.vehicles
+            if context.queue_lengths[vehicle] > 0:
+                self._next = (vehicle + 1) % context.vehicles
+                scores[vehicle] = 1.0
+                return SchedulerDecision(vehicle, scores, self.name)
+        return SchedulerDecision(None, scores, self.name)
+
+
+@dataclass(frozen=True)
+class ReactiveGreedyScheduler:
+    name: str = "reactive_greedy"
+    forecast_mode: str = "reactive"
+
+    def select(self, context: SchedulerContext) -> SchedulerDecision:
+        queue_scale = context.queue_lengths / max(1, int(context.queue_lengths.max()))
+        scores = (
+            context.current_goodput_bps / context.data_rate_bps
+        ) * (0.25 + 0.75 * queue_scale)
+        scores -= context.current_outage.astype(float)
+        return choose_best(scores, eligible_mask(context), self.name)
+
+
+@dataclass(frozen=True)
+class ProportionalFairScheduler:
+    name: str = "proportional_fair"
+    forecast_mode: str = "reactive"
+
+    def select(self, context: SchedulerContext) -> SchedulerDecision:
+        mean_delivered = max(float(context.delivered_bits.mean()), 1.0)
+        normalized_history = context.delivered_bits / mean_delivered
+        scores = (context.current_goodput_bps / context.data_rate_bps) / (
+            0.1 + normalized_history
+        )
+        scores -= context.current_outage.astype(float)
+        return choose_best(scores, eligible_mask(context), self.name)
+
+
+@dataclass(frozen=True)
+class PredictiveUtilityScheduler:
+    config: SchedulerConfig
+    name: str = "predictive_utility"
+    forecast_mode: str = "constant_acceleration"
+
+    def _score(self, context: SchedulerContext) -> NDArray[np.float64]:
+        horizon = context.predicted_goodput_bps.shape[1]
+        discount = context.discount ** np.arange(horizon, dtype=np.float64)
+        discount /= discount.sum()
+        normalized_goodput = context.predicted_goodput_bps / context.data_rate_bps
+        expected_goodput = normalized_goodput @ discount
+        outage_risk = context.predicted_outage.astype(float) @ discount
+        queue = context.queue_lengths / max(1, int(context.queue_lengths.max()))
+        current_goodput = context.current_goodput_bps / context.data_rate_bps
+        opportunity_loss = np.maximum(
+            0.0, current_goodput - normalized_goodput[:, -1]
+        ) * queue
+        deadline = np.where(
+            np.isfinite(context.time_to_deadline),
+            1.0 / (1.0 + context.time_to_deadline),
+            0.0,
+        )
+        mean_delivered = max(float(context.delivered_bits.mean()), 1.0)
+        fairness = 1.0 / (0.25 + context.delivered_bits / mean_delivered)
+        scores = (
+            self.config.goodput_weight * expected_goodput
+            - self.config.outage_weight * outage_risk
+            - self.config.outage_weight * context.current_outage.astype(float)
+            + self.config.opportunity_weight * opportunity_loss
+            + self.config.queue_weight * queue
+            + self.config.deadline_weight * deadline
+            + self.config.fairness_weight * fairness
+        )
+        if context.previous_vehicle is not None:
+            switching = np.ones(context.vehicles, dtype=np.float64)
+            switching[context.previous_vehicle] = 0.0
+            scores -= self.config.switching_weight * switching
+        return scores
+
+    def select(self, context: SchedulerContext) -> SchedulerDecision:
+        return choose_best(self._score(context), eligible_mask(context), self.name)
+
+
+@dataclass(frozen=True)
+class CVPredictiveScheduler(PredictiveUtilityScheduler):
+    name: str = "cv_predictive"
+    forecast_mode: str = "constant_velocity"
+
+
+@dataclass(frozen=True)
+class LearnedPredictiveScheduler(PredictiveUtilityScheduler):
+    name: str = "learned_predictive"
+    forecast_mode: str = "learned"
+
+
+@dataclass(frozen=True)
+class LinkLifetimeScheduler(PredictiveUtilityScheduler):
+    name: str = "link_lifetime"
+    forecast_mode: str = "constant_acceleration"
+
+    def _score(self, context: SchedulerContext) -> NDArray[np.float64]:
+        scores = super()._score(context)
+        queue = context.queue_lengths / max(1, int(context.queue_lengths.max()))
+        horizon = context.predicted_goodput_bps.shape[1]
+        closing_pressure = np.clip(
+            (horizon - context.predicted_lifetime_steps) / max(1, horizon), 0.0, 1.0
+        )
+        currently_usable = (~context.current_outage).astype(float)
+        lifetime_urgency = (
+            closing_pressure * queue * currently_usable
+            + queue / (1.0 + context.predicted_lifetime_steps)
+        )
+        return scores + self.config.lifetime_weight * lifetime_urgency
+
+
+@dataclass(frozen=True)
+class OracleScheduler(PredictiveUtilityScheduler):
+    name: str = "oracle"
+    forecast_mode: str = "oracle"
+
+    def select(self, context: SchedulerContext) -> SchedulerDecision:
+        if not context.oracle_forecast:
+            raise ValueError("Oracle scheduler requires an oracle forecast context.")
+        return super().select(context)
+
+
+def build_scheduler(name: str, config: SchedulerConfig, seed: int):
+    policies = {
+        "random": lambda: RandomScheduler(seed),
+        "round_robin": RoundRobinScheduler,
+        "reactive_greedy": ReactiveGreedyScheduler,
+        "proportional_fair": ProportionalFairScheduler,
+        "cv_predictive": lambda: CVPredictiveScheduler(config),
+        "learned_predictive": lambda: LearnedPredictiveScheduler(config),
+        "predictive_utility": lambda: PredictiveUtilityScheduler(config),
+        "link_lifetime": lambda: LinkLifetimeScheduler(config),
+        "oracle": lambda: OracleScheduler(config),
+    }
+    try:
+        return policies[name]()
+    except KeyError as exc:
+        raise ValueError(f"Unknown scheduler: {name}") from exc
