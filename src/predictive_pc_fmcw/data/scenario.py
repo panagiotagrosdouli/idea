@@ -29,7 +29,9 @@ class MotionScenario:
                 "vehicle_positions_xy must have shape (time, vehicles, 2)."
             )
         if vehicles.shape[2] != 2 or vehicles.shape[1] != len(self.actor_ids):
-            raise ValueError("Vehicle positions and actor identifiers are inconsistent.")
+            raise ValueError(
+                "Vehicle positions and actor identifiers are inconsistent."
+            )
         if not 2 <= self.start_index < timestamps.size:
             raise ValueError("start_index must leave history and evaluation samples.")
         if np.any(np.diff(timestamps) <= 0):
@@ -51,4 +53,3 @@ class MotionScenario:
         return np.concatenate(
             [self.ego_positions_xy[:, None, :], self.vehicle_positions_xy], axis=1
         )
-
