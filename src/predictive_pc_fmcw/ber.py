@@ -76,7 +76,7 @@ class DPSKLookupTable:
         self.ber = np.clip(self.ber[order], 1e-15, 0.5)
 
     @classmethod
-    def from_csv(cls, path: str | Path) -> "DPSKLookupTable":
+    def from_csv(cls, path: str | Path) -> DPSKLookupTable:
         with Path(path).open("r", encoding="utf-8") as handle:
             rows = list(csv.DictReader(handle))
         return cls(
@@ -94,4 +94,3 @@ class DPSKLookupTable:
             right=np.log10(self.ber[-1]),
         )
         return 10**log_ber
-

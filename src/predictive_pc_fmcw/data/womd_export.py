@@ -47,9 +47,13 @@ def load_womd_motion_scenarios(
         if len(lengths) != 1 or next(iter(lengths))[1:] != (2,):
             raise ValueError(f"Inconsistent trajectories in scenario {scenario_id}.")
         history_steps = len(actors[0]["past"])
-        current = np.stack([trajectory[history_steps - 1] for trajectory in trajectories])
+        current = np.stack(
+            [trajectory[history_steps - 1] for trajectory in trajectories]
+        )
         ego_index = _medoid_index(current)
-        candidate_indices = [index for index in range(len(actors)) if index != ego_index]
+        candidate_indices = [
+            index for index in range(len(actors)) if index != ego_index
+        ]
         candidate_indices.sort(
             key=lambda index: float(np.linalg.norm(current[index] - current[ego_index]))
         )
@@ -74,4 +78,3 @@ def load_womd_motion_scenarios(
             )
         )
     return scenarios
-
