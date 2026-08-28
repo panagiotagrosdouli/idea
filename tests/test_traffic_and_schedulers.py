@@ -16,6 +16,17 @@ class TrafficAndSchedulerTest(unittest.TestCase):
         np.testing.assert_array_equal(first.success_uniforms, second.success_uniforms)
         self.assertEqual(first.deadlines, second.deadlines)
 
+    def test_periodic_and_markov_traffic_are_reproducible(self):
+        for model in ("periodic", "markov_modulated"):
+            config = TrafficConfig(model=model, periodic_interval_slots=4)
+            first = generate_traffic_trace(14, 40, 3, 20, config)
+            second = generate_traffic_trace(14, 40, 3, 20, config)
+            np.testing.assert_array_equal(first.arrivals, second.arrivals)
+            self.assertGreater(int(first.arrivals.sum()), 0)
+            if model == "periodic":
+                active_slots = np.flatnonzero(first.arrivals.sum(axis=1))
+                self.assertTrue(np.all(active_slots % 4 == 0))
+
     def test_all_policies_choose_at_most_one_eligible_vehicle(self):
         context = SchedulerContext(
             slot=0,
@@ -38,6 +49,8 @@ class TrafficAndSchedulerTest(unittest.TestCase):
             "reactive_greedy",
             "proportional_fair",
             "cv_predictive",
+            "kalman_predictive",
+            "imm_predictive",
             "predictive_utility",
             "link_lifetime",
             "oracle",
@@ -49,4 +62,3 @@ class TrafficAndSchedulerTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

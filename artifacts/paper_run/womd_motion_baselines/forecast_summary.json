@@ -1,0 +1,62 @@
+{
+  "constant_acceleration": {
+    "samples": 150,
+    "ade_m": 0.19613446685197058,
+    "fde_m": 0.44964644739194626,
+    "range_mae_m": 0.15985785026313104,
+    "snr_mae_db": 22.638734153089878,
+    "outage_f1": 0.8798941997688129,
+    "outage_auroc": 0.5070802005012531,
+    "link_lifetime_error_steps": 0.5066666666666667
+  },
+  "constant_velocity": {
+    "samples": 150,
+    "ade_m": 0.09730219882266333,
+    "fde_m": 0.19913599828527012,
+    "range_mae_m": 0.08656614945484777,
+    "snr_mae_db": 23.09285966846979,
+    "outage_f1": 0.8739548058294188,
+    "outage_auroc": 0.4555451127819549,
+    "link_lifetime_error_steps": 0.56
+  },
+  "imm": {
+    "samples": 150,
+    "ade_m": 0.21240609904033173,
+    "fde_m": 0.3718349066088812,
+    "range_mae_m": 0.19077289388995902,
+    "snr_mae_db": 22.27554580267595,
+    "outage_f1": 0.8798941997688129,
+    "outage_auroc": 0.49041353383458647,
+    "link_lifetime_error_steps": 0.54
+  },
+  "kalman_cv": {
+    "samples": 150,
+    "ade_m": 0.32761332944202676,
+    "fde_m": 0.5119742170762498,
+    "range_mae_m": 0.3114782879073399,
+    "snr_mae_db": 19.28677825765059,
+    "outage_f1": 0.8904198222944353,
+    "outage_auroc": 0.5753320802005012,
+    "link_lifetime_error_steps": 0.26
+  },
+  "last_position": {
+    "samples": 150,
+    "ade_m": 1.9027028094543088,
+    "fde_m": 3.1937027476402537,
+    "range_mae_m": 1.7944632638754472,
+    "snr_mae_db": 45.6781240129249,
+    "outage_f1": 0.7514265919265919,
+    "outage_auroc": 0.5,
+    "link_lifetime_error_steps": 1.1666666666666667
+  },
+  "oracle": {
+    "samples": 150,
+    "ade_m": 0.0,
+    "fde_m": 0.0,
+    "range_mae_m": 0.0,
+    "snr_mae_db": 0.0,
+    "outage_f1": 1.0,
+    "outage_auroc": 1.0,
+    "link_lifetime_error_steps": 0.0
+  }
+}

@@ -34,7 +34,19 @@ def generate_traffic_trace(
     rng = np.random.default_rng(seed)
     mean_total = config.offered_load * nominal_capacity_packets
     weights = rng.dirichlet(np.full(vehicles, 2.0))
-    arrivals = rng.poisson(mean_total * weights[None, :], size=(slots, vehicles))
+    if config.model == "poisson":
+        arrivals = rng.poisson(
+            mean_total * weights[None, :], size=(slots, vehicles)
+        )
+    elif config.model == "periodic":
+        arrivals = np.zeros((slots, vehicles), dtype=np.int64)
+        interval = config.periodic_interval_slots
+        for slot in range(0, slots, interval):
+            arrivals[slot] = rng.poisson(mean_total * interval * weights)
+    else:
+        arrivals = _markov_modulated_arrivals(
+            rng, slots, mean_total, weights, config
+        )
     deadline_rows: list[tuple[tuple[int, ...], ...]] = []
     for slot in range(slots):
         vehicle_rows: list[tuple[int, ...]] = []
@@ -56,6 +68,43 @@ def generate_traffic_trace(
         deadlines=tuple(deadline_rows),
         success_uniforms=success_uniforms,
     )
+
+
+def _markov_modulated_arrivals(
+    rng: np.random.Generator,
+    slots: int,
+    mean_total: float,
+    weights: NDArray[np.float64],
+    config: TrafficConfig,
+) -> NDArray[np.int64]:
+    vehicles = weights.size
+    arrivals = np.zeros((slots, vehicles), dtype=np.int64)
+    denominator = config.markov_low_to_high + config.markov_high_to_low
+    high_probability = (
+        config.markov_low_to_high / denominator if denominator > 0 else 0.0
+    )
+    mean_scale = (
+        (1 - high_probability) * config.markov_low_rate_scale
+        + high_probability * config.markov_high_rate_scale
+    )
+    normalization = max(mean_scale, 1e-12)
+    high_state = rng.random(vehicles) < high_probability
+    for slot in range(slots):
+        leave_high = high_state & (
+            rng.random(vehicles) < config.markov_high_to_low
+        )
+        enter_high = (~high_state) & (
+            rng.random(vehicles) < config.markov_low_to_high
+        )
+        high_state = (high_state & ~leave_high) | enter_high
+        scale = np.where(
+            high_state,
+            config.markov_high_rate_scale,
+            config.markov_low_rate_scale,
+        )
+        rate = mean_total * weights * scale / normalization
+        arrivals[slot] = rng.poisson(rate)
+    return arrivals
 
 
 class PacketQueues:
@@ -117,4 +166,3 @@ class PacketQueues:
 
     def remaining(self) -> NDArray[np.int64]:
         return self.lengths()
-

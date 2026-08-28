@@ -4,6 +4,7 @@ from pathlib import Path
 
 import numpy as np
 
+from .manifest import deterministic_development_split
 from .womd_export import load_womd_motion_scenarios
 
 
@@ -29,6 +30,17 @@ def build_relative_motion_training_npz(
             actor_ids.append(actor_id)
     if not histories:
         raise ValueError("No training samples were produced.")
+    unique_scenarios = sorted(set(scenario_ids))
+    split_by_scenario = {
+        scenario_id: deterministic_development_split(scenario_id)
+        for scenario_id in unique_scenarios
+    }
+    if len(unique_scenarios) > 1:
+        if "development" not in split_by_scenario.values():
+            split_by_scenario[unique_scenarios[-1]] = "development"
+        if "training" not in split_by_scenario.values():
+            split_by_scenario[unique_scenarios[0]] = "training"
+    splits = [split_by_scenario[scenario_id] for scenario_id in scenario_ids]
     destination = Path(output_path)
     destination.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(
@@ -37,7 +49,7 @@ def build_relative_motion_training_npz(
         future_xy=np.stack(futures),
         scenario_id=np.asarray(scenario_ids),
         actor_id=np.asarray(actor_ids),
+        split=np.asarray(splits),
         source=np.asarray("real_WOMD_motion_proxy_ego_geometry"),
     )
     return destination
-

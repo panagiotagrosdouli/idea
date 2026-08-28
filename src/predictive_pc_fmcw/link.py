@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
+from .ber import DPSKLookupTable
 from .config import LinkConfig
 
 
@@ -30,6 +31,11 @@ class LinkModel:
 
     def __init__(self, config: LinkConfig):
         self.config = config
+        self._ber_lut = (
+            DPSKLookupTable.from_csv(config.ber_lut_path)
+            if config.ber_source == "lut" and config.ber_lut_path
+            else None
+        )
         self._reference_gain = float(
             self._relative_gain(config.reference_distance_m, 0.0)
         )
@@ -46,11 +52,18 @@ class LinkModel:
         fov_half = np.deg2rad(self.config.field_of_view_deg / 2)
         footprint_area = np.pi * np.maximum(distance * np.tan(divergence), 0.05) ** 2
         geometric = 1.0 / footprint_area
-        atmospheric = np.exp(
-            -self.config.atmospheric_attenuation_per_m * distance
-        )
-        pointing = np.exp(-0.5 * (bearing / sigma) ** 2)
-        inside_fov = np.abs(bearing) <= fov_half
+        if self.config.channel_mode == "range_only":
+            atmospheric = np.ones_like(distance)
+            pointing = np.ones_like(bearing)
+            inside_fov = np.ones_like(bearing, dtype=bool)
+        else:
+            pointing = np.exp(-0.5 * (bearing / sigma) ** 2)
+            inside_fov = np.abs(bearing) <= fov_half
+            atmospheric = (
+                np.exp(-self.config.atmospheric_attenuation_per_m * distance)
+                if self.config.channel_mode == "full"
+                else np.ones_like(distance)
+            )
         return geometric * atmospheric * pointing * inside_fov
 
     def received_power_w(
@@ -85,7 +98,11 @@ class LinkModel:
         bearing = np.asarray(bearing_rad, dtype=np.float64)
         snr_linear = self.snr_linear(distance, bearing)
         snr_db = 10 * np.log10(np.maximum(snr_linear, 1e-15))
-        ber = self.dbpsk_ber(snr_linear)
+        ber = (
+            self._ber_lut(snr_db)
+            if self._ber_lut is not None
+            else self.dbpsk_ber(snr_linear)
+        )
         per = self.packet_error_rate(ber)
         goodput = self.config.data_rate_bps * (1 - per)
         outage = ber > self.config.outage_ber_threshold
@@ -131,4 +148,3 @@ class LinkModel:
         first = np.argmax(outage, axis=1)
         has_outage = np.any(outage, axis=1)
         return np.where(has_outage, first, horizon).astype(np.int64)
-

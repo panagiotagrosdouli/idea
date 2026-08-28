@@ -131,6 +131,18 @@ class CVPredictiveScheduler(PredictiveUtilityScheduler):
 
 
 @dataclass(frozen=True)
+class KalmanPredictiveScheduler(PredictiveUtilityScheduler):
+    name: str = "kalman_predictive"
+    forecast_mode: str = "kalman_cv"
+
+
+@dataclass(frozen=True)
+class IMMPredictiveScheduler(PredictiveUtilityScheduler):
+    name: str = "imm_predictive"
+    forecast_mode: str = "imm"
+
+
+@dataclass(frozen=True)
 class LearnedPredictiveScheduler(PredictiveUtilityScheduler):
     name: str = "learned_predictive"
     forecast_mode: str = "learned"
@@ -157,7 +169,9 @@ class LinkLifetimeScheduler(PredictiveUtilityScheduler):
 
 
 @dataclass(frozen=True)
-class OracleScheduler(PredictiveUtilityScheduler):
+class OracleScheduler(LinkLifetimeScheduler):
+    """Perfect-future upper bound with the proposed lifetime-aware objective."""
+
     name: str = "oracle"
     forecast_mode: str = "oracle"
 
@@ -174,6 +188,8 @@ def build_scheduler(name: str, config: SchedulerConfig, seed: int):
         "reactive_greedy": ReactiveGreedyScheduler,
         "proportional_fair": ProportionalFairScheduler,
         "cv_predictive": lambda: CVPredictiveScheduler(config),
+        "kalman_predictive": lambda: KalmanPredictiveScheduler(config),
+        "imm_predictive": lambda: IMMPredictiveScheduler(config),
         "learned_predictive": lambda: LearnedPredictiveScheduler(config),
         "predictive_utility": lambda: PredictiveUtilityScheduler(config),
         "link_lifetime": lambda: LinkLifetimeScheduler(config),

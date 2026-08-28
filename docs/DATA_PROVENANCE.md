@@ -25,6 +25,12 @@ The adapter therefore selects the current-position medoid as a deterministic
 proxy ego. Every resulting artifact records the source string
 `real_WOMD_motion_proxy_ego_geometry`.
 
+`pcfmcw dataset-manifest` records the input SHA256, record/scenario counts,
+declared release, license boundary and deterministic SHA256 scenario split.
+The supplied compact file has 56 actor records across three scenarios. This
+manifest must be regenerated with the exact official release label when full
+WOMD data are supplied.
+
 ## Large upstream results
 
 The supplied Part-B archive reports later Stage-4 Gaussian/GMM results, but the
@@ -46,4 +52,3 @@ All link, BER, PER and packet-delivery outputs are simulated. Absolute values
 depend on the declared reference SNR, packet size, field of view, offered load
 and resource fraction in `configs/default.json`. Sensitivity sweeps must precede
 any publication claim.
-

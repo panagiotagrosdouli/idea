@@ -13,6 +13,12 @@ The future-mutation gate in `validation.py` changes every future ground-truth
 position and verifies that a causal forecast remains bit-identical. Only the
 oracle-information policy reads the mutated future.
 
+The frozen motion baselines are Last Position, Constant Velocity, a position-
+only CV Kalman filter, a causal CV/CA IMM approximation, Constant Acceleration
+and Oracle. They are evaluated with ADE and FDE. Derived communication accuracy
+is evaluated separately with range MAE, SNR MAE, outage F1/AUROC and absolute
+link-lifetime error.
+
 ## 2. Relative geometry
 
 The forecast is mapped to ego-relative distance and bearing:
@@ -77,8 +83,9 @@ detection; it is kept separate from the analytical expression for validation.
 
 ## 4. Traffic and packet delivery
 
-Each vehicle has an independent FIFO queue. Poisson arrivals are generated from
-the normalized offered load. Every packet has an absolute deadline. For all
+Each vehicle has an independent FIFO queue. Poisson, periodic and
+Markov-modulated arrivals can be generated from the normalized offered load.
+Every packet has an absolute deadline. For all
 schedulers in the same episode, arrivals, deadlines and per-attempt uniform
 random variables are identical. This common-random-number design prevents a
 policy from receiving an easier traffic or channel realization.
@@ -93,9 +100,11 @@ the queue; successful packets contribute their payload bits and latency.
 - Reactive Greedy: current goodput and queue only.
 - Proportional Fair: current rate divided by past service.
 - CV Predictive: finite-horizon link estimate from constant velocity.
+- Kalman Predictive: position-only filtered constant-velocity forecast.
+- IMM Predictive: maneuver-aware blend of CV and bounded acceleration.
 - Predictive Utility: constant-acceleration forecast and finite-horizon utility.
 - Link-Lifetime: predictive utility plus proactive drain pressure.
-- Oracle: perfect future positions used by the same utility heuristic.
+- Oracle: perfect future positions used by the same lifetime-aware objective.
 
 The predictive score combines discounted expected goodput, predicted outage,
 queue size, deadline urgency, fairness, switching cost and the opportunity loss
@@ -127,8 +136,17 @@ used for the train/validation split.
 ## 7. Evaluation
 
 Primary metrics are successfully delivered goodput, PDR, scheduled outage,
-availability outage, mean/P95 latency, deadline-miss ratio and Jain fairness.
-Results are paired by scenario and seed. The summary reports nonparametric
-bootstrap confidence intervals and paired differences relative to Reactive
-Greedy.
+availability outage, mean/P95 latency, deadline-miss ratio, delivered-before-
+expiry ratio, packets left undelivered at first disconnection and Jain
+fairness. Results are paired by scenario and seed. Reports include bootstrap
+confidence intervals, paired t-tests, Wilcoxon signed-rank tests, win fractions
+and Cohen's paired effect size relative to Reactive Greedy.
 
+## 8. Channel and robustness ablations
+
+The channel mapper has three explicit fidelity levels: inverse-square range
+only; range plus pointing/FoV; and the full model with atmospheric attenuation.
+BER can come from the analytical DBPSK expression or the frozen Monte Carlo
+Part-A LUT. Separate sweeps inject causal history-measurement noise and future-
+forecast degradation. Realized transmissions always use the ground-truth
+trajectory-derived channel, never the predictor's own link estimate.

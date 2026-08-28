@@ -26,8 +26,23 @@ class SimulationTest(unittest.TestCase):
             self.assertLessEqual(result.metrics.packet_delivery_ratio, 1.0)
             self.assertGreaterEqual(result.metrics.jain_fairness, 0.0)
             self.assertLessEqual(result.metrics.jain_fairness, 1.0)
+            self.assertGreaterEqual(
+                result.metrics.delivered_before_expiry_ratio, 0.0
+            )
+            self.assertLessEqual(
+                result.metrics.delivered_before_expiry_ratio, 1.0
+            )
+            self.assertGreaterEqual(
+                result.metrics.undelivered_packets_at_disconnect, 0
+            )
+            accounted = (
+                result.metrics.delivered_packets
+                + result.metrics.deadline_dropped_packets
+                + result.metrics.overflow_dropped_packets
+                + result.metrics.remaining_packets
+            )
+            self.assertEqual(result.metrics.generated_packets, accounted)
 
 
 if __name__ == "__main__":
     unittest.main()
-

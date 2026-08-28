@@ -36,6 +36,8 @@ class SimulationMetrics:
     mean_latency_ms: float
     p95_latency_ms: float
     deadline_miss_ratio: float
+    delivered_before_expiry_ratio: float
+    undelivered_packets_at_disconnect: int
     jain_fairness: float
     switch_count: int
 

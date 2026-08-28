@@ -7,6 +7,7 @@ from pathlib import Path
 
 import numpy as np
 
+from .ablations import run_paper_ablations, write_ablation_artifacts
 from .benchmark import (
     run_horizon_ablation,
     run_scenario_benchmark,
@@ -15,9 +16,16 @@ from .benchmark import (
 )
 from .ber import simulate_dbpsk_ber, write_ber_lut
 from .config import load_config
+from .data.manifest import write_compact_womd_manifest
+from .data.synthetic import generate_synthetic_scenario
 from .data.training_export import build_relative_motion_training_npz
 from .data.womd_export import load_womd_motion_scenarios
 from .experiment_matrix import load_matrix, run_experiment_matrix, write_matrix
+from .forecast_evaluation import (
+    evaluate_motion_and_link_forecasts,
+    write_forecast_artifacts,
+)
+from .link import LinkModel
 from .validation import run_validation
 
 
@@ -86,6 +94,7 @@ def build_parser() -> argparse.ArgumentParser:
     benchmark.add_argument("--womd-export")
     benchmark.add_argument("--max-vehicles", type=int)
     benchmark.add_argument("--checkpoint")
+    benchmark.add_argument("--schedulers", nargs="+")
 
     ablation = subparsers.add_parser("ablation", help="Run horizon ablation")
     ablation.add_argument("--config", default="configs/default.json")
@@ -121,6 +130,34 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Use the first two values of each axis for a fast integration run.",
     )
+
+    motion = subparsers.add_parser(
+        "motion-eval", help="Evaluate causal motion and derived-link forecasts"
+    )
+    motion.add_argument("--config", default="configs/default.json")
+    motion.add_argument("--output", default="results/motion_eval")
+    motion.add_argument("--womd-export")
+    motion.add_argument("--max-vehicles", type=int)
+    motion.add_argument("--anchor-stride", type=int, default=5)
+
+    manifest = subparsers.add_parser(
+        "dataset-manifest", help="Freeze compact WOMD provenance and split"
+    )
+    manifest.add_argument("womd_export")
+    manifest.add_argument("output")
+    manifest.add_argument(
+        "--release", default="unknown-supplied-compact-export"
+    )
+
+    paper_ablation = subparsers.add_parser(
+        "paper-ablation", help="Run the scripted paper ablation suite"
+    )
+    paper_ablation.add_argument("--config", default="configs/default.json")
+    paper_ablation.add_argument(
+        "--ber-lut", default="artifacts/ber/dbpsk_ber_lut.csv"
+    )
+    paper_ablation.add_argument("--output", default="results/paper_ablations")
+    paper_ablation.add_argument("--quick", action="store_true")
     return parser
 
 
@@ -140,7 +177,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "benchmark":
         config = load_config(args.config)
         learned_predictor = None
-        scheduler_names = config.benchmark.schedulers
+        scheduler_names = tuple(args.schedulers or config.benchmark.schedulers)
         if args.checkpoint:
             from .learning.inference import TorchCheckpointPredictor
 
@@ -213,6 +250,44 @@ def main(argv: list[str] | None = None) -> int:
         )
         printable = {key: str(value) for key, value in artifacts.items()}
         print(json.dumps(printable, indent=2))
+        return 0
+    if args.command == "motion-eval":
+        config = load_config(args.config)
+        if args.womd_export:
+            scenarios = load_womd_motion_scenarios(
+                args.womd_export, max_vehicles=args.max_vehicles
+            )
+        else:
+            scenarios = [
+                generate_synthetic_scenario(
+                    seed=config.seed + episode,
+                    slots=config.benchmark.slots,
+                    vehicles=config.benchmark.vehicles,
+                    dt_s=config.slot_duration_s,
+                )
+                for episode in range(config.benchmark.episodes)
+            ]
+        rows = evaluate_motion_and_link_forecasts(
+            scenarios,
+            LinkModel(config.link),
+            config.prediction_horizon_steps,
+            anchor_stride=args.anchor_stride,
+        )
+        artifacts = write_forecast_artifacts(rows, args.output)
+        print(json.dumps({key: str(value) for key, value in artifacts.items()}))
+        return 0
+    if args.command == "dataset-manifest":
+        path = write_compact_womd_manifest(
+            args.womd_export, args.output, release=args.release
+        )
+        print(path)
+        return 0
+    if args.command == "paper-ablation":
+        rows = run_paper_ablations(
+            load_config(args.config), args.ber_lut, quick=args.quick
+        )
+        artifacts = write_ablation_artifacts(rows, args.output)
+        print(json.dumps({key: str(value) for key, value in artifacts.items()}))
         return 0
     raise AssertionError("Unhandled command")
 

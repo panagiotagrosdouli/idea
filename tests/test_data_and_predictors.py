@@ -7,7 +7,13 @@ import numpy as np
 
 from predictive_pc_fmcw.data.synthetic import generate_synthetic_scenario
 from predictive_pc_fmcw.data.womd_export import load_womd_motion_scenarios
-from predictive_pc_fmcw.predictors import ConstantVelocityPredictor, forecast_scenario
+from predictive_pc_fmcw.predictors import (
+    ConstantVelocityPredictor,
+    InteractingMultipleModelPredictor,
+    KalmanConstantVelocityPredictor,
+    LastPositionPredictor,
+    forecast_scenario,
+)
 
 
 class DataAndPredictorTest(unittest.TestCase):
@@ -37,6 +43,39 @@ class DataAndPredictorTest(unittest.TestCase):
         )
         np.testing.assert_array_equal(first.vehicle_xy, second.vehicle_xy)
 
+    def test_paper_motion_baselines_follow_linear_motion(self):
+        history = np.asarray(
+            [[0.0, 1.0], [1.0, 1.0], [2.0, 1.0], [3.0, 1.0]]
+        )
+        last = LastPositionPredictor().predict(history, 3, 1.0)
+        cv = ConstantVelocityPredictor().predict(history, 3, 1.0)
+        kalman = KalmanConstantVelocityPredictor().predict(history, 3, 1.0)
+        imm = InteractingMultipleModelPredictor().predict(history, 3, 1.0)
+        np.testing.assert_allclose(last, [[3.0, 1.0]] * 3)
+        np.testing.assert_allclose(cv, [[4.0, 1.0], [5.0, 1.0], [6.0, 1.0]])
+        np.testing.assert_allclose(kalman, cv, atol=0.25)
+        np.testing.assert_allclose(imm, cv, atol=0.25)
+
+    def test_all_deployable_baselines_are_future_leakage_free(self):
+        scenario = generate_synthetic_scenario(12, slots=10, vehicles=2)
+        combined = scenario.combined_positions()
+        changed = combined.copy()
+        changed[scenario.start_index + 1 :] -= 9e4
+        predictors = (
+            LastPositionPredictor(),
+            ConstantVelocityPredictor(),
+            KalmanConstantVelocityPredictor(),
+            InteractingMultipleModelPredictor(),
+        )
+        for predictor in predictors:
+            first = forecast_scenario(
+                combined, scenario.start_index, 4, scenario.dt_s, predictor
+            )
+            second = forecast_scenario(
+                changed, scenario.start_index, 4, scenario.dt_s, predictor
+            )
+            np.testing.assert_array_equal(first.vehicle_xy, second.vehicle_xy)
+
     def test_womd_proxy_adapter(self):
         records = []
         for actor in range(3):
@@ -59,4 +98,3 @@ class DataAndPredictorTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
