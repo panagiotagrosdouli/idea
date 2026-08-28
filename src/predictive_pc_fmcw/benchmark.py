@@ -24,6 +24,8 @@ PRIMARY_METRICS = (
     "mean_latency_ms",
     "p95_latency_ms",
     "deadline_miss_ratio",
+    "delivered_before_expiry_ratio",
+    "undelivered_packets_at_disconnect",
     "jain_fairness",
 )
 

@@ -22,7 +22,20 @@ class MatrixTest(unittest.TestCase):
             artifacts = write_matrix(rows, directory)
             self.assertTrue(all(path.exists() for path in artifacts.values()))
 
+    def test_seconds_horizon_is_converted_per_slot_duration(self):
+        matrix = {
+            "prediction_horizon_seconds": [0.5],
+            "vehicles": [2],
+            "offered_load": [0.5],
+            "slot_duration_s": [0.1],
+            "seeds": [10],
+        }
+        rows = run_experiment_matrix(
+            ExperimentConfig(), matrix, schedulers=("reactive_greedy",)
+        )
+        self.assertEqual(rows[0]["prediction_horizon_steps"], 5)
+        self.assertAlmostEqual(rows[0]["prediction_horizon_s"], 0.5)
+
 
 if __name__ == "__main__":
     unittest.main()
-

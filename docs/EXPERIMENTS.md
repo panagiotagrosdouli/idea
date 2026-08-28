@@ -21,11 +21,12 @@ fast reproducibility configuration, not a frozen publication configuration.
 
 ## Required sweeps
 
-`configs/experiment_matrix.json` defines:
+`configs/paper_experiment_matrix.json` defines the union of the requested PDF
+sweeps:
 
-- horizon: 0.3, 0.5, 1.0 and 2.0 s at the 100 ms default;
+- horizon: 0.1, 0.3, 0.5, 1.0, 2.0 and 3.0 s;
 - connected receivers: 3, 5 and 10;
-- normalized offered load: 0.35, 0.55, 0.75 and 0.90;
+- normalized offered load: 0.3, 0.5, 0.7, 0.9, 1.0 and 1.1;
 - scheduler slot: 50, 100 and 200 ms;
 - five paired random seeds.
 
@@ -33,9 +34,22 @@ Use:
 
 ```bash
 pcfmcw matrix --config configs/default.json \
-  --matrix configs/experiment_matrix.json \
+  --matrix configs/paper_experiment_matrix.json \
   --output results/matrix
 ```
+
+The full Cartesian product contains 1,620 operating points and 11,340 policy
+rows for the seven main policies. `--quick` selects the first two values of
+each axis and is an integration check, not final paper evidence.
+
+## Scripted paper ablations
+
+`pcfmcw paper-ablation` evaluates: no prediction; CV/Kalman/IMM/CA prediction;
+perfect future; removal of fairness or link-lifetime urgency; range-only,
+range+pointing and full channels; analytical versus LUT BER; history noise at
+0.5/1/2 m; forecast degradation at 0.5/1/2 m; and periodic or
+Markov-modulated traffic. Every policy receives common traffic and packet-
+success randomness.
 
 ## Communication-aware ablation
 
@@ -50,6 +64,11 @@ Report ADE, FDE, log-SNR error, outage classification, goodput, PDR, latency and
 fairness. Checkpoint selection must use the internal validation split; the test
 set is evaluated once after weights are frozen.
 
+The compact supplied export is sufficient to exercise the training code, but
+it is not sufficient for a paper-quality learned-model result. Official WOMD
+train/validation shards and the intended frozen upstream checkpoint are needed
+before this ablation can be reported as final evidence.
+
 ## Acceptance rule
 
 The main hypothesis is supported only if paired confidence intervals show a
@@ -57,4 +76,3 @@ communication gain in the declared operating region. A gain in controlled
 motion but not in the compact WOMD proxy benchmark is evidence that more real
 scenes and correct ego geometry are required; it is not permission to generalize
 the controlled result.
-

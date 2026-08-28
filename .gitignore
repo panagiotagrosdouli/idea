@@ -33,4 +33,12 @@ artifacts/**/*.png
 artifacts/experiment_matrix/experiment_matrix_results.json
 artifacts/experiment_matrix/experiment_matrix_results.csv
 artifacts/horizon_ablation/horizon_ablation.json
+artifacts/paper_run/**/forecast_metrics.json
+artifacts/paper_run/**/forecast_metrics.csv
+artifacts/paper_run/**/episode_metrics.json
+artifacts/paper_run/**/episode_metrics.csv
+artifacts/paper_run/**/paper_ablation_rows.json
+artifacts/paper_run/**/paper_ablation_rows.csv
+artifacts/paper_run/**/experiment_matrix_results.json
+artifacts/paper_run/**/experiment_matrix_results.csv
 .DS_Store

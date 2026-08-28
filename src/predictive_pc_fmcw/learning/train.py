@@ -46,13 +46,19 @@ def train_from_npz(
     scenario_id = np.asarray(data["scenario_id"]).astype(str)
     if history.ndim != 3 or future.ndim != 3 or history.shape[-1] != 2:
         raise ValueError("Expected history_xy/future_xy with shape (samples, time, 2).")
-    unique = np.unique(scenario_id)
-    rng = np.random.default_rng(seed)
-    shuffled = unique.copy()
-    rng.shuffle(shuffled)
-    validation_count = max(1, int(np.ceil(0.15 * shuffled.size)))
-    validation_scenarios = set(shuffled[-validation_count:])
-    validation_mask = np.asarray([item in validation_scenarios for item in scenario_id])
+    if "split" in data:
+        split = np.asarray(data["split"]).astype(str)
+        validation_mask = split == "development"
+    else:
+        unique = np.unique(scenario_id)
+        rng = np.random.default_rng(seed)
+        shuffled = unique.copy()
+        rng.shuffle(shuffled)
+        validation_count = max(1, int(np.ceil(0.15 * shuffled.size)))
+        validation_scenarios = set(shuffled[-validation_count:])
+        validation_mask = np.asarray(
+            [item in validation_scenarios for item in scenario_id]
+        )
     train_mask = ~validation_mask
     if not np.any(train_mask) or not np.any(validation_mask):
         raise ValueError(

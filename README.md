@@ -23,21 +23,25 @@ decision problem.
 
 - Causal motion adapters for controlled trajectories and the supplied compact
   real-WOMD export.
-- Constant-velocity, constant-acceleration and optional learned GRU forecasts.
+- Last-position, constant-velocity, Kalman-CV, IMM, constant-acceleration and
+  perfect-future motion references, plus optional learned GRU forecasts.
 - Geometry-to-link mapping: range/bearing, atmospheric loss, pointing loss,
   reference-SNR calibration and fixed optical field of view.
 - Analytical DBPSK BER plus a reproducible Monte Carlo BER-vs-SNR LUT.
 - BER-to-PER and successfully delivered goodput, rather than nominal rate only.
-- Packet arrivals, bounded queues, deadlines, failures and common random traces.
-- Eight policies: Random, Round Robin, Reactive Greedy, Proportional Fair,
-  CV Predictive, Predictive Utility, Link-Lifetime Prefetch and perfect-future
-  Oracle-Information Utility.
+- Poisson, periodic and Markov-modulated arrivals, bounded queues, deadlines,
+  failures and common random traces.
+- Ten policies: Random, Round Robin, Reactive Greedy, Proportional Fair,
+  CV/Kalman/IMM Predictive, Predictive Utility, Link-Lifetime Prefetch and a
+  perfect-future lifetime-aware Oracle reference.
 - Communication-aware GRU objective:
   trajectory loss + log-SNR loss + differentiable outage loss.
 - Scenario-level train/validation splitting and checkpointed PyTorch training.
-- Paired bootstrap confidence intervals, experiment matrix, ablations, CSV,
-  JSON, LaTeX tables and publication-quality figures.
-- Scientific sanity gates and 19 automated tests.
+- ADE/FDE, range/SNR error, outage F1/AUROC, link-lifetime error, delivered
+  before expiry and undelivered-at-disconnection metrics.
+- Paired bootstrap confidence intervals, paired t-tests, Wilcoxon tests, effect
+  sizes, experiment matrices, ablations, CSV/JSON/LaTeX and paper figures.
+- Scientific sanity gates and 28 automated tests.
 
 ## Scientific scope
 
@@ -60,7 +64,7 @@ globally optimal offline packet schedule.
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -e ".[dev]"
+pip install -e ".[dev,paper]"
 ```
 
 For communication-aware GRU training:
@@ -69,7 +73,31 @@ For communication-aware GRU training:
 pip install -e ".[dev,ml]"
 ```
 
-## Reproduce the supplied artifacts
+## One-command reproduction
+
+Run the complete fast integration pipeline:
+
+```bash
+make paper-quick
+```
+
+It freezes the dataset manifest, creates the Part-A BER LUT, evaluates motion
+and link forecasts, benchmarks all schedulers on controlled and compact WOMD
+motion, executes traffic/channel/noise ablations, runs a paired matrix and
+generates LaTeX tables and figures under `artifacts/paper_run/`.
+It also builds the six-page manuscript draft at
+`output/pdf/predictive_pc_fmcw_paper_draft.pdf`.
+
+Run the declared full paper matrix with:
+
+```bash
+make paper-full
+```
+
+The full run is intentionally compute-intensive. It does not replace the need
+for the official WOMD shards and frozen trained checkpoints.
+
+## Individual reproduction commands
 
 Scientific sanity gates:
 
@@ -101,12 +129,17 @@ pcfmcw benchmark \
   --output artifacts/womd_proxy_benchmark
 ```
 
-Horizon ablation and full experiment matrix:
+Motion/link metrics, paper ablations and experiment matrix:
 
 ```bash
+pcfmcw motion-eval --config configs/default.json \
+  --output artifacts/motion_baselines
+pcfmcw paper-ablation --config configs/default.json \
+  --ber-lut artifacts/ber/dbpsk_ber_lut.csv \
+  --output artifacts/paper_ablations
 pcfmcw ablation --config configs/default.json --horizons 3 5 10 20
 pcfmcw matrix --config configs/default.json \
-  --matrix configs/experiment_matrix.json --output results/matrix
+  --matrix configs/paper_experiment_matrix.json --output results/matrix
 ```
 
 Use `--quick` with `pcfmcw matrix` for an integration run.
@@ -164,5 +197,6 @@ docs/                     methodology, provenance, results and execution notes
 
 See [Methodology](docs/METHODOLOGY.md),
 [Data provenance](docs/DATA_PROVENANCE.md),
-[Experiments](docs/EXPERIMENTS.md) and [Current results](docs/RESULTS.md).
-
+[Experiments](docs/EXPERIMENTS.md), [Current results](docs/RESULTS.md),
+[PDF traceability](docs/PDF_REQUIREMENTS_TRACEABILITY.md) and
+[Paper readiness](docs/PAPER_READINESS.md).

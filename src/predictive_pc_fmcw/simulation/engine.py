@@ -13,6 +13,8 @@ from ..metrics import SimulationMetrics, jains_fairness
 from ..predictors import (
     ConstantAccelerationPredictor,
     ConstantVelocityPredictor,
+    InteractingMultipleModelPredictor,
+    KalmanConstantVelocityPredictor,
     TrajectoryPredictor,
     forecast_scenario,
 )
@@ -46,27 +48,41 @@ def _link_forecast(
     mode: str,
     model: LinkModel,
     learned_predictor: TrajectoryPredictor | None = None,
+    history_noise_std_m: float = 0.0,
+    forecast_noise_std_m: float = 0.0,
+    noise_seed: int = 0,
 ) -> tuple[dict[str, NDArray], NDArray[np.int64], bool]:
     predictors = {
         "constant_velocity": ConstantVelocityPredictor(),
         "constant_acceleration": ConstantAccelerationPredictor(),
+        "kalman_cv": KalmanConstantVelocityPredictor(),
+        "imm": InteractingMultipleModelPredictor(),
         "reactive": None,
         "oracle": None,
         "learned": learned_predictor,
     }
     if mode not in predictors:
         raise ValueError(f"Unknown forecast mode: {mode}")
+    combined = scenario.combined_positions()
+    rng = np.random.default_rng(noise_seed)
+    if history_noise_std_m > 0 and mode not in {"reactive", "oracle"}:
+        combined = combined.copy()
+        combined[: time_index + 1] += rng.normal(
+            0.0,
+            history_noise_std_m,
+            size=combined[: time_index + 1].shape,
+        )
     if mode == "learned":
         if learned_predictor is None:
             raise ValueError("learned forecast mode requires a checkpoint predictor.")
         relative_history = (
-            scenario.vehicle_positions_xy[: time_index + 1]
-            - scenario.ego_positions_xy[: time_index + 1, None, :]
+            combined[: time_index + 1, 1:]
+            - combined[: time_index + 1, :1]
         ).transpose(1, 0, 2)
         relative_prediction = learned_predictor.predict(
             relative_history, horizon, scenario.dt_s
         )
-        ego_history = scenario.ego_positions_xy[: time_index + 1][None, :, :]
+        ego_history = combined[: time_index + 1, 0][None, :, :]
         ego_prediction = ConstantVelocityPredictor().predict(
             ego_history, horizon, scenario.dt_s
         )[0]
@@ -74,7 +90,7 @@ def _link_forecast(
         oracle_forecast = False
     else:
         bundle = forecast_scenario(
-            scenario.combined_positions(),
+            combined,
             time_index,
             horizon,
             scenario.dt_s,
@@ -84,6 +100,10 @@ def _link_forecast(
         ego_prediction = bundle.ego_xy
         vehicle_prediction = bundle.vehicle_xy
         oracle_forecast = bundle.oracle
+    if forecast_noise_std_m > 0 and mode not in {"reactive", "oracle"}:
+        vehicle_prediction = vehicle_prediction + rng.normal(
+            0.0, forecast_noise_std_m, size=vehicle_prediction.shape
+        )
     current_ego = scenario.ego_positions_xy[time_index]
     heading_path = np.concatenate([current_ego[None, :], ego_prediction], axis=0)
     headings = heading_from_positions(heading_path)[1:]
@@ -117,6 +137,7 @@ def run_simulation(
     actual_snr = np.empty((slots, vehicles), dtype=np.float64)
     actual_outage = np.empty((slots, vehicles), dtype=bool)
     delivered_by_vehicle = np.zeros(vehicles, dtype=np.int64)
+    delivered_by_slot_vehicle = np.zeros((slots, vehicles), dtype=np.int64)
     delivered_bits = np.zeros(vehicles, dtype=np.float64)
     failed_attempts = 0
     scheduled_outages = 0
@@ -146,6 +167,9 @@ def run_simulation(
             scheduler.forecast_mode,
             model,
             learned_predictor=learned_predictor,
+            history_noise_std_m=config.history_measurement_noise_std_m,
+            forecast_noise_std_m=config.forecast_position_noise_std_m,
+            noise_seed=seed + 10_000 * relative_slot,
         )
         context = SchedulerContext(
             slot=relative_slot,
@@ -189,6 +213,7 @@ def run_simulation(
         ]
         failed_attempts += len(failed)
         delivered_by_vehicle[vehicle] += len(successful)
+        delivered_by_slot_vehicle[relative_slot, vehicle] = len(successful)
         delivered_bits[vehicle] += len(successful) * config.link.packet_bits
         latencies.extend(
             (relative_slot - packet.arrival_slot + 1) * config.slot_duration_s
@@ -202,6 +227,21 @@ def run_simulation(
     remaining = int(queues.remaining().sum())
     duration = slots * config.slot_duration_s
     latency_ms = np.asarray(latencies, dtype=np.float64) * 1e3
+    has_disconnect = np.any(actual_outage, axis=0)
+    first_disconnect = np.argmax(actual_outage, axis=0)
+    first_disconnect = np.where(has_disconnect, first_disconnect, slots)
+    delivered_before_expiry = 0
+    eligible_before_expiry = 0
+    undelivered_at_disconnect = 0
+    for vehicle, disconnect in enumerate(first_disconnect):
+        delivered_before_expiry += int(
+            delivered_by_slot_vehicle[:disconnect, vehicle].sum()
+        )
+        eligible_before_expiry += int(
+            traffic.arrivals[:disconnect, vehicle].sum()
+        )
+        if disconnect < slots:
+            undelivered_at_disconnect += int(queue_series[disconnect, vehicle])
     metrics = SimulationMetrics(
         scheduler=scheduler_name,
         scenario_id=scenario.scenario_id,
@@ -224,6 +264,9 @@ def run_simulation(
         if latency_ms.size
         else float("nan"),
         deadline_miss_ratio=(deadline_dropped + overflow_dropped) / max(1, generated),
+        delivered_before_expiry_ratio=delivered_before_expiry
+        / max(1, eligible_before_expiry),
+        undelivered_packets_at_disconnect=undelivered_at_disconnect,
         jain_fairness=jains_fairness(delivered_by_vehicle),
         switch_count=switch_count,
     )

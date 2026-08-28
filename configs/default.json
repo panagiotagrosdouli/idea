@@ -43,6 +43,8 @@
       "reactive_greedy",
       "proportional_fair",
       "cv_predictive",
+      "kalman_predictive",
+      "imm_predictive",
       "predictive_utility",
       "link_lifetime",
       "oracle"

@@ -1,0 +1,23 @@
+{
+  "dataset": "Waymo Open Motion Dataset compact trajectory export",
+  "release": "unknown-supplied-compact-export",
+  "source_file": "womd_trajectories.json",
+  "source_sha256": "b56950c0cfb81563da55f8d358d3ce167a97b73920b406a182431e70e6d11484",
+  "license": "Waymo Dataset License Agreement for Non-Commercial Use",
+  "contains_official_sdc_index": false,
+  "contains_raw_lidar": false,
+  "record_count": 56,
+  "scenario_count": 3,
+  "development_fraction": 0.1,
+  "split_method": "SHA256(scenario_id), deterministic",
+  "split_by_scenario": {
+    "52dafd686fe77b21": "training",
+    "75ae707721eb23b4": "training",
+    "b85e1bd6cc8e74c0": "development"
+  },
+  "limitations": [
+    "The originating official WOMD release is absent from the export.",
+    "The compact records omit sdc_track_index and map context.",
+    "A proxy ego is used only for software and mechanism evaluation."
+  ]
+}
