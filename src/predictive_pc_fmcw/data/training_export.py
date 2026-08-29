@@ -4,7 +4,9 @@ from pathlib import Path
 
 import numpy as np
 
+from ..geometry import heading_from_positions
 from .manifest import deterministic_development_split
+from .scenario import MotionScenario
 from .womd_export import load_womd_motion_scenarios
 
 
@@ -13,12 +15,28 @@ def build_relative_motion_training_npz(
     output_path: str | Path,
     max_vehicles: int | None = None,
 ) -> Path:
+    scenarios = load_womd_motion_scenarios(womd_json, max_vehicles=max_vehicles)
+    return build_training_npz_from_scenarios(
+        scenarios,
+        output_path,
+        source="real_WOMD_motion_proxy_ego_geometry",
+    )
+
+
+def build_training_npz_from_scenarios(
+    scenarios: list[MotionScenario],
+    output_path: str | Path,
+    *,
+    source: str,
+) -> Path:
     histories: list[np.ndarray] = []
     futures: list[np.ndarray] = []
     scenario_ids: list[str] = []
     actor_ids: list[str] = []
-    for scenario in load_womd_motion_scenarios(womd_json, max_vehicles=max_vehicles):
+    future_ego_headings: list[np.ndarray] = []
+    for scenario in scenarios:
         split = scenario.start_index
+        ego_heading = heading_from_positions(scenario.ego_positions_xy)
         for vehicle, actor_id in enumerate(scenario.actor_ids):
             relative = (
                 scenario.vehicle_positions_xy[:, vehicle]
@@ -28,6 +46,7 @@ def build_relative_motion_training_npz(
             futures.append(relative[split:])
             scenario_ids.append(scenario.scenario_id)
             actor_ids.append(actor_id)
+            future_ego_headings.append(ego_heading[split:])
     if not histories:
         raise ValueError("No training samples were produced.")
     unique_scenarios = sorted(set(scenario_ids))
@@ -49,7 +68,9 @@ def build_relative_motion_training_npz(
         future_xy=np.stack(futures),
         scenario_id=np.asarray(scenario_ids),
         actor_id=np.asarray(actor_ids),
+        future_ego_heading_rad=np.stack(future_ego_headings),
         split=np.asarray(splits),
-        source=np.asarray("real_WOMD_motion_proxy_ego_geometry"),
+        source=np.asarray(source),
+        coordinate_frame=np.asarray("world_xy_with_explicit_ego_heading"),
     )
     return destination

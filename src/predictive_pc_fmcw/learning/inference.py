@@ -24,6 +24,15 @@ class TorchCheckpointPredictor:
             device or ("cuda" if torch.cuda.is_available() else "cpu")
         )
         payload = torch.load(checkpoint, map_location=self.device, weights_only=False)
+        feature_schema = payload.get("feature_schema")
+        if not isinstance(feature_schema, dict) or feature_schema.get("version") != 1:
+            raise ValueError(
+                "Checkpoint lacks the version-1 local feature schema; upstream "
+                "Stage-4 reports/checkpoints are not silently compatible."
+            )
+        if feature_schema.get("input") != "ego_relative_xy":
+            raise ValueError("Checkpoint input schema is not ego_relative_xy.")
+        self.feature_schema = dict(feature_schema)
         model_config = payload["model_config"]
         self.horizon_steps = int(model_config["horizon_steps"])
         self.model = GRUTrajectoryPredictor(**model_config).to(self.device)
@@ -47,6 +56,12 @@ class TorchCheckpointPredictor:
         history = np.asarray(history_xy, dtype=np.float32)
         if history.ndim != 3 or history.shape[-1] != 2:
             raise ValueError("Learned predictor expects shape (actors, history, 2).")
+        expected_history = int(self.feature_schema["history_steps"])
+        if history.shape[1] != expected_history:
+            raise ValueError(
+                f"Checkpoint history is {expected_history} steps, received "
+                f"{history.shape[1]}."
+            )
         normalized = (history - self.center) / self.scale
         with self._torch.no_grad():
             tensor = self._torch.from_numpy(normalized).to(self.device)

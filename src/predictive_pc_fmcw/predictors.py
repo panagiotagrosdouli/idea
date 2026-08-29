@@ -155,13 +155,16 @@ class InteractingMultipleModelPredictor:
     """
 
     innovation_std_m: float = 1.5
+    measurement_std_m: float = 0.75
     name: str = "imm"
 
     def predict(
         self, history_xy: ArrayLike, horizon_steps: int, dt_s: float
     ) -> NDArray[np.float64]:
         history = _validate_history(history_xy)
-        cv = KalmanConstantVelocityPredictor().predict(
+        cv = KalmanConstantVelocityPredictor(
+            measurement_std_m=self.measurement_std_m
+        ).predict(
             history, horizon_steps, dt_s
         )
         ca = ConstantAccelerationPredictor().predict(

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "design": "one-axis-at-a-time around frozen reference",
+  "rows": 430,
+  "studies": [
+    "deadline",
+    "field_of_view",
+    "offered_load",
+    "outage_definition",
+    "packet_size",
+    "prediction_horizon",
+    "reference_snr",
+    "sensing_uncertainty",
+    "slot_duration",
+    "traffic_model",
+    "vehicle_count"
+  ],
+  "seeds": [
+    20260827,
+    20260828
+  ],
+  "diagnostic_quick_run": true
+}

@@ -8,6 +8,9 @@ from typing import Any
 
 @dataclass(frozen=True)
 class LinkConfig:
+    carrier_frequency_hz: float = 193.4e12
+    chirp_bandwidth_hz: float = 10e9
+    chirp_duration_s: float = 10e-6
     data_rate_bps: float = 1e9
     packet_bits: int = 12_000
     resource_fraction: float = 0.005
@@ -19,13 +22,26 @@ class LinkConfig:
     atmospheric_attenuation_per_m: float = 0.004
     outage_ber_threshold: float = 1e-3
     min_received_power_w: float = 1e-15
+    reference_received_power_w: float = 1e-6
+    received_power_calibrated: bool = False
     channel_mode: str = "full"
     ber_source: str = "analytical"
     ber_lut_path: str | None = None
+    outage_mode: str = "ber"
+    outage_per_threshold: float = 0.1
+    outage_goodput_fraction_threshold: float = 0.1
+    physical_layer_source: str = "supplied Part-A PC-FMCW/DPSK notebook"
 
     def __post_init__(self) -> None:
-        if self.data_rate_bps <= 0 or self.packet_bits <= 0:
-            raise ValueError("Data rate and packet length must be positive.")
+        physical = (
+            self.carrier_frequency_hz,
+            self.chirp_bandwidth_hz,
+            self.chirp_duration_s,
+            self.data_rate_bps,
+            self.reference_received_power_w,
+        )
+        if any(value <= 0 for value in physical) or self.packet_bits <= 0:
+            raise ValueError("Physical parameters and packet length must be positive.")
         if not 0 < self.resource_fraction <= 1:
             raise ValueError("resource_fraction must be in (0, 1].")
         if not 0 < self.field_of_view_deg <= 180:
@@ -40,6 +56,14 @@ class LinkConfig:
             raise ValueError("ber_source must be analytical or lut.")
         if self.ber_source == "lut" and not self.ber_lut_path:
             raise ValueError("ber_lut_path is required when ber_source is lut.")
+        if self.outage_mode not in {"ber", "per", "goodput"}:
+            raise ValueError("outage_mode must be ber, per, or goodput.")
+        if not 0 < self.outage_per_threshold < 1:
+            raise ValueError("outage_per_threshold must be in (0, 1).")
+        if not 0 < self.outage_goodput_fraction_threshold < 1:
+            raise ValueError(
+                "outage_goodput_fraction_threshold must be in (0, 1)."
+            )
 
 
 @dataclass(frozen=True)
@@ -47,6 +71,8 @@ class TrafficConfig:
     offered_load: float = 0.72
     deadline_slots: int = 12
     deadline_jitter_slots: int = 4
+    deadline_s: float | None = 1.2
+    deadline_jitter_s: float | None = 0.4
     max_queue_packets: int = 2_000
     model: str = "poisson"
     periodic_interval_slots: int = 5
@@ -60,8 +86,17 @@ class TrafficConfig:
             raise ValueError("offered_load must be in [0, 2].")
         if self.deadline_slots < 1 or self.max_queue_packets < 1:
             raise ValueError("Deadlines and queue capacity must be positive.")
-        if self.model not in {"poisson", "periodic", "markov_modulated"}:
+        if self.model not in {
+            "poisson",
+            "periodic",
+            "markov_modulated",
+            "saturated",
+        }:
             raise ValueError("Unsupported traffic model.")
+        if self.deadline_s is not None and self.deadline_s <= 0:
+            raise ValueError("deadline_s must be positive when provided.")
+        if self.deadline_jitter_s is not None and self.deadline_jitter_s < 0:
+            raise ValueError("deadline_jitter_s must be non-negative when provided.")
         if self.periodic_interval_slots < 1:
             raise ValueError("periodic_interval_slots must be positive.")
         probabilities = (self.markov_low_to_high, self.markov_high_to_low)
@@ -69,6 +104,41 @@ class TrafficConfig:
             raise ValueError("Markov transition probabilities must be in [0, 1].")
         if self.markov_low_rate_scale < 0 or self.markov_high_rate_scale < 0:
             raise ValueError("Markov traffic-rate scales must be non-negative.")
+
+
+@dataclass(frozen=True)
+class SensingConfig:
+    """Assumed observation model used only for controlled robustness studies.
+
+    These parameters do not describe measured PC-FMCW sensor performance.  The
+    default is perfect state knowledge so legacy experiments remain unchanged.
+    """
+
+    model: str = "perfect"
+    cartesian_std_m: float = 0.75
+    range_std_base_m: float = 0.20
+    range_std_per_m: float = 0.005
+    bearing_std_deg: float = 0.25
+    temporal_correlation: float = 0.0
+    covariance_aware: bool = True
+    assumption_source: str = "declared synthetic robustness model"
+
+    def __post_init__(self) -> None:
+        if self.model not in {"perfect", "cartesian_iid", "range_bearing_assumed"}:
+            raise ValueError(
+                "sensing.model must be perfect, cartesian_iid, or "
+                "range_bearing_assumed."
+            )
+        non_negative = (
+            self.cartesian_std_m,
+            self.range_std_base_m,
+            self.range_std_per_m,
+            self.bearing_std_deg,
+        )
+        if any(value < 0 for value in non_negative):
+            raise ValueError("Sensing uncertainty parameters must be non-negative.")
+        if not 0 <= self.temporal_correlation < 1:
+            raise ValueError("temporal_correlation must be in [0, 1).")
 
 
 @dataclass(frozen=True)
@@ -87,6 +157,7 @@ class SchedulerConfig:
 class BenchmarkConfig:
     episodes: int = 12
     slots: int = 120
+    duration_s: float | None = 12.0
     vehicles: int = 5
     bootstrap_samples: int = 2_000
     schedulers: tuple[str, ...] = (
@@ -102,6 +173,12 @@ class BenchmarkConfig:
         "oracle",
     )
 
+    def __post_init__(self) -> None:
+        if self.episodes < 1 or self.slots < 1 or self.vehicles < 1:
+            raise ValueError("Benchmark sizes must be positive.")
+        if self.duration_s is not None and self.duration_s <= 0:
+            raise ValueError("duration_s must be positive when provided.")
+
 
 @dataclass(frozen=True)
 class ExperimentConfig:
@@ -113,6 +190,7 @@ class ExperimentConfig:
     forecast_position_noise_std_m: float = 0.0
     link: LinkConfig = field(default_factory=LinkConfig)
     traffic: TrafficConfig = field(default_factory=TrafficConfig)
+    sensing: SensingConfig = field(default_factory=SensingConfig)
     scheduler: SchedulerConfig = field(default_factory=SchedulerConfig)
     benchmark: BenchmarkConfig = field(default_factory=BenchmarkConfig)
 
@@ -153,6 +231,7 @@ def config_from_dict(raw: dict[str, Any]) -> ExperimentConfig:
         ),
         link=LinkConfig(**raw.get("link", {})),
         traffic=TrafficConfig(**raw.get("traffic", {})),
+        sensing=SensingConfig(**raw.get("sensing", {})),
         scheduler=SchedulerConfig(**raw.get("scheduler", {})),
         benchmark=BenchmarkConfig(**_tuple_schedulers(raw.get("benchmark", {}))),
     )

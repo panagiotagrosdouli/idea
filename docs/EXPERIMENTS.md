@@ -1,78 +1,100 @@
 # Experiment protocol
 
-## Reproducibility gates
+## Evidence tiers
 
-1. Run all unit/integration tests.
-2. Run `pcfmcw validate` and require every monotonicity and causality gate to
-   pass.
-3. Generate the DBPSK LUT with a fixed bit count and seed.
-4. Keep motion, arrivals, deadlines and channel random numbers identical across
-   schedulers.
-5. Run the reactive baselines before any learned model.
-6. Compare predictive policies to Reactive Greedy with paired scenario-level
-   differences.
-7. Treat Oracle as an information reference, not a deployable method.
+1. **Exact regression:** deterministic unit and scientific-gate tests.
+2. **Controlled benchmark:** 12 independent synthetic episodes.
+3. **Diagnostic robustness:** two-seed or two-episode quick sweeps.
+4. **Compact WOMD proxy:** three real-motion scenes with proxy ego.
+5. **Publication evidence:** official WOMD true-SDC held-out scenes plus frozen
+   learned checkpoints and multi-seed inference. This tier is not yet available.
 
-## Main benchmark
-
-The checked-in default uses 12 controlled episodes, 120 scheduling slots,
-five connected receivers, 100 ms slots and a 1 s prediction horizon. This is a
-fast reproducibility configuration, not a frozen publication configuration.
-
-## Required sweeps
-
-`configs/paper_experiment_matrix.json` defines the union of the requested PDF
-sweeps:
-
-- horizon: 0.1, 0.3, 0.5, 1.0, 2.0 and 3.0 s;
-- connected receivers: 3, 5 and 10;
-- normalized offered load: 0.3, 0.5, 0.7, 0.9, 1.0 and 1.1;
-- scheduler slot: 50, 100 and 200 ms;
-- five paired random seeds.
-
-Use:
+## Reproduction
 
 ```bash
-pcfmcw matrix --config configs/default.json \
-  --matrix configs/paper_experiment_matrix.json \
-  --output results/matrix
+make test
+make lint
+make corrected-quick
 ```
 
-The full Cartesian product contains 1,620 operating points and 11,340 policy
-rows for the seven main policies. `--quick` selects the first two values of
-each axis and is an integration check, not final paper evidence.
+`corrected-quick` writes only under `artifacts/corrected_v1/` and never reads
+old benchmark values. `corrected-full` uses all five staged seeds and all
+default ablation episodes.
 
-## Scripted paper ablations
+## Controlled benchmark
 
-`pcfmcw paper-ablation` evaluates: no prediction; CV/Kalman/IMM/CA prediction;
-perfect future; removal of fairness or link-lifetime urgency; range-only,
-range+pointing and full channels; analytical versus LUT BER; history noise at
-0.5/1/2 m; forecast degradation at 0.5/1/2 m; and periodic or
-Markov-modulated traffic. Every policy receives common traffic and packet-
-success randomness.
+The default holds 12 s physical duration, 100 ms slots, five receivers, 1 s
+prediction horizon, Poisson load 0.72 and physical packet deadlines of
+1.2±0.4 s. Each episode generates one scenario/seed cluster. All policy traffic
+and packet-success draws are shared.
 
-## Communication-aware ablation
+## Staged design
 
-Train the same GRU architecture with:
+`configs/staged_experiments.json` replaces the previous inferential use of a
+large Cartesian product. Each study changes one axis around the frozen default:
 
-1. `lambda_link=0`, `lambda_outage=0`;
-2. link loss only;
-3. outage loss only;
-4. full objective.
+- load: 0.3, 0.5, 0.7, 0.9, 1.1;
+- physical horizon: 0.1, 0.3, 0.5, 1, 2 s;
+- slot duration: 0.05, 0.1, 0.2 s;
+- receiver count: 3, 5, 10;
+- Poisson, periodic, Markov-modulated and saturated traffic;
+- packet size: 2,400, 9,600, 12,000 bits;
+- deadline: 0.05, 0.1, 0.25, 0.5, 1 s;
+- reference SNR offset: −6, −3, 0, +3, +6 dB;
+- FoV: 50°, 70°, 90°;
+- BER-, PER- and goodput-defined outage;
+- perfect, Cartesian and assumed range/bearing sensing.
 
-Report ADE, FDE, log-SNR error, outage classification, goodput, PDR, latency and
-fairness. Checkpoint selection must use the internal validation split; the test
-set is evaluated once after weights are frozen.
+When slot duration changes, the number of slots and horizon steps are converted
+so physical duration, horizon and deadlines remain constant.
 
-The compact supplied export is sufficient to exercise the training code, but
-it is not sufficient for a paper-quality learned-model result. Official WOMD
-train/validation shards and the intended frozen upstream checkpoint are needed
-before this ablation can be reported as final evidence.
+## Learned-model ablation
+
+The pre-registered comparison uses identical architecture, data split and
+optimizer while changing only the loss:
+
+1. trajectory-only;
+2. trajectory + link;
+3. trajectory + outage;
+4. full trajectory + link + outage.
+
+At least three training seeds are required. Model selection uses development
+scenes. Final motion, link and scheduler metrics must be evaluated on held-out
+scenario IDs. `scripts/04_run_training_ablation.py --plan-only` validates the
+run matrix without importing PyTorch.
+
+## Official WOMD gate
+
+The publication run must record:
+
+- exact WOMD release and shard hashes;
+- true `sdc_track_index`;
+- validity-mask and actor-eligibility counts;
+- scenario-safe train/development/test lists;
+- feature schema and checkpoint SHA-256;
+- exact command, config, seed, software versions and commit.
+
+The included official adapter conservatively drops any retained track with an
+invalid state. It does not interpolate hidden values.
+
+## Statistical plan
+
+Primary policy comparisons use paired scenario/seed differences. Bootstrap,
+paired t and Wilcoxon tests operate on independent cluster aggregates.
+Metric direction is declared in advance; lower latency/outage/miss is favorable,
+while higher goodput/PDR/fairness is favorable. Wilcoxon families receive Holm
+correction. Effect sizes, win rates, support and negative regimes are reported.
+
+Two-seed quick runs cannot support p-value claims and are labelled diagnostic.
 
 ## Acceptance rule
 
-The main hypothesis is supported only if paired confidence intervals show a
-communication gain in the declared operating region. A gain in controlled
-motion but not in the compact WOMD proxy benchmark is evidence that more real
-scenes and correct ego geometry are required; it is not permission to generalize
-the controlled result.
+The hypothesis is supported only in an operating region where:
+
+- the paired communication interval excludes zero in the favorable direction;
+- tail latency, PDR, censoring and fairness are reported together;
+- the result survives pre-registered channel and sensing sensitivity;
+- the learned objective improves link-relevant metrics on held-out official
+  scenes without unacceptable trajectory degradation.
+
+A negative or null result is retained.

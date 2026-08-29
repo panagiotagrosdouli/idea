@@ -14,11 +14,16 @@ class LinkState:
     distance_m: float
     bearing_rad: float
     received_power_w: float
+    relative_received_power: float
+    received_power_calibrated: bool
     snr_db: float
     ber: float
     per: float
     goodput_bps: float
     outage: bool
+    ber_outage: bool
+    per_outage: bool
+    goodput_outage: bool
 
 
 class LinkModel:
@@ -71,9 +76,17 @@ class LinkModel:
     ) -> NDArray[np.float64]:
         gain = self._relative_gain(distance_m, bearing_rad)
         return np.maximum(
-            gain / self._reference_gain * 1e-6,
+            gain
+            / self._reference_gain
+            * self.config.reference_received_power_w,
             self.config.min_received_power_w,
         )
+
+    def relative_received_power(
+        self, distance_m: ArrayLike, bearing_rad: ArrayLike
+    ) -> NDArray[np.float64]:
+        gain = self._relative_gain(distance_m, bearing_rad)
+        return np.maximum(gain / self._reference_gain, 0.0)
 
     def snr_linear(
         self, distance_m: ArrayLike, bearing_rad: ArrayLike
@@ -105,15 +118,33 @@ class LinkModel:
         )
         per = self.packet_error_rate(ber)
         goodput = self.config.data_rate_bps * (1 - per)
-        outage = ber > self.config.outage_ber_threshold
+        ber_outage = ber > self.config.outage_ber_threshold
+        per_outage = per > self.config.outage_per_threshold
+        goodput_outage = (
+            goodput
+            < self.config.data_rate_bps
+            * self.config.outage_goodput_fraction_threshold
+        )
+        outage_by_mode = {
+            "ber": ber_outage,
+            "per": per_outage,
+            "goodput": goodput_outage,
+        }
+        outage = outage_by_mode[self.config.outage_mode]
         return {
             "received_power_w": self.received_power_w(distance, bearing),
+            "relative_received_power": self.relative_received_power(
+                distance, bearing
+            ),
             "snr_linear": snr_linear,
             "snr_db": snr_db,
             "ber": ber,
             "per": per,
             "goodput_bps": goodput,
             "outage": outage,
+            "ber_outage": ber_outage,
+            "per_outage": per_outage,
+            "goodput_outage": goodput_outage,
         }
 
     def evaluate(self, distance_m: float, bearing_rad: float) -> LinkState:
@@ -122,11 +153,16 @@ class LinkModel:
             distance_m=float(distance_m),
             bearing_rad=float(bearing_rad),
             received_power_w=float(values["received_power_w"]),
+            relative_received_power=float(values["relative_received_power"]),
+            received_power_calibrated=self.config.received_power_calibrated,
             snr_db=float(values["snr_db"]),
             ber=float(values["ber"]),
             per=float(values["per"]),
             goodput_bps=float(values["goodput_bps"]),
             outage=bool(values["outage"]),
+            ber_outage=bool(values["ber_outage"]),
+            per_outage=bool(values["per_outage"]),
+            goodput_outage=bool(values["goodput_outage"]),
         )
 
     def capacity_packets(self, slot_duration_s: float) -> int:
@@ -148,3 +184,15 @@ class LinkModel:
         first = np.argmax(outage, axis=1)
         has_outage = np.any(outage, axis=1)
         return np.where(has_outage, first, horizon).astype(np.int64)
+
+    def link_lifetime_seconds(
+        self,
+        distances_m: ArrayLike,
+        bearings_rad: ArrayLike,
+        step_duration_s: float,
+    ) -> NDArray[np.float64]:
+        if step_duration_s <= 0:
+            raise ValueError("step_duration_s must be positive.")
+        return self.link_lifetime_steps(
+            distances_m, bearings_rad
+        ).astype(np.float64) * step_duration_s

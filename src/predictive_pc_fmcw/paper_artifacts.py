@@ -304,6 +304,162 @@ def make_example_motion_figure(
     return destination
 
 
+def make_corrected_result_figures(
+    benchmark_summary: str | Path,
+    episode_metrics: str | Path,
+    staged_rows: str | Path,
+    scenario_slices: str | Path,
+    output_dir: str | Path,
+) -> dict[str, Path]:
+    """Create exact charts from corrected-v1 machine-readable artifacts."""
+
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    benchmark = _read_json(benchmark_summary)
+    episodes = _read_json(episode_metrics)
+    staged = _read_json(staged_rows)
+    slices = _read_json(scenario_slices)
+    destination = Path(output_dir)
+    destination.mkdir(parents=True, exist_ok=True)
+    policies = (
+        "reactive_greedy",
+        "kalman_predictive",
+        "link_lifetime",
+        "oracle",
+    )
+
+    figure, first = plt.subplots(figsize=(9, 4.8), constrained_layout=True)
+    second = first.twinx()
+    positions = np.arange(len(policies))
+    goodput = [benchmark["schedulers"][name]["goodput_mbps"] for name in policies]
+    means = [item["mean"] for item in goodput]
+    errors = np.asarray(
+        [
+            [item["mean"] - item["low"] for item in goodput],
+            [item["high"] - item["mean"] for item in goodput],
+        ]
+    )
+    first.bar(positions, means, yerr=errors, capsize=4, color="#2563eb", alpha=0.8)
+    latency = [
+        benchmark["schedulers"][name]["p95_latency_ms"]["mean"]
+        for name in policies
+    ]
+    second.plot(positions, latency, color="#d97706", marker="o", linewidth=2)
+    first.set_xticks(positions, policies, rotation=18, ha="right")
+    first.set_ylabel("Goodput (Mbps), bootstrap 95% CI", color="#2563eb")
+    second.set_ylabel("P95 latency (ms)", color="#d97706")
+    first.set_title("Corrected controlled benchmark: gain and latency trade-off")
+    first.grid(axis="y", alpha=0.25)
+    benchmark_path = destination / "corrected_benchmark_tradeoff.png"
+    figure.savefig(benchmark_path, dpi=240)
+    plt.close(figure)
+
+    by_key = {
+        (row["scenario_id"], int(row["seed"]), row["scheduler"]): row
+        for row in episodes
+    }
+    differences = []
+    for (scenario, seed, scheduler), row in by_key.items():
+        if scheduler != "link_lifetime":
+            continue
+        baseline = by_key[(scenario, seed, "reactive_greedy")]
+        differences.append(float(row["goodput_mbps"]) - float(baseline["goodput_mbps"]))
+    values = np.sort(np.asarray(differences, dtype=np.float64))
+    ecdf = np.arange(1, values.size + 1) / values.size
+    figure, axis = plt.subplots(figsize=(7.5, 4.6), constrained_layout=True)
+    axis.step(values, ecdf, where="post", color="#2563eb", linewidth=2)
+    axis.axvline(0.0, color="black", linewidth=1, alpha=0.65)
+    axis.set_xlabel("Link-Lifetime − Reactive goodput (Mbps)")
+    axis.set_ylabel("Empirical cumulative fraction")
+    axis.set_title("Paired episode gains include positive and negative cases")
+    axis.grid(alpha=0.25)
+    ecdf_path = destination / "paired_goodput_difference_ecdf.png"
+    figure.savefig(ecdf_path, dpi=240)
+    plt.close(figure)
+
+    staged_index = {
+        (row["study"], row["setting"], int(row["seed"]), row["scheduler"]): row
+        for row in staged
+    }
+    figure, axes = plt.subplots(1, 2, figsize=(11, 4.6), constrained_layout=True)
+    for axis, study, x_key, label in (
+        (axes[0], "offered_load", "offered_load", "Offered load"),
+        (axes[1], "prediction_horizon", "prediction_horizon_s", "Horizon (s)"),
+    ):
+        settings = sorted(
+            {row["setting"] for row in staged if row["study"] == study},
+            key=lambda setting: float(
+                next(
+                    row[x_key]
+                    for row in staged
+                    if row["study"] == study and row["setting"] == setting
+                )
+            ),
+        )
+        x_values = []
+        means = []
+        lows = []
+        highs = []
+        for setting in settings:
+            selected = [
+                row
+                for row in staged
+                if row["study"] == study
+                and row["setting"] == setting
+                and row["scheduler"] == "link_lifetime"
+            ]
+            gains = []
+            for row in selected:
+                reference = staged_index[
+                    (study, setting, int(row["seed"]), "reactive_greedy")
+                ]
+                gains.append(
+                    float(row["goodput_mbps"])
+                    - float(reference["goodput_mbps"])
+                )
+            x_values.append(float(selected[0][x_key]))
+            means.append(float(np.mean(gains)))
+            lows.append(float(np.min(gains)))
+            highs.append(float(np.max(gains)))
+        axis.plot(x_values, means, color="#2563eb", marker="o", linewidth=2)
+        axis.fill_between(x_values, lows, highs, color="#93c5fd", alpha=0.35)
+        axis.axhline(0.0, color="black", linewidth=1, alpha=0.65)
+        axis.set_xlabel(label)
+        axis.set_ylabel("Goodput difference vs Reactive (Mbps)")
+        axis.grid(alpha=0.25)
+    figure.suptitle("Two-seed staged diagnostic: operating-region sign changes")
+    staged_path = destination / "staged_operating_region_diagnostic.png"
+    figure.savefig(staged_path, dpi=240)
+    plt.close(figure)
+
+    label_counts: dict[str, int] = {}
+    for row in slices:
+        for label in row["labels"]:
+            label_counts[label] = label_counts.get(label, 0) + 1
+    labels = sorted(label_counts, key=label_counts.get, reverse=True)
+    figure, axis = plt.subplots(figsize=(8, 4.6), constrained_layout=True)
+    axis.barh(
+        labels[::-1],
+        [label_counts[label] for label in labels[::-1]],
+        color="#2563eb",
+    )
+    axis.set_xlabel("Actor-scenario count")
+    axis.set_title("Deterministic mobility and optical-boundary slices")
+    axis.grid(axis="x", alpha=0.25)
+    slice_path = destination / "scenario_slice_counts.png"
+    figure.savefig(slice_path, dpi=240)
+    plt.close(figure)
+    return {
+        "benchmark": benchmark_path,
+        "ecdf": ecdf_path,
+        "staged": staged_path,
+        "slices": slice_path,
+    }
+
+
 def _read_json(path: str | Path) -> dict[str, object]:
     with Path(path).open("r", encoding="utf-8") as handle:
         return json.load(handle)

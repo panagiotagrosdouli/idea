@@ -10,7 +10,7 @@ from typing import Any
 
 from .benchmark import run_synthetic_benchmark
 from .config import ExperimentConfig
-from .metrics import bootstrap_mean_ci
+from .metrics import holm_adjusted_pvalues, paired_metric_statistics
 
 MATRIX_SCHEDULERS = (
     "reactive_greedy",
@@ -161,6 +161,7 @@ def _matrix_summary(rows: list[dict[str, object]]) -> dict[str, object]:
         if policy == "reactive_greedy":
             continue
         differences: list[float] = []
+        clusters: list[object] = []
         for key, row in index.items():
             if key[-1] != policy:
                 continue
@@ -168,17 +169,25 @@ def _matrix_summary(rows: list[dict[str, object]]) -> dict[str, object]:
             differences.append(
                 float(row["goodput_mbps"]) - float(baseline["goodput_mbps"])
             )
+            clusters.append(row["seed"])
         comparisons[policy] = {
             "paired_points": len(differences),
             "mean_goodput_difference_mbps": statistics.mean(differences),
             "median_goodput_difference_mbps": statistics.median(differences),
             "goodput_win_fraction": sum(value > 0 for value in differences)
             / len(differences),
-            **_paired_statistics(differences),
+            **_paired_statistics(differences, clusters),
         }
+    policy_names = sorted(comparisons)
+    adjusted = holm_adjusted_pvalues(
+        comparisons[name]["wilcoxon_p_value"] for name in policy_names
+    )
+    for name, value in zip(policy_names, adjusted, strict=True):
+        comparisons[name]["wilcoxon_holm_p_value"] = value
     load_slices: dict[str, object] = {}
     for load in sorted({float(row["offered_load"]) for row in rows}):
         differences = []
+        clusters = []
         for key, row in index.items():
             if key[-1] == "link_lifetime" and float(row["offered_load"]) == load:
                 baseline = index[key[:-1] + ("reactive_greedy",)]
@@ -186,6 +195,7 @@ def _matrix_summary(rows: list[dict[str, object]]) -> dict[str, object]:
                     float(row["goodput_mbps"])
                     - float(baseline["goodput_mbps"])
                 )
+                clusters.append(row["seed"])
         if not differences:
             continue
         load_slices[str(load)] = {
@@ -193,9 +203,12 @@ def _matrix_summary(rows: list[dict[str, object]]) -> dict[str, object]:
             "mean_goodput_difference_mbps": statistics.mean(differences),
             "goodput_win_fraction": sum(value > 0 for value in differences)
             / len(differences),
-            "bootstrap_95_ci_mbps": _paired_statistics(differences)[
+            "bootstrap_95_ci_mbps": _paired_statistics(
+                differences, clusters
+            )[
                 "bootstrap_95_ci_mbps"
             ],
+            "independent_seed_clusters": len(set(clusters)),
         }
     return {
         "paired_comparison_vs_reactive": comparisons,
@@ -203,34 +216,24 @@ def _matrix_summary(rows: list[dict[str, object]]) -> dict[str, object]:
     }
 
 
-def _paired_statistics(differences: list[float]) -> dict[str, object]:
-    import numpy as np
-    from scipy import stats
-
-    values = np.asarray(differences, dtype=np.float64)
-    interval = bootstrap_mean_ci(values, samples=5_000, seed=20260827)
-    if values.size > 1:
-        t_test_p = float(stats.ttest_1samp(values, 0.0).pvalue)
-        standard_deviation = float(values.std(ddof=1))
-        cohen_dz = (
-            float(values.mean() / standard_deviation)
-            if standard_deviation > 0
-            else float("nan")
-        )
-    else:
-        t_test_p = float("nan")
-        cohen_dz = float("nan")
-    nonzero = values[values != 0]
-    wilcoxon_p = (
-        float(stats.wilcoxon(nonzero).pvalue)
-        if nonzero.size > 0
-        else float("nan")
+def _paired_statistics(
+    differences: list[float], clusters: list[object]
+) -> dict[str, object]:
+    zeros = [0.0] * len(differences)
+    result = paired_metric_statistics(
+        differences,
+        zeros,
+        higher_is_better=True,
+        clusters=clusters,
+        samples=5_000,
+        seed=20260827,
     )
     return {
-        "bootstrap_95_ci_mbps": {"low": interval.low, "high": interval.high},
-        "paired_t_test_p_value": t_test_p,
-        "wilcoxon_p_value": wilcoxon_p,
-        "cohen_dz": cohen_dz,
+        "bootstrap_95_ci_mbps": result["bootstrap_95_ci_favorable"],
+        "paired_t_test_p_value": result["paired_t_test_p_value"],
+        "wilcoxon_p_value": result["wilcoxon_p_value"],
+        "cohen_dz": result["cohen_dz_favorable"],
+        "independent_seed_clusters": result["independent_clusters"],
     }
 
 

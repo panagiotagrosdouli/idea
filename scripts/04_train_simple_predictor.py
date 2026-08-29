@@ -18,6 +18,7 @@ def main() -> None:
         epochs=args.epochs,
         lambda_link=0.0,
         lambda_outage=0.0,
+        objective="trajectory_only",
         seed=args.seed,
     )
     print(result)

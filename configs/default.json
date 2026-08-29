@@ -4,6 +4,9 @@
   "prediction_horizon_steps": 10,
   "discount": 0.93,
   "link": {
+    "carrier_frequency_hz": 193400000000000.0,
+    "chirp_bandwidth_hz": 10000000000.0,
+    "chirp_duration_s": 0.00001,
     "data_rate_bps": 1000000000.0,
     "packet_bits": 12000,
     "resource_fraction": 0.005,
@@ -14,13 +17,31 @@
     "pointing_sigma_deg": 18.0,
     "atmospheric_attenuation_per_m": 0.004,
     "outage_ber_threshold": 0.001,
-    "min_received_power_w": 1e-15
+    "min_received_power_w": 1e-15,
+    "reference_received_power_w": 1e-6,
+    "received_power_calibrated": false,
+    "outage_mode": "ber",
+    "outage_per_threshold": 0.1,
+    "outage_goodput_fraction_threshold": 0.1,
+    "physical_layer_source": "supplied Part-A PC-FMCW/DPSK notebook"
   },
   "traffic": {
     "offered_load": 0.72,
     "deadline_slots": 12,
     "deadline_jitter_slots": 4,
+    "deadline_s": 1.2,
+    "deadline_jitter_s": 0.4,
     "max_queue_packets": 2000
+  },
+  "sensing": {
+    "model": "perfect",
+    "cartesian_std_m": 0.75,
+    "range_std_base_m": 0.2,
+    "range_std_per_m": 0.005,
+    "bearing_std_deg": 0.25,
+    "temporal_correlation": 0.0,
+    "covariance_aware": true,
+    "assumption_source": "declared synthetic robustness model"
   },
   "scheduler": {
     "goodput_weight": 1.0,
@@ -35,6 +56,7 @@
   "benchmark": {
     "episodes": 12,
     "slots": 120,
+    "duration_s": 12.0,
     "vehicles": 5,
     "bootstrap_samples": 2000,
     "schedulers": [

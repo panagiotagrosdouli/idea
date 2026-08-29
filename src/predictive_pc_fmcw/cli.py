@@ -14,7 +14,11 @@ from .benchmark import (
     run_synthetic_benchmark,
     write_benchmark_artifacts,
 )
-from .ber import simulate_dbpsk_ber, write_ber_lut
+from .ber import (
+    simulate_dbpsk_ber,
+    simulate_dbpsk_ber_adaptive,
+    write_ber_lut,
+)
 from .config import load_config
 from .data.manifest import write_compact_womd_manifest
 from .data.synthetic import generate_synthetic_scenario
@@ -26,6 +30,10 @@ from .forecast_evaluation import (
     write_forecast_artifacts,
 )
 from .link import LinkModel
+from .scenario_slices import (
+    classify_scenario_slices,
+    write_scenario_slice_artifacts,
+)
 from .validation import run_validation
 
 
@@ -83,9 +91,16 @@ def build_parser() -> argparse.ArgumentParser:
     ber = subparsers.add_parser("ber-lut", help="Generate a DBPSK BER-vs-SNR LUT")
     ber.add_argument("--output", default="results/ber/dbpsk_ber_lut.csv")
     ber.add_argument("--bits", type=int, default=250_000)
+    ber.add_argument("--max-bits", type=int, default=1_000_000)
+    ber.add_argument("--target-errors", type=int, default=200)
+    ber.add_argument(
+        "--fixed-bits",
+        action="store_true",
+        help="Disable adaptive error-targeted simulation.",
+    )
     ber.add_argument("--seed", type=int, default=20260827)
-    ber.add_argument("--snr-min", type=float, default=-4.0)
-    ber.add_argument("--snr-max", type=float, default=16.0)
+    ber.add_argument("--snr-min", type=float, default=-5.0)
+    ber.add_argument("--snr-max", type=float, default=25.0)
     ber.add_argument("--snr-step", type=float, default=1.0)
 
     benchmark = subparsers.add_parser("benchmark", help="Run scheduler benchmark")
@@ -117,6 +132,18 @@ def build_parser() -> argparse.ArgumentParser:
     train.add_argument("output")
     train.add_argument("--epochs", type=int, default=80)
     train.add_argument("--batch-size", type=int, default=64)
+    train.add_argument("--config", default="configs/default.json")
+    train.add_argument("--dropout", type=float, default=0.0)
+    train.add_argument(
+        "--objective",
+        choices=(
+            "trajectory_only",
+            "trajectory_link",
+            "trajectory_outage",
+            "full",
+        ),
+        default="full",
+    )
     train.add_argument("--lambda-link", type=float, default=0.2)
     train.add_argument("--lambda-outage", type=float, default=0.1)
     train.add_argument("--seed", type=int, default=20260827)
@@ -158,6 +185,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     paper_ablation.add_argument("--output", default="results/paper_ablations")
     paper_ablation.add_argument("--quick", action="store_true")
+
+    slices = subparsers.add_parser(
+        "scenario-slices", help="Classify mobility and FoV-critical regimes"
+    )
+    slices.add_argument("--config", default="configs/default.json")
+    slices.add_argument("--womd-export")
+    slices.add_argument("--max-vehicles", type=int)
+    slices.add_argument("--output", default="results/scenario_slices")
     return parser
 
 
@@ -169,9 +204,18 @@ def main(argv: list[str] | None = None) -> int:
             args.snr_max + 0.5 * args.snr_step,
             args.snr_step,
         )
-        path = write_ber_lut(
-            simulate_dbpsk_ber(grid, bits=args.bits, seed=args.seed), args.output
+        points = (
+            simulate_dbpsk_ber(grid, bits=args.bits, seed=args.seed)
+            if args.fixed_bits
+            else simulate_dbpsk_ber_adaptive(
+                grid,
+                min_bits=args.bits,
+                max_bits=args.max_bits,
+                target_errors=args.target_errors,
+                seed=args.seed,
+            )
         )
+        path = write_ber_lut(points, args.output)
         print(path)
         return 0
     if args.command == "benchmark":
@@ -231,8 +275,11 @@ def main(argv: list[str] | None = None) -> int:
             args.output,
             epochs=args.epochs,
             batch_size=args.batch_size,
+            dropout=args.dropout,
             lambda_link=args.lambda_link,
             lambda_outage=args.lambda_outage,
+            objective=args.objective,
+            link_config=load_config(args.config).link,
             seed=args.seed,
         )
         print(json.dumps(result.__dict__, indent=2))
@@ -258,10 +305,23 @@ def main(argv: list[str] | None = None) -> int:
                 args.womd_export, max_vehicles=args.max_vehicles
             )
         else:
+            slots = (
+                max(
+                    2,
+                    int(
+                        round(
+                            config.benchmark.duration_s
+                            / config.slot_duration_s
+                        )
+                    ),
+                )
+                if config.benchmark.duration_s is not None
+                else config.benchmark.slots
+            )
             scenarios = [
                 generate_synthetic_scenario(
                     seed=config.seed + episode,
-                    slots=config.benchmark.slots,
+                    slots=slots,
                     vehicles=config.benchmark.vehicles,
                     dt_s=config.slot_duration_s,
                 )
@@ -274,6 +334,45 @@ def main(argv: list[str] | None = None) -> int:
             anchor_stride=args.anchor_stride,
         )
         artifacts = write_forecast_artifacts(rows, args.output)
+        print(json.dumps({key: str(value) for key, value in artifacts.items()}))
+        return 0
+    if args.command == "scenario-slices":
+        config = load_config(args.config)
+        if args.womd_export:
+            scenarios = load_womd_motion_scenarios(
+                args.womd_export, max_vehicles=args.max_vehicles
+            )
+        else:
+            slots = (
+                max(
+                    2,
+                    int(
+                        round(
+                            config.benchmark.duration_s
+                            / config.slot_duration_s
+                        )
+                    ),
+                )
+                if config.benchmark.duration_s is not None
+                else config.benchmark.slots
+            )
+            scenarios = [
+                generate_synthetic_scenario(
+                    config.seed + episode,
+                    slots=slots,
+                    vehicles=config.benchmark.vehicles,
+                    dt_s=config.slot_duration_s,
+                )
+                for episode in range(config.benchmark.episodes)
+            ]
+        rows = [
+            row
+            for scenario in scenarios
+            for row in classify_scenario_slices(
+                scenario, field_of_view_deg=config.link.field_of_view_deg
+            )
+        ]
+        artifacts = write_scenario_slice_artifacts(rows, args.output)
         print(json.dumps({key: str(value) for key, value in artifacts.items()}))
         return 0
     if args.command == "dataset-manifest":

@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 
 from .data.scenario import MotionScenario
-from .geometry import heading_from_positions, range_and_bearing
+from .geometry import heading_from_positions, range_and_bearing, wrap_angle_rad
 from .link import LinkModel
 from .predictors import (
     ConstantAccelerationPredictor,
@@ -32,10 +32,13 @@ class ForecastMetricRow:
     ade_m: float
     fde_m: float
     range_mae_m: float
+    bearing_mae_deg: float
     snr_mae_db: float
     outage_f1: float
     outage_auroc: float
     link_lifetime_error_steps: float
+    link_lifetime_error_s: float
+    outage_positive_steps: int
 
 
 def default_predictors() -> dict[str, TrajectoryPredictor | None]:
@@ -148,6 +151,16 @@ def _rows_for_forecast(
                         predicted_range[vehicle] - actual_range[vehicle]
                     ).mean()
                 ),
+                bearing_mae_deg=float(
+                    np.rad2deg(
+                        np.abs(
+                            wrap_angle_rad(
+                                predicted_bearing[vehicle]
+                                - actual_bearing[vehicle]
+                            )
+                        )
+                    ).mean()
+                ),
                 snr_mae_db=float(
                     np.abs(
                         predicted_link["snr_db"][vehicle]
@@ -159,6 +172,11 @@ def _rows_for_forecast(
                 link_lifetime_error_steps=float(
                     abs(predicted_lifetime[vehicle] - actual_lifetime[vehicle])
                 ),
+                link_lifetime_error_s=float(
+                    abs(predicted_lifetime[vehicle] - actual_lifetime[vehicle])
+                    * scenario.dt_s
+                ),
+                outage_positive_steps=int(np.count_nonzero(true_outage)),
             )
         )
     return rows
@@ -191,10 +209,12 @@ def summarize_forecasts(rows: list[ForecastMetricRow]) -> dict[str, object]:
         "ade_m",
         "fde_m",
         "range_mae_m",
+        "bearing_mae_deg",
         "snr_mae_db",
         "outage_f1",
         "outage_auroc",
         "link_lifetime_error_steps",
+        "link_lifetime_error_s",
     )
     predictors = sorted({row.predictor for row in rows})
     summary: dict[str, object] = {}

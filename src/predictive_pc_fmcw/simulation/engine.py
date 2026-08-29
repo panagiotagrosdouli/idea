@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import numpy as np
 from numpy.typing import NDArray
 
-from ..config import ExperimentConfig
+from ..config import ExperimentConfig, SensingConfig
 from ..data.scenario import MotionScenario
 from ..geometry import heading_from_positions, range_and_bearing
 from ..link import LinkModel
@@ -20,6 +20,7 @@ from ..predictors import (
 )
 from ..scheduling.base import SchedulerContext
 from ..scheduling.policies import build_scheduler
+from ..sensing import observe_combined_history
 from ..traffic import PacketQueues, TrafficTrace
 
 
@@ -35,10 +36,9 @@ class SimulationOutput:
 
 
 def _current_heading(ego_history: NDArray[np.float64]) -> float:
-    delta = ego_history[-1] - ego_history[-2]
-    if np.linalg.norm(delta) <= 1e-9:
+    if ego_history.shape[0] < 2:
         return 0.0
-    return float(np.arctan2(delta[1], delta[0]))
+    return float(heading_from_positions(ego_history)[-1])
 
 
 def _link_forecast(
@@ -51,19 +51,54 @@ def _link_forecast(
     history_noise_std_m: float = 0.0,
     forecast_noise_std_m: float = 0.0,
     noise_seed: int = 0,
+    sensing_config: SensingConfig | None = None,
 ) -> tuple[dict[str, NDArray], NDArray[np.int64], bool]:
+    combined = scenario.combined_positions()
+    measurement_std_m = 0.75
+    if (
+        sensing_config is not None
+        and sensing_config.model != "perfect"
+        and mode not in {"reactive", "oracle"}
+    ):
+        observation = observe_combined_history(
+            combined[: time_index + 1], sensing_config, noise_seed
+        )
+        combined = combined.copy()
+        combined[: time_index + 1] = observation.positions_xy
+        if sensing_config.covariance_aware:
+            target_std = observation.position_std_m[:, 1:]
+            positive = target_std[target_std > 0]
+            if positive.size:
+                measurement_std_m = float(np.sqrt(np.mean(positive**2)))
     predictors = {
         "constant_velocity": ConstantVelocityPredictor(),
         "constant_acceleration": ConstantAccelerationPredictor(),
-        "kalman_cv": KalmanConstantVelocityPredictor(),
-        "imm": InteractingMultipleModelPredictor(),
+        "kalman_cv": KalmanConstantVelocityPredictor(
+            measurement_std_m=measurement_std_m
+        ),
+        "imm": InteractingMultipleModelPredictor(
+            measurement_std_m=measurement_std_m
+        ),
         "reactive": None,
         "oracle": None,
         "learned": learned_predictor,
     }
     if mode not in predictors:
         raise ValueError(f"Unknown forecast mode: {mode}")
-    combined = scenario.combined_positions()
+    available_future = combined.shape[0] - time_index - 1
+    if available_future <= 0:
+        heading = _current_heading(combined[: time_index + 1, 0])
+        distances, bearings = range_and_bearing(
+            combined[time_index, 1:],
+            combined[time_index, 0],
+            heading,
+        )
+        distances = distances[:, None]
+        bearings = bearings[:, None]
+        values = model.evaluate_arrays(distances, bearings)
+        lifetime = model.link_lifetime_steps(distances, bearings)
+        return values, lifetime, mode == "oracle"
+    effective_horizon = min(horizon, available_future)
     rng = np.random.default_rng(noise_seed)
     if history_noise_std_m > 0 and mode not in {"reactive", "oracle"}:
         combined = combined.copy()
@@ -81,10 +116,10 @@ def _link_forecast(
         ).transpose(1, 0, 2)
         relative_prediction = learned_predictor.predict(
             relative_history, horizon, scenario.dt_s
-        )
+        )[:, :effective_horizon]
         ego_history = combined[: time_index + 1, 0][None, :, :]
         ego_prediction = ConstantVelocityPredictor().predict(
-            ego_history, horizon, scenario.dt_s
+            ego_history, effective_horizon, scenario.dt_s
         )[0]
         vehicle_prediction = relative_prediction + ego_prediction[None, :, :]
         oracle_forecast = False
@@ -92,7 +127,7 @@ def _link_forecast(
         bundle = forecast_scenario(
             combined,
             time_index,
-            horizon,
+            effective_horizon,
             scenario.dt_s,
             predictors[mode],
             oracle=mode == "oracle",
@@ -142,6 +177,10 @@ def run_simulation(
     failed_attempts = 0
     scheduled_outages = 0
     scheduled_slots = 0
+    scheduled_snr_sum = 0.0
+    scheduled_ber_sum = 0.0
+    scheduled_per_sum = 0.0
+    scheduled_relative_power_sum = 0.0
     switch_count = 0
     previous: int | None = None
     latencies: list[float] = []
@@ -170,6 +209,7 @@ def run_simulation(
             history_noise_std_m=config.history_measurement_noise_std_m,
             forecast_noise_std_m=config.forecast_position_noise_std_m,
             noise_seed=seed + 10_000 * relative_slot,
+            sensing_config=config.sensing,
         )
         context = SchedulerContext(
             slot=relative_slot,
@@ -194,6 +234,12 @@ def run_simulation(
         selected[relative_slot] = vehicle
         scheduled_slots += 1
         scheduled_outages += int(current["outage"][vehicle])
+        scheduled_snr_sum += float(current["snr_db"][vehicle])
+        scheduled_ber_sum += float(current["ber"][vehicle])
+        scheduled_per_sum += float(current["per"][vehicle])
+        scheduled_relative_power_sum += float(
+            current["relative_received_power"][vehicle]
+        )
         if previous is not None and previous != vehicle:
             switch_count += 1
         previous = vehicle
@@ -227,6 +273,7 @@ def run_simulation(
     remaining = int(queues.remaining().sum())
     duration = slots * config.slot_duration_s
     latency_ms = np.asarray(latencies, dtype=np.float64) * 1e3
+    demand_service_ratio = delivered_by_vehicle / np.maximum(queues.generated, 1)
     has_disconnect = np.any(actual_outage, axis=0)
     first_disconnect = np.argmax(actual_outage, axis=0)
     first_disconnect = np.where(has_disconnect, first_disconnect, slots)
@@ -260,14 +307,32 @@ def run_simulation(
         scheduled_outage_fraction=scheduled_outages / max(1, scheduled_slots),
         availability_outage_fraction=float(actual_outage.mean()),
         mean_latency_ms=float(latency_ms.mean()) if latency_ms.size else float("nan"),
+        p50_latency_ms=float(np.quantile(latency_ms, 0.50))
+        if latency_ms.size
+        else float("nan"),
         p95_latency_ms=float(np.quantile(latency_ms, 0.95))
         if latency_ms.size
         else float("nan"),
+        p99_latency_ms=float(np.quantile(latency_ms, 0.99))
+        if latency_ms.size
+        else float("nan"),
         deadline_miss_ratio=(deadline_dropped + overflow_dropped) / max(1, generated),
+        censored_packet_ratio=remaining / max(1, generated),
+        deadline_or_censored_ratio=(
+            deadline_dropped + overflow_dropped + remaining
+        )
+        / max(1, generated),
         delivered_before_expiry_ratio=delivered_before_expiry
         / max(1, eligible_before_expiry),
         undelivered_packets_at_disconnect=undelivered_at_disconnect,
         jain_fairness=jains_fairness(delivered_by_vehicle),
+        demand_normalized_jain_fairness=jains_fairness(demand_service_ratio),
+        mean_scheduled_snr_db=scheduled_snr_sum / max(1, scheduled_slots),
+        mean_scheduled_ber=scheduled_ber_sum / max(1, scheduled_slots),
+        mean_scheduled_per=scheduled_per_sum / max(1, scheduled_slots),
+        mean_scheduled_relative_power=(
+            scheduled_relative_power_sum / max(1, scheduled_slots)
+        ),
         switch_count=switch_count,
     )
     return SimulationOutput(

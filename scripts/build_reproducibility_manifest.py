@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import hashlib
 import importlib.util
 import json
@@ -23,6 +24,7 @@ INCLUDED_ROOTS = (
     "docs",
     "paper",
     "data/example",
+    "reference/part_b_stage4",
 )
 INCLUDED_FILES = (
     ".gitignore",
@@ -44,6 +46,18 @@ def sha256(path: Path) -> str:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Hash the executable research package and record its environment."
+    )
+    parser.add_argument(
+        "--output",
+        default=str(OUTPUT.relative_to(ROOT)),
+        help="Manifest path, relative to the repository unless absolute.",
+    )
+    args = parser.parse_args()
+    output = Path(args.output)
+    if not output.is_absolute():
+        output = ROOT / output
     files = []
     for relative_root in INCLUDED_ROOTS:
         root = ROOT / relative_root
@@ -104,9 +118,9 @@ def main() -> None:
         "file_count": len(files),
         "files": files,
     }
-    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text(json.dumps(report, indent=2), encoding="utf-8")
-    print(OUTPUT)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    print(output)
 
 
 if __name__ == "__main__":

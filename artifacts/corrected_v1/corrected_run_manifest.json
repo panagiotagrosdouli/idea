@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "config": "configs/default.json",
+  "output": "artifacts/corrected_v1",
+  "quick_diagnostic": true,
+  "official_womd_used": false,
+  "learned_checkpoint_used": false,
+  "measured_optical_channel_used": false,
+  "notes": [
+    "Compact WOMD uses proxy ego and model-based communication.",
+    "Quick staged inference uses two seeds and is diagnostic only.",
+    "Existing artifacts outside this directory are not mixed into this run."
+  ]
+}

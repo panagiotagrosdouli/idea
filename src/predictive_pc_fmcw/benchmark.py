@@ -12,7 +12,12 @@ from .config import ExperimentConfig
 from .data.scenario import MotionScenario
 from .data.synthetic import generate_synthetic_scenario
 from .link import LinkModel
-from .metrics import bootstrap_mean_ci, paired_bootstrap_difference
+from .metrics import (
+    bootstrap_mean_ci,
+    holm_adjusted_pvalues,
+    paired_bootstrap_difference,
+    paired_metric_statistics,
+)
 from .predictors import TrajectoryPredictor
 from .simulation.engine import SimulationOutput, run_simulation
 from .traffic import generate_traffic_trace
@@ -21,13 +26,38 @@ PRIMARY_METRICS = (
     "goodput_mbps",
     "packet_delivery_ratio",
     "scheduled_outage_fraction",
+    "availability_outage_fraction",
     "mean_latency_ms",
+    "p50_latency_ms",
     "p95_latency_ms",
+    "p99_latency_ms",
     "deadline_miss_ratio",
+    "censored_packet_ratio",
+    "deadline_or_censored_ratio",
     "delivered_before_expiry_ratio",
     "undelivered_packets_at_disconnect",
     "jain_fairness",
+    "demand_normalized_jain_fairness",
+    "mean_scheduled_snr_db",
+    "mean_scheduled_ber",
+    "mean_scheduled_per",
+    "mean_scheduled_relative_power",
 )
+
+LOWER_IS_BETTER = {
+    "scheduled_outage_fraction",
+    "availability_outage_fraction",
+    "mean_latency_ms",
+    "p50_latency_ms",
+    "p95_latency_ms",
+    "p99_latency_ms",
+    "deadline_miss_ratio",
+    "censored_packet_ratio",
+    "deadline_or_censored_ratio",
+    "undelivered_packets_at_disconnect",
+    "mean_scheduled_ber",
+    "mean_scheduled_per",
+}
 
 
 def run_scenario_benchmark(
@@ -48,6 +78,7 @@ def run_scenario_benchmark(
             vehicles=scenario.vehicle_count,
             nominal_capacity_packets=capacity,
             config=config.traffic,
+            slot_duration_s=config.slot_duration_s,
         )
         for scheduler_name in schedulers:
             outputs.append(
@@ -68,10 +99,15 @@ def run_synthetic_benchmark(
     scheduler_names: Iterable[str] | None = None,
     learned_predictor: TrajectoryPredictor | None = None,
 ) -> list[SimulationOutput]:
+    slots = (
+        max(2, int(round(config.benchmark.duration_s / config.slot_duration_s)))
+        if config.benchmark.duration_s is not None
+        else config.benchmark.slots
+    )
     scenarios = [
         generate_synthetic_scenario(
             seed=config.seed + episode,
-            slots=config.benchmark.slots,
+            slots=slots,
             vehicles=config.benchmark.vehicles,
             dt_s=config.slot_duration_s,
         )
@@ -135,6 +171,42 @@ def summarize_outputs(
                     )
                 )
     summary["paired_difference_vs_reactive"] = comparisons
+    statistical_comparisons: dict[str, object] = {}
+    if baseline is not None:
+        baseline_by_scenario = {
+            str(row["scenario_id"]): row for row in baseline
+        }
+        for scheduler, rows in grouped.items():
+            if scheduler == "reactive_greedy":
+                continue
+            current_by_scenario = {str(row["scenario_id"]): row for row in rows}
+            shared = sorted(set(baseline_by_scenario) & set(current_by_scenario))
+            statistical_comparisons[scheduler] = {}
+            for metric in PRIMARY_METRICS:
+                proposed = [float(current_by_scenario[key][metric]) for key in shared]
+                reference = [float(baseline_by_scenario[key][metric]) for key in shared]
+                statistical_comparisons[scheduler][metric] = (
+                    paired_metric_statistics(
+                        proposed,
+                        reference,
+                        higher_is_better=metric not in LOWER_IS_BETTER,
+                        clusters=shared,
+                        samples=config.benchmark.bootstrap_samples,
+                        seed=config.seed,
+                    )
+                )
+        policy_names = sorted(statistical_comparisons)
+        for metric in PRIMARY_METRICS:
+            raw = [
+                statistical_comparisons[name][metric]["wilcoxon_p_value"]
+                for name in policy_names
+            ]
+            adjusted = holm_adjusted_pvalues(raw)
+            for name, value in zip(policy_names, adjusted, strict=True):
+                statistical_comparisons[name][metric][
+                    "wilcoxon_holm_p_value"
+                ] = value
+    summary["paired_statistics_vs_reactive"] = statistical_comparisons
     return summary
 
 

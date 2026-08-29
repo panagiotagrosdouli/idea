@@ -1,152 +1,180 @@
 # Methodology
 
-## 1. Causal motion forecast
+## 1. Scope and decision variable
 
-At decision slot `t`, a deployable predictor receives states only through `t`.
-For target `i` and look-ahead step `k`, it produces
+The system schedules at most one candidate receiver in each communication
+slot. Beam-index selection, Adaptive Driving Beam control, illumination quality
+and the separate Joint project are outside the optimization problem.
+
+The executed chain is:
+
+```text
+causal position history
+→ future trajectory
+→ ego-relative range and bearing
+→ normalized optical link
+→ SNR, BER, PER, goodput and outage
+→ queue/deadline-aware scheduling
+→ packet outcome on the ground-truth-derived current link
+```
+
+## 2. Causal motion forecasting
+
+At decision time `t`, every deployable predictor receives samples only through
+`t`. For target `i` and look-ahead step `k`, it estimates
 
 ```math
 \hat{\mathbf p}_{i,t+k}.
 ```
 
-The future-mutation gate in `validation.py` changes every future ground-truth
-position and verifies that a causal forecast remains bit-identical. Only the
-oracle-information policy reads the mutated future.
+The deployable baselines are Last Position, Constant Velocity, Constant
+Acceleration, position-only Kalman CV and a lightweight CV/CA IMM. A learned GRU
+adapter is optional. The Oracle reads the hidden future and is used only as an
+information reference.
 
-The frozen motion baselines are Last Position, Constant Velocity, a position-
-only CV Kalman filter, a causal CV/CA IMM approximation, Constant Acceleration
-and Oracle. They are evaluated with ADE and FDE. Derived communication accuracy
-is evaluated separately with range MAE, SNR MAE, outage F1/AUROC and absolute
-link-lifetime error.
+Tests mutate every state after `t` and require all deployable forecasts to
+remain unchanged. Forecasts are truncated uniformly when fewer than `H` future
+states exist; no policy receives repeated clamped tail samples.
 
-## 2. Relative geometry
+## 3. Frames, heading and relative geometry
 
-The forecast is mapped to ego-relative distance and bearing:
+Range and bearing are
 
 ```math
 d_{i,k}=\|\hat{\mathbf p}_{i,k}-\hat{\mathbf p}_{e,k}\|_2,
 ```
 
 ```math
-\phi_{i,k}=\operatorname{wrap}\left(
+\phi_{i,k}=\operatorname{wrap}\left[
 \operatorname{atan2}(\Delta y_{i,k},\Delta x_{i,k})-\psi_{e,k}
-\right).
+\right].
 ```
 
-## 3. PC-FMCW/DPSK link abstraction
+Stationary ego samples reuse the last valid heading rather than resetting to
+zero. The communication-aware training loss receives explicit ego heading, so
+its link geometry is rotation-consistent with scheduler evaluation.
 
-The original Assignment 1 demonstrates the PC-FMCW waveform and DPSK receiver,
-but it does not supply an experimentally calibrated absolute vehicle-to-vehicle
-optical link budget. This repository therefore uses a transparent reference-SNR
-calibration.
+## 4. PC-FMCW/DPSK-informed link abstraction
 
-The relative link gain is
+The frozen Part-A assumptions are 193.4 THz carrier, 10 GHz chirp bandwidth,
+10 μs chirp duration and 1 Gbit/s data rate. Their notebook hash and upstream
+commit are recorded in `configs/part_a_physical_layer.json`.
+
+The available inputs do not contain a measured end-to-end vehicle optical link
+budget. The implementation therefore uses a reference-SNR abstraction:
 
 ```math
 h(d,\phi) \propto
 \frac{1}{\pi[d\tan(\theta_b)]^2}
 \exp(-\kappa d)
 \exp\left[-\frac{1}{2}\left(\frac{\phi}{\sigma_\phi}\right)^2\right]
-\mathbb{1}(|\phi|\leq \Phi_{FOV}/2).
+\mathbf 1(|\phi|\leq \Phi_{FOV}/2),
 ```
-
-The SNR is anchored at `(d_ref, phi=0)`:
 
 ```math
 \gamma(d,\phi)=\gamma_{ref}\frac{h(d,\phi)}{h(d_{ref},0)}.
 ```
 
-This makes every absolute result conditional on the declared reference SNR,
-while preserving the required physical monotonicity.
+The reported power is normalized to a declared reference and carries
+`received_power_calibrated=false`. It is not a measured watt-level claim.
 
-For binary differential detection in AWGN:
-
-```math
-P_b=\frac{1}{2}\exp(-E_b/N_0).
-```
-
-For a packet of `L` bits:
+For analytical DBPSK in AWGN,
 
 ```math
-PER=1-(1-P_b)^L,
-```
-
-and effective goodput is
-
-```math
+P_b=\frac{1}{2}e^{-\gamma},\qquad
+PER=1-(1-P_b)^L,\qquad
 G=R_b(1-PER).
 ```
 
-Outage is declared when BER exceeds the configured threshold. The Monte Carlo
-LUT uses differential encoding, complex AWGN and adjacent-symbol differential
-detection; it is kept separate from the analytical expression for validation.
+The alternative Monte Carlo LUT uses differential encoding/detection, adaptive
+bit counts, an error target and Wilson 95% upper bounds for zero-error points.
+The generated grid covers −5 to 25 dB.
 
-## 4. Traffic and packet delivery
+Outage is explicitly selectable as BER-, PER- or goodput-based. All three flags
+are stored, even when only one drives the scheduler.
 
-Each vehicle has an independent FIFO queue. Poisson, periodic and
-Markov-modulated arrivals can be generated from the normalized offered load.
-Every packet has an absolute deadline. For all
-schedulers in the same episode, arrivals, deadlines and per-attempt uniform
-random variables are identical. This common-random-number design prevents a
-policy from receiving an easier traffic or channel realization.
+## 5. Traffic and packet simulation
 
-At most one vehicle is selected per slot. Failed packets return to the head of
-the queue; successful packets contribute their payload bits and latency.
+The simulator supports Poisson, periodic, Markov-modulated and saturated
+traffic. Every packet has a physical deadline in seconds; deadline slots are
+derived after the slot duration is selected. Physical episode duration is also
+fixed in seconds, preventing slot-size sweeps from changing the simulated time.
 
-## 5. Scheduling policies
+All policies in a paired episode share arrivals, deadlines and packet-success
+uniform random values. Failed transmissions return packets to the FIFO queue.
+Delivered, deadline-dropped, overflow-dropped and remaining packets must sum to
+generated packets.
 
-- Random: lower baseline.
-- Round Robin: equal-turn baseline.
-- Reactive Greedy: current goodput and queue only.
-- Proportional Fair: current rate divided by past service.
-- CV Predictive: finite-horizon link estimate from constant velocity.
-- Kalman Predictive: position-only filtered constant-velocity forecast.
-- IMM Predictive: maneuver-aware blend of CV and bounded acceleration.
-- Predictive Utility: constant-acceleration forecast and finite-horizon utility.
-- Link-Lifetime: predictive utility plus proactive drain pressure.
-- Oracle: perfect future positions used by the same lifetime-aware objective.
+Packets still queued at episode end are reported as censored. Latency is
+interpreted jointly with PDR and censoring because it is defined only for
+delivered packets.
 
-The predictive score combines discounted expected goodput, predicted outage,
-queue size, deadline urgency, fairness, switching cost and the opportunity loss
-between the current and final predicted link. The link-lifetime variant adds a
-pressure term only while the current link is usable:
+## 6. Scheduling policies
+
+- Random and Round Robin provide lower/reference baselines.
+- Reactive Greedy uses current goodput, outage and queue state.
+- Proportional Fair uses current normalized rate divided by historical
+  normalized service per elapsed slot.
+- CV, Kalman and IMM Predictive policies apply the same future-link utility to
+  different causal forecasts.
+- Predictive Utility combines discounted future goodput, outage risk, queue,
+  deadline, fairness, opportunity and switching terms.
+- Link Lifetime adds a dimensionless urgency term for a currently usable link:
 
 ```math
-U_i^{life}\propto
-Q_i\left(1-\frac{T_i^{link}}{H}\right)
-+\frac{Q_i}{1+T_i^{link}}.
+U_i^{life}=w_{life}\,\tilde Q_i\,
+\max\left(0,1-\frac{T_i^{link}}{H}\right).
 ```
 
-## 6. Communication-aware learning
+- Oracle uses perfect future positions with the same heuristic utility. It is
+  not a globally optimal offline schedule.
+
+The explicit lifetime term is zero when no outage lies inside the forecast
+horizon. The corrected default ablation records this null behavior instead of
+claiming an effect that did not occur.
+
+## 7. Sensing uncertainty
+
+The default assumes perfect observed positions. Robustness studies can use:
+
+- IID Cartesian target-position noise;
+- range/bearing noise with range-dependent radial variance;
+- temporally correlated AR(1) errors;
+- an isotropic-equivalent measurement covariance for the Kalman baseline.
+
+The ego pose remains exact in these tests. These are declared synthetic
+assumptions, not measured PC-FMCW sensor specifications.
+
+## 8. Communication-aware learning
 
 The trainable objective is
 
 ```math
-\mathcal L = \mathcal L_{traj}
+\mathcal L=\lambda_{traj}\mathcal L_{traj}
 +\lambda_{link}\mathcal L_{link}
 +\lambda_{out}\mathcal L_{out}.
 ```
 
-`L_traj` is Smooth L1 trajectory loss. `L_link` is Smooth L1 error between
-predicted and ground-truth log-SNR. `L_out` is binary cross entropy for a smooth
-outage probability. The architecture is a compact GRU encoder with a
-multi-step decoder. Scenario IDs, rather than independent trajectory rows, are
-used for the train/validation split.
+The link term compares log-SNR in the correct ego-heading frame. The outage
+term uses a smooth FoV surrogate during training and exact hard-FoV evaluation.
+Four pre-registered modes are supported: trajectory-only, trajectory+link,
+trajectory+outage and full. The multi-seed runner requires at least three seeds.
 
-## 7. Evaluation
+Every local checkpoint stores a versioned feature schema, dataset SHA-256,
+scenario-safe split metadata and objective. An upstream checkpoint without the
+matching schema is rejected rather than silently adapted.
 
-Primary metrics are successfully delivered goodput, PDR, scheduled outage,
-availability outage, mean/P95 latency, deadline-miss ratio, delivered-before-
-expiry ratio, packets left undelivered at first disconnection and Jain
-fairness. Results are paired by scenario and seed. Reports include bootstrap
-confidence intervals, paired t-tests, Wilcoxon signed-rank tests, win fractions
-and Cohen's paired effect size relative to Reactive Greedy.
+## 9. Metrics and inference
 
-## 8. Channel and robustness ablations
+Motion/link metrics include ADE, FDE, range MAE, bearing MAE, SNR MAE, outage
+F1/AUROC with positive support, and link-lifetime error in steps and seconds.
 
-The channel mapper has three explicit fidelity levels: inverse-square range
-only; range plus pointing/FoV; and the full model with atmospheric attenuation.
-BER can come from the analytical DBPSK expression or the frozen Monte Carlo
-Part-A LUT. Separate sweeps inject causal history-measurement noise and future-
-forecast degradation. Realized transmissions always use the ground-truth
-trajectory-derived channel, never the predictor's own link estimate.
+Communication metrics include goodput, PDR, availability and scheduled outage,
+mean/P50/P95/P99 latency, deadline miss, censoring, delivered before expiry,
+queue at disconnection, raw and demand-normalized Jain fairness, scheduled
+SNR/BER/PER/relative power and switching count.
+
+Policy comparisons are paired and direction-aware. Resampling and tests operate
+at independent scenario/seed-cluster level, not at every correlated Cartesian
+row. Wilcoxon families receive Holm correction. Two-seed outputs are labelled
+diagnostic and cannot support final inference.
