@@ -1,0 +1,274 @@
+[
+  {
+    "scenario_id": "52dafd686fe77b21",
+    "actor_id": "383",
+    "approaching": false,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": true,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 0.012394507283877587,
+    "lateral_change_m": 2.2509333991624922,
+    "heading_change_deg": 48.81407483429035,
+    "labels": [
+      "lane_change_or_merge",
+      "turn"
+    ]
+  },
+  {
+    "scenario_id": "52dafd686fe77b21",
+    "actor_id": "387",
+    "approaching": false,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": true,
+    "fov_edge": true,
+    "dense": false,
+    "range_change_m": -0.012256170119241183,
+    "lateral_change_m": 7.648569488669365,
+    "heading_change_deg": 105.1540680503126,
+    "labels": [
+      "lane_change_or_merge",
+      "turn",
+      "fov_edge"
+    ]
+  },
+  {
+    "scenario_id": "52dafd686fe77b21",
+    "actor_id": "391",
+    "approaching": false,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": true,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -0.02035171344747244,
+    "lateral_change_m": 8.386426392532535,
+    "heading_change_deg": 70.70995378081128,
+    "labels": [
+      "lane_change_or_merge",
+      "turn"
+    ]
+  },
+  {
+    "scenario_id": "52dafd686fe77b21",
+    "actor_id": "395",
+    "approaching": false,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": true,
+    "fov_edge": true,
+    "dense": false,
+    "range_change_m": 0.8649604336910368,
+    "lateral_change_m": 5.390168252342774,
+    "heading_change_deg": 87.35745470593528,
+    "labels": [
+      "lane_change_or_merge",
+      "turn",
+      "fov_edge"
+    ]
+  },
+  {
+    "scenario_id": "52dafd686fe77b21",
+    "actor_id": "408",
+    "approaching": false,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": true,
+    "fov_edge": true,
+    "dense": false,
+    "range_change_m": -0.003943328932318302,
+    "lateral_change_m": -6.095339559135488,
+    "heading_change_deg": 126.86989764584402,
+    "labels": [
+      "lane_change_or_merge",
+      "turn",
+      "fov_edge"
+    ]
+  },
+  {
+    "scenario_id": "75ae707721eb23b4",
+    "actor_id": "4356",
+    "approaching": false,
+    "receding": true,
+    "straight": true,
+    "lane_change_or_merge": false,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 2.4895959327199844,
+    "lateral_change_m": 0.3489758827520735,
+    "heading_change_deg": 0.7928568392717897,
+    "labels": [
+      "receding",
+      "straight"
+    ]
+  },
+  {
+    "scenario_id": "75ae707721eb23b4",
+    "actor_id": "1502",
+    "approaching": false,
+    "receding": false,
+    "straight": true,
+    "lane_change_or_merge": false,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 1.8149442016503627,
+    "lateral_change_m": 0.40428780889424987,
+    "heading_change_deg": 0.6236397949248347,
+    "labels": [
+      "straight"
+    ]
+  },
+  {
+    "scenario_id": "75ae707721eb23b4",
+    "actor_id": "1503",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": false,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -6.565154466983255,
+    "lateral_change_m": -0.7509305109093858,
+    "heading_change_deg": 1.8059406155136046,
+    "labels": [
+      "approaching"
+    ]
+  },
+  {
+    "scenario_id": "75ae707721eb23b4",
+    "actor_id": "1505",
+    "approaching": true,
+    "receding": false,
+    "straight": true,
+    "lane_change_or_merge": false,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -3.9790757855968266,
+    "lateral_change_m": 0.6580946331943373,
+    "heading_change_deg": 0.7505482621757514,
+    "labels": [
+      "approaching",
+      "straight"
+    ]
+  },
+  {
+    "scenario_id": "75ae707721eb23b4",
+    "actor_id": "1504",
+    "approaching": true,
+    "receding": false,
+    "straight": true,
+    "lane_change_or_merge": false,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -7.085554294963082,
+    "lateral_change_m": -0.46552301770996873,
+    "heading_change_deg": 0.2508079626610501,
+    "labels": [
+      "approaching",
+      "straight"
+    ]
+  },
+  {
+    "scenario_id": "b85e1bd6cc8e74c0",
+    "actor_id": "1807",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": true,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 3.0523669118165078,
+    "lateral_change_m": 10.490736937812802,
+    "heading_change_deg": 87.37182949074457,
+    "labels": [
+      "receding",
+      "lane_change_or_merge",
+      "turn"
+    ]
+  },
+  {
+    "scenario_id": "b85e1bd6cc8e74c0",
+    "actor_id": "1817",
+    "approaching": false,
+    "receding": true,
+    "straight": true,
+    "lane_change_or_merge": false,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 32.42123635627493,
+    "lateral_change_m": 0.039865954936594505,
+    "heading_change_deg": 0.0,
+    "labels": [
+      "receding",
+      "straight"
+    ]
+  },
+  {
+    "scenario_id": "b85e1bd6cc8e74c0",
+    "actor_id": "1816",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 33.45742927808233,
+    "lateral_change_m": -4.749159747717975,
+    "heading_change_deg": 0.0,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "b85e1bd6cc8e74c0",
+    "actor_id": "1825",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 30.697695270836654,
+    "lateral_change_m": -41.507634652029566,
+    "heading_change_deg": 0.0,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "b85e1bd6cc8e74c0",
+    "actor_id": "1819",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 34.19752592816533,
+    "lateral_change_m": -42.33261421493327,
+    "heading_change_deg": 0.0,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  }
+]

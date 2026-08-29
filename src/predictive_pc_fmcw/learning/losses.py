@@ -33,6 +33,7 @@ def communication_aware_loss(
     lambda_outage: float = 0.1,
     huber_delta_m: float = 1.0,
     outage_temperature: float = 0.5,
+    ego_heading_rad: ArrayLike | float = 0.0,
 ) -> CommunicationLossBreakdown:
     predicted = np.asarray(predicted_relative_xy, dtype=np.float64)
     target = np.asarray(target_relative_xy, dtype=np.float64)
@@ -43,7 +44,10 @@ def communication_aware_loss(
 
     def link_values(relative: np.ndarray) -> dict[str, np.ndarray]:
         distance = np.linalg.norm(relative, axis=-1)
-        bearing = np.arctan2(relative[..., 1], relative[..., 0])
+        bearing = (
+            np.arctan2(relative[..., 1], relative[..., 0])
+            - np.asarray(ego_heading_rad, dtype=np.float64)
+        )
         return link_model.evaluate_arrays(distance, bearing)
 
     predicted_link = link_values(predicted)
@@ -64,4 +68,3 @@ def communication_aware_loss(
     )
     total = trajectory_loss + lambda_link * link_loss + lambda_outage * outage_loss
     return CommunicationLossBreakdown(total, trajectory_loss, link_loss, outage_loss)
-

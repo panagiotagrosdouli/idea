@@ -24,7 +24,12 @@ from reportlab.platypus import (
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "paper" / "PAPER_DRAFT.md"
-OUTPUT = ROOT / "output" / "pdf" / "predictive_pc_fmcw_paper_draft.pdf"
+OUTPUT = (
+    ROOT
+    / "output"
+    / "pdf"
+    / "predictive_pc_fmcw_corrected_research_draft.pdf"
+)
 STYLES: dict[str, ParagraphStyle] = {}
 
 
@@ -109,7 +114,9 @@ def _footer(canvas, document) -> None:
     canvas.saveState()
     canvas.setFont("DejaVuSerif", 7.5)
     canvas.setFillColor(colors.HexColor("#4B5563"))
-    canvas.drawString(18 * mm, 10 * mm, "Predictive PC-FMCW/DPSK — research draft")
+    canvas.drawString(
+        18 * mm, 10 * mm, "Predictive PC-FMCW/DPSK - corrected research draft"
+    )
     canvas.drawRightString(192 * mm, 10 * mm, f"Page {document.page}")
     canvas.restoreState()
 
@@ -180,7 +187,7 @@ def build() -> Path:
         rightMargin=18 * mm,
         topMargin=16 * mm,
         bottomMargin=16 * mm,
-        title="Trajectory-Predictive Link-Lifetime Scheduling",
+        title="When Does Trajectory Prediction Help PC-FMCW/DPSK Scheduling?",
         author="Author to be inserted",
     )
     width = A4[0] - document.leftMargin - document.rightMargin

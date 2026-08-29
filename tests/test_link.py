@@ -31,6 +31,23 @@ class LinkModelTest(unittest.TestCase):
     def test_reference_snr(self):
         state = self.model.evaluate(40.0, 0.0)
         self.assertAlmostEqual(state.snr_db, 18.0, places=8)
+        self.assertAlmostEqual(state.relative_received_power, 1.0, places=8)
+        self.assertFalse(state.received_power_calibrated)
+
+    def test_outage_semantics_are_explicit(self):
+        distance = 72.0
+        bearing = np.deg2rad(25.0)
+        states = {
+            mode: LinkModel(LinkConfig(outage_mode=mode)).evaluate(
+                distance, bearing
+            )
+            for mode in ("ber", "per", "goodput")
+        }
+        self.assertEqual(states["ber"].outage, states["ber"].ber_outage)
+        self.assertEqual(states["per"].outage, states["per"].per_outage)
+        self.assertEqual(
+            states["goodput"].outage, states["goodput"].goodput_outage
+        )
 
     def test_outside_fov_is_outage(self):
         state = self.model.evaluate(20.0, np.deg2rad(80))

@@ -1,0 +1,5224 @@
+{
+  "config": {
+    "seed": 20260827,
+    "slot_duration_s": 0.1,
+    "prediction_horizon_steps": 10,
+    "discount": 0.93,
+    "history_measurement_noise_std_m": 0.0,
+    "forecast_position_noise_std_m": 0.0,
+    "link": {
+      "carrier_frequency_hz": 193400000000000.0,
+      "chirp_bandwidth_hz": 10000000000.0,
+      "chirp_duration_s": 1e-05,
+      "data_rate_bps": 1000000000.0,
+      "packet_bits": 12000,
+      "resource_fraction": 0.005,
+      "reference_distance_m": 40.0,
+      "reference_snr_db": 18.0,
+      "beam_divergence_half_angle_deg": 5.0,
+      "field_of_view_deg": 70.0,
+      "pointing_sigma_deg": 18.0,
+      "atmospheric_attenuation_per_m": 0.004,
+      "outage_ber_threshold": 0.001,
+      "min_received_power_w": 1e-15,
+      "reference_received_power_w": 1e-06,
+      "received_power_calibrated": false,
+      "channel_mode": "full",
+      "ber_source": "analytical",
+      "ber_lut_path": null,
+      "outage_mode": "ber",
+      "outage_per_threshold": 0.1,
+      "outage_goodput_fraction_threshold": 0.1,
+      "physical_layer_source": "supplied Part-A PC-FMCW/DPSK notebook"
+    },
+    "traffic": {
+      "offered_load": 0.72,
+      "deadline_slots": 12,
+      "deadline_jitter_slots": 4,
+      "deadline_s": 1.2,
+      "deadline_jitter_s": 0.4,
+      "max_queue_packets": 2000,
+      "model": "poisson",
+      "periodic_interval_slots": 5,
+      "markov_low_rate_scale": 0.25,
+      "markov_high_rate_scale": 2.5,
+      "markov_low_to_high": 0.08,
+      "markov_high_to_low": 0.2
+    },
+    "sensing": {
+      "model": "perfect",
+      "cartesian_std_m": 0.75,
+      "range_std_base_m": 0.2,
+      "range_std_per_m": 0.005,
+      "bearing_std_deg": 0.25,
+      "temporal_correlation": 0.0,
+      "covariance_aware": true,
+      "assumption_source": "declared synthetic robustness model"
+    },
+    "scheduler": {
+      "goodput_weight": 1.0,
+      "outage_weight": 1.5,
+      "queue_weight": 0.35,
+      "deadline_weight": 0.5,
+      "fairness_weight": 0.2,
+      "switching_weight": 0.02,
+      "opportunity_weight": 0.6,
+      "lifetime_weight": 2.0
+    },
+    "benchmark": {
+      "episodes": 12,
+      "slots": 120,
+      "duration_s": 12.0,
+      "vehicles": 5,
+      "bootstrap_samples": 2000,
+      "schedulers": [
+        "random",
+        "round_robin",
+        "reactive_greedy",
+        "proportional_fair",
+        "cv_predictive",
+        "kalman_predictive",
+        "imm_predictive",
+        "predictive_utility",
+        "link_lifetime",
+        "oracle"
+      ]
+    }
+  },
+  "episodes": 12,
+  "schedulers": {
+    "cv_predictive": {
+      "goodput_mbps": {
+        "mean": 2.3052499999999996,
+        "low": 2.0033937500000003,
+        "high": 2.597516666666667,
+        "samples": 12
+      },
+      "packet_delivery_ratio": {
+        "mean": 0.6473250629645196,
+        "low": 0.56400831609637,
+        "high": 0.730000651753705,
+        "samples": 12
+      },
+      "scheduled_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "availability_outage_fraction": {
+        "mean": 0.23388888888888892,
+        "low": 0.16345833333333334,
+        "high": 0.29931597222222217,
+        "samples": 12
+      },
+      "mean_latency_ms": {
+        "mean": 427.6364211575774,
+        "low": 359.9445657575748,
+        "high": 498.3477548011865,
+        "samples": 12
+      },
+      "p50_latency_ms": {
+        "mean": 391.6666666666667,
+        "low": 316.6666666666667,
+        "high": 475.0,
+        "samples": 12
+      },
+      "p95_latency_ms": {
+        "mean": 948.7499999999992,
+        "low": 848.7187499999992,
+        "high": 1048.7499999999993,
+        "samples": 12
+      },
+      "p99_latency_ms": {
+        "mean": 1216.6666666666667,
+        "low": 1091.6666666666667,
+        "high": 1325.0,
+        "samples": 12
+      },
+      "deadline_miss_ratio": {
+        "mean": 0.29807586811109904,
+        "low": 0.22513072605757437,
+        "high": 0.3715080361612734,
+        "samples": 12
+      },
+      "censored_packet_ratio": {
+        "mean": 0.05459906892438134,
+        "low": 0.04300917893434756,
+        "high": 0.0668927032304849,
+        "samples": 12
+      },
+      "deadline_or_censored_ratio": {
+        "mean": 0.3526749370354804,
+        "low": 0.26999934824629485,
+        "high": 0.43599168390363,
+        "samples": 12
+      },
+      "delivered_before_expiry_ratio": {
+        "mean": 0.8019059508719238,
+        "low": 0.7268935865995062,
+        "high": 0.8638951177311127,
+        "samples": 12
+      },
+      "undelivered_packets_at_disconnect": {
+        "mean": 57.666666666666664,
+        "low": 31.083333333333332,
+        "high": 89.66874999999999,
+        "samples": 12
+      },
+      "jain_fairness": {
+        "mean": 0.5632901467013309,
+        "low": 0.4923288068605717,
+        "high": 0.6371912950191047,
+        "samples": 12
+      },
+      "demand_normalized_jain_fairness": {
+        "mean": 0.6962074917188102,
+        "low": 0.6169573603138455,
+        "high": 0.7700301632885513,
+        "samples": 12
+      },
+      "mean_scheduled_snr_db": {
+        "mean": 12.182752729333126,
+        "low": 11.566947354336829,
+        "high": 12.857958032394501,
+        "samples": 12
+      },
+      "mean_scheduled_ber": {
+        "mean": 5.899439962729605e-05,
+        "low": 2.4606909423763178e-05,
+        "high": 9.947333684294071e-05,
+        "samples": 12
+      },
+      "mean_scheduled_per": {
+        "mean": 0.20391803709243939,
+        "low": 0.12019774436061713,
+        "high": 0.28782931064581563,
+        "samples": 12
+      },
+      "mean_scheduled_relative_power": {
+        "mean": 0.3843672738722757,
+        "low": 0.28567600090963674,
+        "high": 0.5194494243315404,
+        "samples": 12
+      }
+    },
+    "imm_predictive": {
+      "goodput_mbps": {
+        "mean": 2.3072500000000002,
+        "low": 2.0048208333333335,
+        "high": 2.5998729166666665,
+        "samples": 12
+      },
+      "packet_delivery_ratio": {
+        "mean": 0.6478964580407333,
+        "low": 0.5640348195946123,
+        "high": 0.7304567676319956,
+        "samples": 12
+      },
+      "scheduled_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "availability_outage_fraction": {
+        "mean": 0.23388888888888892,
+        "low": 0.16345833333333334,
+        "high": 0.29931597222222217,
+        "samples": 12
+      },
+      "mean_latency_ms": {
+        "mean": 427.8109229388621,
+        "low": 359.2532230978737,
+        "high": 499.72458893292537,
+        "samples": 12
+      },
+      "p50_latency_ms": {
+        "mean": 391.6666666666667,
+        "low": 308.3333333333333,
+        "high": 483.3333333333333,
+        "samples": 12
+      },
+      "p95_latency_ms": {
+        "mean": 948.7499999999992,
+        "low": 848.7187499999992,
+        "high": 1048.7499999999993,
+        "samples": 12
+      },
+      "p99_latency_ms": {
+        "mean": 1223.9166666666658,
+        "low": 1090.5833333333323,
+        "high": 1339.5270833333313,
+        "samples": 12
+      },
+      "deadline_miss_ratio": {
+        "mean": 0.29785974376805857,
+        "low": 0.22499967487110065,
+        "high": 0.371219527970551,
+        "samples": 12
+      },
+      "censored_packet_ratio": {
+        "mean": 0.05424379819120812,
+        "low": 0.042447527347435426,
+        "high": 0.0671715782888186,
+        "samples": 12
+      },
+      "deadline_or_censored_ratio": {
+        "mean": 0.35210354195926663,
+        "low": 0.26954323236800426,
+        "high": 0.4359651804053877,
+        "samples": 12
+      },
+      "delivered_before_expiry_ratio": {
+        "mean": 0.8027279903489816,
+        "low": 0.7262651114594263,
+        "high": 0.8651472157480764,
+        "samples": 12
+      },
+      "undelivered_packets_at_disconnect": {
+        "mean": 57.25,
+        "low": 30.66250000000001,
+        "high": 89.17083333333332,
+        "samples": 12
+      },
+      "jain_fairness": {
+        "mean": 0.5629110169835673,
+        "low": 0.49133678657440794,
+        "high": 0.6371837928173926,
+        "samples": 12
+      },
+      "demand_normalized_jain_fairness": {
+        "mean": 0.6949023167480891,
+        "low": 0.6143642792366147,
+        "high": 0.769996410349804,
+        "samples": 12
+      },
+      "mean_scheduled_snr_db": {
+        "mean": 12.212381001274485,
+        "low": 11.576155568149579,
+        "high": 12.925142489879509,
+        "samples": 12
+      },
+      "mean_scheduled_ber": {
+        "mean": 5.901734004352574e-05,
+        "low": 2.4738259088484756e-05,
+        "high": 9.953739598816269e-05,
+        "samples": 12
+      },
+      "mean_scheduled_per": {
+        "mean": 0.2034732417758751,
+        "low": 0.11984382192600926,
+        "high": 0.2879372643392132,
+        "samples": 12
+      },
+      "mean_scheduled_relative_power": {
+        "mean": 0.39859693980808336,
+        "low": 0.28576352786848996,
+        "high": 0.5596799701235168,
+        "samples": 12
+      }
+    },
+    "kalman_predictive": {
+      "goodput_mbps": {
+        "mean": 2.304666666666667,
+        "low": 2.0029979166666667,
+        "high": 2.59815625,
+        "samples": 12
+      },
+      "packet_delivery_ratio": {
+        "mean": 0.6471594035251357,
+        "low": 0.5640267751652893,
+        "high": 0.7301596083155317,
+        "samples": 12
+      },
+      "scheduled_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "availability_outage_fraction": {
+        "mean": 0.23388888888888892,
+        "low": 0.16345833333333334,
+        "high": 0.29931597222222217,
+        "samples": 12
+      },
+      "mean_latency_ms": {
+        "mean": 426.4040851575323,
+        "low": 358.7520829155153,
+        "high": 498.5007158588712,
+        "samples": 12
+      },
+      "p50_latency_ms": {
+        "mean": 391.6666666666667,
+        "low": 308.3333333333333,
+        "high": 483.3333333333333,
+        "samples": 12
+      },
+      "p95_latency_ms": {
+        "mean": 933.3333333333334,
+        "low": 833.3333333333334,
+        "high": 1033.3333333333333,
+        "samples": 12
+      },
+      "p99_latency_ms": {
+        "mean": 1216.6666666666667,
+        "low": 1091.6666666666667,
+        "high": 1325.0,
+        "samples": 12
+      },
+      "deadline_miss_ratio": {
+        "mean": 0.297888426615532,
+        "low": 0.22462442235363106,
+        "high": 0.37039857431053047,
+        "samples": 12
+      },
+      "censored_packet_ratio": {
+        "mean": 0.054952169859332295,
+        "low": 0.043139779865521644,
+        "high": 0.06799608622165536,
+        "samples": 12
+      },
+      "deadline_or_censored_ratio": {
+        "mean": 0.3528405964748644,
+        "low": 0.2698403916844683,
+        "high": 0.43597322483471085,
+        "samples": 12
+      },
+      "delivered_before_expiry_ratio": {
+        "mean": 0.8023139410350275,
+        "low": 0.7256745797707774,
+        "high": 0.8650361999806205,
+        "samples": 12
+      },
+      "undelivered_packets_at_disconnect": {
+        "mean": 57.25,
+        "low": 30.333333333333332,
+        "high": 89.33541666666665,
+        "samples": 12
+      },
+      "jain_fairness": {
+        "mean": 0.5632945074546193,
+        "low": 0.49218719328854516,
+        "high": 0.635975883208005,
+        "samples": 12
+      },
+      "demand_normalized_jain_fairness": {
+        "mean": 0.6947522264983115,
+        "low": 0.6142848265604219,
+        "high": 0.7703273776295444,
+        "samples": 12
+      },
+      "mean_scheduled_snr_db": {
+        "mean": 12.217430329353379,
+        "low": 11.576343092620686,
+        "high": 12.925282682255405,
+        "samples": 12
+      },
+      "mean_scheduled_ber": {
+        "mean": 5.904985386326291e-05,
+        "low": 2.477220589541044e-05,
+        "high": 9.945014232527788e-05,
+        "samples": 12
+      },
+      "mean_scheduled_per": {
+        "mean": 0.20324302515209777,
+        "low": 0.12017637300805556,
+        "high": 0.2877524601801033,
+        "samples": 12
+      },
+      "mean_scheduled_relative_power": {
+        "mean": 0.3996074328044352,
+        "low": 0.2868490537886992,
+        "high": 0.561643929913243,
+        "samples": 12
+      }
+    },
+    "link_lifetime": {
+      "goodput_mbps": {
+        "mean": 2.307,
+        "low": 2.0021395833333333,
+        "high": 2.601339583333333,
+        "samples": 12
+      },
+      "packet_delivery_ratio": {
+        "mean": 0.6478107623464653,
+        "low": 0.5636102550938277,
+        "high": 0.73095922497264,
+        "samples": 12
+      },
+      "scheduled_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "availability_outage_fraction": {
+        "mean": 0.23388888888888892,
+        "low": 0.16345833333333334,
+        "high": 0.29931597222222217,
+        "samples": 12
+      },
+      "mean_latency_ms": {
+        "mean": 430.1178477969043,
+        "low": 363.7710212872458,
+        "high": 500.23220949767676,
+        "samples": 12
+      },
+      "p50_latency_ms": {
+        "mean": 391.6666666666667,
+        "low": 316.6666666666667,
+        "high": 475.0,
+        "samples": 12
+      },
+      "p95_latency_ms": {
+        "mean": 968.3333333333318,
+        "low": 859.958333333332,
+        "high": 1068.333333333332,
+        "samples": 12
+      },
+      "p99_latency_ms": {
+        "mean": 1223.0,
+        "low": 1089.6666666666667,
+        "high": 1341.6666666666667,
+        "samples": 12
+      },
+      "deadline_miss_ratio": {
+        "mean": 0.2973971761932266,
+        "low": 0.22435700262123215,
+        "high": 0.37078599931918843,
+        "samples": 12
+      },
+      "censored_packet_ratio": {
+        "mean": 0.05479206146030818,
+        "low": 0.04327385682108966,
+        "high": 0.06722988481627895,
+        "samples": 12
+      },
+      "deadline_or_censored_ratio": {
+        "mean": 0.3521892376535347,
+        "low": 0.26904077502736007,
+        "high": 0.43638974490617216,
+        "samples": 12
+      },
+      "delivered_before_expiry_ratio": {
+        "mean": 0.8026373137631307,
+        "low": 0.7268872121770253,
+        "high": 0.8655600086613148,
+        "samples": 12
+      },
+      "undelivered_packets_at_disconnect": {
+        "mean": 54.25,
+        "low": 27.333333333333332,
+        "high": 87.5,
+        "samples": 12
+      },
+      "jain_fairness": {
+        "mean": 0.5658151786535671,
+        "low": 0.4939613923363091,
+        "high": 0.6401809134758241,
+        "samples": 12
+      },
+      "demand_normalized_jain_fairness": {
+        "mean": 0.6993047895527101,
+        "low": 0.6198301950419192,
+        "high": 0.7728333890849948,
+        "samples": 12
+      },
+      "mean_scheduled_snr_db": {
+        "mean": 12.165392973892109,
+        "low": 11.564192121315156,
+        "high": 12.8372757482852,
+        "samples": 12
+      },
+      "mean_scheduled_ber": {
+        "mean": 6.461664314422718e-05,
+        "low": 3.35083064117649e-05,
+        "high": 0.00010291526574691007,
+        "samples": 12
+      },
+      "mean_scheduled_per": {
+        "mean": 0.20994976426987433,
+        "low": 0.13158529076060915,
+        "high": 0.2915022049928294,
+        "samples": 12
+      },
+      "mean_scheduled_relative_power": {
+        "mean": 0.38503395070229485,
+        "low": 0.2860530141393845,
+        "high": 0.5203047727472915,
+        "samples": 12
+      }
+    },
+    "oracle": {
+      "goodput_mbps": {
+        "mean": 2.30775,
+        "low": 2.00333125,
+        "high": 2.601358333333333,
+        "samples": 12
+      },
+      "packet_delivery_ratio": {
+        "mean": 0.6480246813424722,
+        "low": 0.5644552351280547,
+        "high": 0.7311677959937467,
+        "samples": 12
+      },
+      "scheduled_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "availability_outage_fraction": {
+        "mean": 0.23388888888888892,
+        "low": 0.16345833333333334,
+        "high": 0.29931597222222217,
+        "samples": 12
+      },
+      "mean_latency_ms": {
+        "mean": 433.6112220764628,
+        "low": 363.80153136667286,
+        "high": 509.16050222713767,
+        "samples": 12
+      },
+      "p50_latency_ms": {
+        "mean": 400.0,
+        "low": 316.6666666666667,
+        "high": 491.6666666666667,
+        "samples": 12
+      },
+      "p95_latency_ms": {
+        "mean": 968.3333333333318,
+        "low": 859.958333333332,
+        "high": 1068.333333333332,
+        "samples": 12
+      },
+      "p99_latency_ms": {
+        "mean": 1223.0,
+        "low": 1089.6666666666667,
+        "high": 1341.6666666666667,
+        "samples": 12
+      },
+      "deadline_miss_ratio": {
+        "mean": 0.29768240152123565,
+        "low": 0.22435936579170693,
+        "high": 0.37138671001707535,
+        "samples": 12
+      },
+      "censored_packet_ratio": {
+        "mean": 0.0542929171362922,
+        "low": 0.04300323957575995,
+        "high": 0.06627020906994656,
+        "samples": 12
+      },
+      "deadline_or_censored_ratio": {
+        "mean": 0.35197531865752785,
+        "low": 0.26883220400625335,
+        "high": 0.4355447648719451,
+        "samples": 12
+      },
+      "delivered_before_expiry_ratio": {
+        "mean": 0.8028586179826646,
+        "low": 0.7273353532215814,
+        "high": 0.8655600086613148,
+        "samples": 12
+      },
+      "undelivered_packets_at_disconnect": {
+        "mean": 54.25,
+        "low": 27.333333333333332,
+        "high": 87.5,
+        "samples": 12
+      },
+      "jain_fairness": {
+        "mean": 0.5657007772977829,
+        "low": 0.4938498510144194,
+        "high": 0.639862341051157,
+        "samples": 12
+      },
+      "demand_normalized_jain_fairness": {
+        "mean": 0.6999537256728648,
+        "low": 0.6198301950419192,
+        "high": 0.7734936391913111,
+        "samples": 12
+      },
+      "mean_scheduled_snr_db": {
+        "mean": 12.153248781835204,
+        "low": 11.554858718409609,
+        "high": 12.822602723883872,
+        "samples": 12
+      },
+      "mean_scheduled_ber": {
+        "mean": 6.477522225973261e-05,
+        "low": 3.36644450412009e-05,
+        "high": 0.0001032324239779209,
+        "samples": 12
+      },
+      "mean_scheduled_per": {
+        "mean": 0.21094571289911943,
+        "low": 0.13158529076060915,
+        "high": 0.29421400302697853,
+        "samples": 12
+      },
+      "mean_scheduled_relative_power": {
+        "mean": 0.3844665155273442,
+        "low": 0.2859822632088879,
+        "high": 0.5203047727472915,
+        "samples": 12
+      }
+    },
+    "predictive_utility": {
+      "goodput_mbps": {
+        "mean": 2.3063333333333333,
+        "low": 2.004329166666667,
+        "high": 2.5983562499999997,
+        "samples": 12
+      },
+      "packet_delivery_ratio": {
+        "mean": 0.6476280524582659,
+        "low": 0.5639829359178736,
+        "high": 0.7297805451403234,
+        "samples": 12
+      },
+      "scheduled_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "availability_outage_fraction": {
+        "mean": 0.23388888888888892,
+        "low": 0.16345833333333334,
+        "high": 0.29931597222222217,
+        "samples": 12
+      },
+      "mean_latency_ms": {
+        "mean": 428.85724510366686,
+        "low": 361.9986458280786,
+        "high": 499.4832597066366,
+        "samples": 12
+      },
+      "p50_latency_ms": {
+        "mean": 391.6666666666667,
+        "low": 316.6666666666667,
+        "high": 475.0,
+        "samples": 12
+      },
+      "p95_latency_ms": {
+        "mean": 965.416666666666,
+        "low": 864.1666666666652,
+        "high": 1058.4791666666658,
+        "samples": 12
+      },
+      "p99_latency_ms": {
+        "mean": 1223.0,
+        "low": 1089.6666666666667,
+        "high": 1337.7166666666665,
+        "samples": 12
+      },
+      "deadline_miss_ratio": {
+        "mean": 0.2976588971289573,
+        "low": 0.22501195070799318,
+        "high": 0.3706158441544621,
+        "samples": 12
+      },
+      "censored_packet_ratio": {
+        "mean": 0.05471305041277675,
+        "low": 0.043282196709804446,
+        "high": 0.0668950313198381,
+        "samples": 12
+      },
+      "deadline_or_censored_ratio": {
+        "mean": 0.352371947541734,
+        "low": 0.2702194548596765,
+        "high": 0.4360170640821262,
+        "samples": 12
+      },
+      "delivered_before_expiry_ratio": {
+        "mean": 0.8024301038547765,
+        "low": 0.7270348145195756,
+        "high": 0.8646504017514034,
+        "samples": 12
+      },
+      "undelivered_packets_at_disconnect": {
+        "mean": 57.666666666666664,
+        "low": 31.083333333333332,
+        "high": 89.66874999999999,
+        "samples": 12
+      },
+      "jain_fairness": {
+        "mean": 0.5638354184193947,
+        "low": 0.4924002454326759,
+        "high": 0.6378299714743373,
+        "samples": 12
+      },
+      "demand_normalized_jain_fairness": {
+        "mean": 0.6971792277991778,
+        "low": 0.6181687111756482,
+        "high": 0.7714996855026631,
+        "samples": 12
+      },
+      "mean_scheduled_snr_db": {
+        "mean": 12.186271375314993,
+        "low": 11.568590081987042,
+        "high": 12.859687391688626,
+        "samples": 12
+      },
+      "mean_scheduled_ber": {
+        "mean": 5.942427756051437e-05,
+        "low": 2.5363326836781466e-05,
+        "high": 9.989059733677146e-05,
+        "samples": 12
+      },
+      "mean_scheduled_per": {
+        "mean": 0.20491486439279705,
+        "low": 0.1218728035955998,
+        "high": 0.2895695863681873,
+        "samples": 12
+      },
+      "mean_scheduled_relative_power": {
+        "mean": 0.38547539891786253,
+        "low": 0.28613936915135363,
+        "high": 0.5206850951106725,
+        "samples": 12
+      }
+    },
+    "proportional_fair": {
+      "goodput_mbps": {
+        "mean": 1.0938333333333332,
+        "low": 0.9244145833333333,
+        "high": 1.2685291666666667,
+        "samples": 12
+      },
+      "packet_delivery_ratio": {
+        "mean": 0.3070234388013629,
+        "low": 0.2602453172802092,
+        "high": 0.35505514240042496,
+        "samples": 12
+      },
+      "scheduled_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "availability_outage_fraction": {
+        "mean": 0.23388888888888892,
+        "low": 0.16345833333333334,
+        "high": 0.29931597222222217,
+        "samples": 12
+      },
+      "mean_latency_ms": {
+        "mean": 474.4081771412932,
+        "low": 352.62098026909564,
+        "high": 593.1190310427452,
+        "samples": 12
+      },
+      "p50_latency_ms": {
+        "mean": 358.3333333333333,
+        "low": 208.33333333333334,
+        "high": 533.3333333333334,
+        "samples": 12
+      },
+      "p95_latency_ms": {
+        "mean": 1214.5833333333333,
+        "low": 1022.8645833333334,
+        "high": 1372.9166666666667,
+        "samples": 12
+      },
+      "p99_latency_ms": {
+        "mean": 1476.4166666666663,
+        "low": 1348.4062499999995,
+        "high": 1579.45625,
+        "samples": 12
+      },
+      "deadline_miss_ratio": {
+        "mean": 0.606936280939721,
+        "low": 0.5601875409344192,
+        "high": 0.6529594265680544,
+        "samples": 12
+      },
+      "censored_packet_ratio": {
+        "mean": 0.08604028025891634,
+        "low": 0.08126444380480623,
+        "high": 0.09072817224152187,
+        "samples": 12
+      },
+      "deadline_or_censored_ratio": {
+        "mean": 0.6929765611986372,
+        "low": 0.6449448575995751,
+        "high": 0.7397546827197907,
+        "samples": 12
+      },
+      "delivered_before_expiry_ratio": {
+        "mean": 0.3874370387212654,
+        "low": 0.32809843361321356,
+        "high": 0.44474585704275665,
+        "samples": 12
+      },
+      "undelivered_packets_at_disconnect": {
+        "mean": 49.833333333333336,
+        "low": 24.416666666666668,
+        "high": 81.75624999999997,
+        "samples": 12
+      },
+      "jain_fairness": {
+        "mean": 0.5687083891444275,
+        "low": 0.5012045603473404,
+        "high": 0.6351023424025247,
+        "samples": 12
+      },
+      "demand_normalized_jain_fairness": {
+        "mean": 0.5364450698655935,
+        "low": 0.4829837225919889,
+        "high": 0.5889426466902947,
+        "samples": 12
+      },
+      "mean_scheduled_snr_db": {
+        "mean": 13.813927434767477,
+        "low": 12.833582574253404,
+        "high": 14.813582497384898,
+        "samples": 12
+      },
+      "mean_scheduled_ber": {
+        "mean": 1.158751708785887e-06,
+        "low": 2.1443403212511506e-07,
+        "high": 2.4846089620495607e-06,
+        "samples": 12
+      },
+      "mean_scheduled_per": {
+        "mean": 0.012335460607595577,
+        "low": 0.002507664134157394,
+        "high": 0.025588161007183436,
+        "samples": 12
+      },
+      "mean_scheduled_relative_power": {
+        "mean": 0.5176975112104959,
+        "low": 0.36483363402954533,
+        "high": 0.7012916640670974,
+        "samples": 12
+      }
+    },
+    "random": {
+      "goodput_mbps": {
+        "mean": 1.8081666666666665,
+        "low": 1.6121937499999999,
+        "high": 2.037945833333333,
+        "samples": 12
+      },
+      "packet_delivery_ratio": {
+        "mean": 0.5084644586158164,
+        "low": 0.45210433759971835,
+        "high": 0.5749125928349745,
+        "samples": 12
+      },
+      "scheduled_outage_fraction": {
+        "mean": 0.23194444444444443,
+        "low": 0.16664930555555557,
+        "high": 0.2916840277777777,
+        "samples": 12
+      },
+      "availability_outage_fraction": {
+        "mean": 0.23388888888888892,
+        "low": 0.16345833333333334,
+        "high": 0.29931597222222217,
+        "samples": 12
+      },
+      "mean_latency_ms": {
+        "mean": 648.6814665016752,
+        "low": 582.2223169613194,
+        "high": 719.8273444154972,
+        "samples": 12
+      },
+      "p50_latency_ms": {
+        "mean": 650.0,
+        "low": 558.3333333333334,
+        "high": 741.6666666666666,
+        "samples": 12
+      },
+      "p95_latency_ms": {
+        "mean": 1291.6666666666667,
+        "low": 1216.6666666666667,
+        "high": 1366.6666666666667,
+        "samples": 12
+      },
+      "p99_latency_ms": {
+        "mean": 1521.0,
+        "low": 1475.0,
+        "high": 1566.6666666666667,
+        "samples": 12
+      },
+      "deadline_miss_ratio": {
+        "mean": 0.4169065365818759,
+        "low": 0.3580163014386168,
+        "high": 0.468805126904384,
+        "samples": 12
+      },
+      "censored_packet_ratio": {
+        "mean": 0.07462900480230782,
+        "low": 0.06487297220583807,
+        "high": 0.08391136965741797,
+        "samples": 12
+      },
+      "deadline_or_censored_ratio": {
+        "mean": 0.49153554138418376,
+        "low": 0.4250874071650255,
+        "high": 0.5478956624002816,
+        "samples": 12
+      },
+      "delivered_before_expiry_ratio": {
+        "mean": 0.6345389076737032,
+        "low": 0.5704929468010588,
+        "high": 0.6942246330449758,
+        "samples": 12
+      },
+      "undelivered_packets_at_disconnect": {
+        "mean": 48.916666666666664,
+        "low": 23.164583333333336,
+        "high": 82.00416666666665,
+        "samples": 12
+      },
+      "jain_fairness": {
+        "mean": 0.614245230500963,
+        "low": 0.5557560959273273,
+        "high": 0.669453755259803,
+        "samples": 12
+      },
+      "demand_normalized_jain_fairness": {
+        "mean": 0.7165027463816044,
+        "low": 0.6494721995040287,
+        "high": 0.7823348056608024,
+        "samples": 12
+      },
+      "mean_scheduled_snr_db": {
+        "mean": 7.401331306492735,
+        "low": 3.0267979088802144,
+        "high": 10.751635185555863,
+        "samples": 12
+      },
+      "mean_scheduled_ber": {
+        "mean": 0.014171119379977781,
+        "low": 0.003927018484706573,
+        "high": 0.027788626186939402,
+        "samples": 12
+      },
+      "mean_scheduled_per": {
+        "mean": 0.40696354411500724,
+        "low": 0.32301638207774686,
+        "high": 0.48348051273442316,
+        "samples": 12
+      },
+      "mean_scheduled_relative_power": {
+        "mean": 0.4045955376260275,
+        "low": 0.22761817994625894,
+        "high": 0.6680903932559535,
+        "samples": 12
+      }
+    },
+    "reactive_greedy": {
+      "goodput_mbps": {
+        "mean": 2.2929999999999997,
+        "low": 1.9975624999999997,
+        "high": 2.5869375,
+        "samples": 12
+      },
+      "packet_delivery_ratio": {
+        "mean": 0.6438811308521737,
+        "low": 0.5619362224679039,
+        "high": 0.7244365791870344,
+        "samples": 12
+      },
+      "scheduled_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "availability_outage_fraction": {
+        "mean": 0.23388888888888892,
+        "low": 0.16345833333333334,
+        "high": 0.29931597222222217,
+        "samples": 12
+      },
+      "mean_latency_ms": {
+        "mean": 246.35327952868576,
+        "low": 230.9341036673704,
+        "high": 260.65713531661237,
+        "samples": 12
+      },
+      "p50_latency_ms": {
+        "mean": 183.33333333333334,
+        "low": 158.33333333333334,
+        "high": 200.0,
+        "samples": 12
+      },
+      "p95_latency_ms": {
+        "mean": 699.5833333333318,
+        "low": 599.1666666666637,
+        "high": 799.5833333333318,
+        "samples": 12
+      },
+      "p99_latency_ms": {
+        "mean": 1093.8333333333333,
+        "low": 989.8333333333331,
+        "high": 1183.3333333333333,
+        "samples": 12
+      },
+      "deadline_miss_ratio": {
+        "mean": 0.30798936846342906,
+        "low": 0.2360605672352923,
+        "high": 0.3792185908515031,
+        "samples": 12
+      },
+      "censored_packet_ratio": {
+        "mean": 0.04812950068439725,
+        "low": 0.03624070099795659,
+        "high": 0.061074668780723956,
+        "samples": 12
+      },
+      "deadline_or_censored_ratio": {
+        "mean": 0.3561188691478263,
+        "low": 0.2755634208129655,
+        "high": 0.4380637775320961,
+        "samples": 12
+      },
+      "delivered_before_expiry_ratio": {
+        "mean": 0.8009604134395324,
+        "low": 0.7265149449825785,
+        "high": 0.8630502664055067,
+        "samples": 12
+      },
+      "undelivered_packets_at_disconnect": {
+        "mean": 49.75,
+        "low": 24.081250000000004,
+        "high": 82.26041666666661,
+        "samples": 12
+      },
+      "jain_fairness": {
+        "mean": 0.5355086607201751,
+        "low": 0.4733797733941159,
+        "high": 0.5999162661410984,
+        "samples": 12
+      },
+      "demand_normalized_jain_fairness": {
+        "mean": 0.6716787423666019,
+        "low": 0.5986894826519799,
+        "high": 0.7406738644063323,
+        "samples": 12
+      },
+      "mean_scheduled_snr_db": {
+        "mean": 13.14953610425436,
+        "low": 12.241913256570964,
+        "high": 14.21352328778282,
+        "samples": 12
+      },
+      "mean_scheduled_ber": {
+        "mean": 6.283707121795876e-06,
+        "low": 3.9416393133720045e-06,
+        "high": 8.718855245243978e-06,
+        "samples": 12
+      },
+      "mean_scheduled_per": {
+        "mean": 0.05819706789222832,
+        "low": 0.037256751951332906,
+        "high": 0.0798547590065661,
+        "samples": 12
+      },
+      "mean_scheduled_relative_power": {
+        "mean": 0.5714174379696298,
+        "low": 0.3133173203975558,
+        "high": 0.9165752411849041,
+        "samples": 12
+      }
+    },
+    "round_robin": {
+      "goodput_mbps": {
+        "mean": 1.9909999999999997,
+        "low": 1.7428875000000001,
+        "high": 2.2533395833333323,
+        "samples": 12
+      },
+      "packet_delivery_ratio": {
+        "mean": 0.5599129119951755,
+        "low": 0.4895724097260913,
+        "high": 0.6357966441666197,
+        "samples": 12
+      },
+      "scheduled_outage_fraction": {
+        "mean": 0.2333333333333333,
+        "low": 0.1625,
+        "high": 0.2986284722222221,
+        "samples": 12
+      },
+      "availability_outage_fraction": {
+        "mean": 0.23388888888888892,
+        "low": 0.16345833333333334,
+        "high": 0.29931597222222217,
+        "samples": 12
+      },
+      "mean_latency_ms": {
+        "mean": 615.1415262740865,
+        "low": 506.0756808498304,
+        "high": 739.3287659344631,
+        "samples": 12
+      },
+      "p50_latency_ms": {
+        "mean": 566.6666666666666,
+        "low": 441.6666666666667,
+        "high": 716.6666666666666,
+        "samples": 12
+      },
+      "p95_latency_ms": {
+        "mean": 1183.3333333333333,
+        "low": 1050.0,
+        "high": 1300.0,
+        "samples": 12
+      },
+      "p99_latency_ms": {
+        "mean": 1375.0,
+        "low": 1291.6666666666667,
+        "high": 1450.0,
+        "samples": 12
+      },
+      "deadline_miss_ratio": {
+        "mean": 0.3654630506670684,
+        "low": 0.2968111746943817,
+        "high": 0.42770747720751434,
+        "samples": 12
+      },
+      "censored_packet_ratio": {
+        "mean": 0.07462403733775612,
+        "low": 0.06608203349899376,
+        "high": 0.08346332969076861,
+        "samples": 12
+      },
+      "deadline_or_censored_ratio": {
+        "mean": 0.4400870880048245,
+        "low": 0.3642033558333803,
+        "high": 0.5104275902739086,
+        "samples": 12
+      },
+      "delivered_before_expiry_ratio": {
+        "mean": 0.6989074473145734,
+        "low": 0.6204243519120796,
+        "high": 0.7683963603635876,
+        "samples": 12
+      },
+      "undelivered_packets_at_disconnect": {
+        "mean": 48.416666666666664,
+        "low": 22.997916666666672,
+        "high": 81.34166666666661,
+        "samples": 12
+      },
+      "jain_fairness": {
+        "mean": 0.6049829404754574,
+        "low": 0.5445879264514946,
+        "high": 0.6632112143863848,
+        "samples": 12
+      },
+      "demand_normalized_jain_fairness": {
+        "mean": 0.7195277422183747,
+        "low": 0.6546243818894018,
+        "high": 0.7829186367770048,
+        "samples": 12
+      },
+      "mean_scheduled_snr_db": {
+        "mean": 7.384424563922809,
+        "low": 3.165173045328496,
+        "high": 10.33401233905224,
+        "samples": 12
+      },
+      "mean_scheduled_ber": {
+        "mean": 0.014466016492654943,
+        "low": 0.00515525090569516,
+        "high": 0.02754489802052974,
+        "samples": 12
+      },
+      "mean_scheduled_per": {
+        "mean": 0.4126931759949952,
+        "low": 0.32710068282129506,
+        "high": 0.4952299135101586,
+        "samples": 12
+      },
+      "mean_scheduled_relative_power": {
+        "mean": 0.3959428416547836,
+        "low": 0.23152210289285946,
+        "high": 0.6418273925631182,
+        "samples": 12
+      }
+    }
+  },
+  "paired_difference_vs_reactive": {
+    "random": {
+      "goodput_mbps": {
+        "mean": -0.4848333333333333,
+        "low": -0.68975625,
+        "high": -0.2840541666666668,
+        "samples": 12
+      },
+      "packet_delivery_ratio": {
+        "mean": -0.13541667223635748,
+        "low": -0.191784708408454,
+        "high": -0.08044890613326572,
+        "samples": 12
+      },
+      "scheduled_outage_fraction": {
+        "mean": 0.23194444444444443,
+        "low": 0.16664930555555557,
+        "high": 0.2916840277777777,
+        "samples": 12
+      },
+      "availability_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "mean_latency_ms": {
+        "mean": 402.3281869729894,
+        "low": 335.22816848683567,
+        "high": 472.03433321968726,
+        "samples": 12
+      },
+      "p50_latency_ms": {
+        "mean": 466.6666666666667,
+        "low": 366.6666666666667,
+        "high": 575.2083333333323,
+        "samples": 12
+      },
+      "p95_latency_ms": {
+        "mean": 592.083333333335,
+        "low": 476.2500000000046,
+        "high": 700.8333333333366,
+        "samples": 12
+      },
+      "p99_latency_ms": {
+        "mean": 427.1666666666666,
+        "low": 333.66666666666634,
+        "high": 533.3791666666665,
+        "samples": 12
+      },
+      "deadline_miss_ratio": {
+        "mean": 0.10891716811844689,
+        "low": 0.0628221723932894,
+        "high": 0.15685817743840558,
+        "samples": 12
+      },
+      "censored_packet_ratio": {
+        "mean": 0.02649950411791055,
+        "low": 0.01638502075023195,
+        "high": 0.03675582404420965,
+        "samples": 12
+      },
+      "deadline_or_censored_ratio": {
+        "mean": 0.13541667223635748,
+        "low": 0.08044890613326561,
+        "high": 0.19178470840845402,
+        "samples": 12
+      },
+      "delivered_before_expiry_ratio": {
+        "mean": -0.1664215057658292,
+        "low": -0.23425846598253547,
+        "high": -0.10084212466952144,
+        "samples": 12
+      },
+      "undelivered_packets_at_disconnect": {
+        "mean": -0.8333333333333334,
+        "low": -3.5833333333333335,
+        "high": 0.8333333333333334,
+        "samples": 12
+      },
+      "jain_fairness": {
+        "mean": 0.0787365697807881,
+        "low": 0.0499626629544738,
+        "high": 0.11136450247225022,
+        "samples": 12
+      },
+      "demand_normalized_jain_fairness": {
+        "mean": 0.04482400401500256,
+        "low": 0.01663895837061839,
+        "high": 0.07345373044528053,
+        "samples": 12
+      },
+      "mean_scheduled_snr_db": {
+        "mean": -5.748204797761626,
+        "low": -10.378309317242397,
+        "high": -2.1360094014651705,
+        "samples": 12
+      },
+      "mean_scheduled_ber": {
+        "mean": 0.014164835672855985,
+        "low": 0.003920444704803373,
+        "high": 0.027782805677913153,
+        "samples": 12
+      },
+      "mean_scheduled_per": {
+        "mean": 0.3487664762227789,
+        "low": 0.2770554585793981,
+        "high": 0.4136213528644931,
+        "samples": 12
+      },
+      "mean_scheduled_relative_power": {
+        "mean": -0.16682190034360214,
+        "low": -0.28136422399521865,
+        "high": -0.07566342898448337,
+        "samples": 12
+      }
+    },
+    "round_robin": {
+      "goodput_mbps": {
+        "mean": -0.30200000000000005,
+        "low": -0.5293354166666666,
+        "high": -0.10350833333333381,
+        "samples": 12
+      },
+      "packet_delivery_ratio": {
+        "mean": -0.08396821885699819,
+        "low": -0.14674858051628237,
+        "high": -0.02888444091242371,
+        "samples": 12
+      },
+      "scheduled_outage_fraction": {
+        "mean": 0.2333333333333333,
+        "low": 0.1625,
+        "high": 0.2986284722222221,
+        "samples": 12
+      },
+      "availability_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "mean_latency_ms": {
+        "mean": 368.7882467454008,
+        "low": 260.3717918774529,
+        "high": 492.5749733968918,
+        "samples": 12
+      },
+      "p50_latency_ms": {
+        "mean": 383.3333333333333,
+        "low": 249.79166666666703,
+        "high": 550.0,
+        "samples": 12
+      },
+      "p95_latency_ms": {
+        "mean": 483.75000000000153,
+        "low": 343.75000000000756,
+        "high": 625.0,
+        "samples": 12
+      },
+      "p99_latency_ms": {
+        "mean": 281.16666666666674,
+        "low": 208.33333333333334,
+        "high": 356.1666666666668,
+        "samples": 12
+      },
+      "deadline_miss_ratio": {
+        "mean": 0.057473682203639305,
+        "low": 0.011908511607356063,
+        "high": 0.10917459459576154,
+        "samples": 12
+      },
+      "censored_packet_ratio": {
+        "mean": 0.026494536653358863,
+        "low": 0.016538398018240405,
+        "high": 0.03743946386865506,
+        "samples": 12
+      },
+      "deadline_or_censored_ratio": {
+        "mean": 0.08396821885699818,
+        "low": 0.028884440912423634,
+        "high": 0.14674858051628234,
+        "samples": 12
+      },
+      "delivered_before_expiry_ratio": {
+        "mean": -0.10205296612495902,
+        "low": -0.17526649964376856,
+        "high": -0.037753091158847396,
+        "samples": 12
+      },
+      "undelivered_packets_at_disconnect": {
+        "mean": -1.3333333333333333,
+        "low": -3.25,
+        "high": 0.0,
+        "samples": 12
+      },
+      "jain_fairness": {
+        "mean": 0.06947427975528239,
+        "low": 0.05001916512387808,
+        "high": 0.09044673867946337,
+        "samples": 12
+      },
+      "demand_normalized_jain_fairness": {
+        "mean": 0.047848999851772815,
+        "low": 0.020983837232225237,
+        "high": 0.07573797637815212,
+        "samples": 12
+      },
+      "mean_scheduled_snr_db": {
+        "mean": -5.76511154033155,
+        "low": -10.083291494368806,
+        "high": -2.4205258614946494,
+        "samples": 12
+      },
+      "mean_scheduled_ber": {
+        "mean": 0.014459732785533147,
+        "low": 0.005149725993567566,
+        "high": 0.02754049333405978,
+        "samples": 12
+      },
+      "mean_scheduled_per": {
+        "mean": 0.3544961081027669,
+        "low": 0.28206941669495256,
+        "high": 0.42250805370824723,
+        "samples": 12
+      },
+      "mean_scheduled_relative_power": {
+        "mean": -0.17547459631484616,
+        "low": -0.31052808026525325,
+        "high": -0.07112814791827055,
+        "samples": 12
+      }
+    },
+    "proportional_fair": {
+      "goodput_mbps": {
+        "mean": -1.1991666666666665,
+        "low": -1.47741875,
+        "high": -0.9307770833333336,
+        "samples": 12
+      },
+      "packet_delivery_ratio": {
+        "mean": -0.33685769205081084,
+        "low": -0.41459884468968744,
+        "high": -0.26194063719041955,
+        "samples": 12
+      },
+      "scheduled_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "availability_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "mean_latency_ms": {
+        "mean": 228.0548976126075,
+        "low": 99.0771560668065,
+        "high": 353.6630358865923,
+        "samples": 12
+      },
+      "p50_latency_ms": {
+        "mean": 175.00000000000003,
+        "low": 33.12500000000037,
+        "high": 341.87499999999886,
+        "samples": 12
+      },
+      "p95_latency_ms": {
+        "mean": 515.0000000000015,
+        "low": 281.25000000000006,
+        "high": 729.1666666666666,
+        "samples": 12
+      },
+      "p99_latency_ms": {
+        "mean": 382.5833333333331,
+        "low": 234.7458333333331,
+        "high": 520.510416666667,
+        "samples": 12
+      },
+      "deadline_miss_ratio": {
+        "mean": 0.29894691247629174,
+        "low": 0.23091555451738224,
+        "high": 0.3729134413153404,
+        "samples": 12
+      },
+      "censored_packet_ratio": {
+        "mean": 0.037910779574519084,
+        "low": 0.026356564189272527,
+        "high": 0.049142054924871795,
+        "samples": 12
+      },
+      "deadline_or_censored_ratio": {
+        "mean": 0.33685769205081084,
+        "low": 0.26194063719041955,
+        "high": 0.41459884468968744,
+        "samples": 12
+      },
+      "delivered_before_expiry_ratio": {
+        "mean": -0.4135233747182669,
+        "low": -0.48843262196485066,
+        "high": -0.3393015495395833,
+        "samples": 12
+      },
+      "undelivered_packets_at_disconnect": {
+        "mean": 0.08333333333333333,
+        "low": -5.0,
+        "high": 7.0,
+        "samples": 12
+      },
+      "jain_fairness": {
+        "mean": 0.03319972842425253,
+        "low": -0.037304442433450366,
+        "high": 0.0935151418844303,
+        "samples": 12
+      },
+      "demand_normalized_jain_fairness": {
+        "mean": -0.13523367250100837,
+        "low": -0.19790124161124428,
+        "high": -0.07298662786302801,
+        "samples": 12
+      },
+      "mean_scheduled_snr_db": {
+        "mean": 0.664391330513118,
+        "low": -0.2464475764910493,
+        "high": 1.6140814107219918,
+        "samples": 12
+      },
+      "mean_scheduled_ber": {
+        "mean": -5.124955413009989e-06,
+        "low": -6.7026380384822e-06,
+        "high": -3.4524483727187302e-06,
+        "samples": 12
+      },
+      "mean_scheduled_per": {
+        "mean": -0.04586160728463273,
+        "low": -0.05946990595981455,
+        "high": -0.031369351894420854,
+        "samples": 12
+      },
+      "mean_scheduled_relative_power": {
+        "mean": -0.05371992675913397,
+        "low": -0.2921724707078882,
+        "high": 0.14167817993870765,
+        "samples": 12
+      }
+    },
+    "cv_predictive": {
+      "goodput_mbps": {
+        "mean": 0.012249999999999983,
+        "low": -0.0310854166666667,
+        "high": 0.05376666666666649,
+        "samples": 12
+      },
+      "packet_delivery_ratio": {
+        "mean": 0.0034439321123459024,
+        "low": -0.008668819113097838,
+        "high": 0.015132819258513078,
+        "samples": 12
+      },
+      "scheduled_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "availability_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "mean_latency_ms": {
+        "mean": 181.28314162889168,
+        "low": 116.5869887182745,
+        "high": 250.30896498600208,
+        "samples": 12
+      },
+      "p50_latency_ms": {
+        "mean": 208.33333333333334,
+        "low": 125.00000000000004,
+        "high": 291.6666666666667,
+        "samples": 12
+      },
+      "p95_latency_ms": {
+        "mean": 249.16666666666742,
+        "low": 165.83333333333408,
+        "high": 332.50000000000074,
+        "samples": 12
+      },
+      "p99_latency_ms": {
+        "mean": 122.83333333333347,
+        "low": 16.666666666666845,
+        "high": 208.3333333333334,
+        "samples": 12
+      },
+      "deadline_miss_ratio": {
+        "mean": -0.009913500352329989,
+        "low": -0.019533915613838285,
+        "high": 5.065952076111425e-06,
+        "samples": 12
+      },
+      "censored_packet_ratio": {
+        "mean": 0.006469568239984086,
+        "low": 0.002549649552353654,
+        "high": 0.011398222083269936,
+        "samples": 12
+      },
+      "deadline_or_censored_ratio": {
+        "mean": -0.0034439321123459093,
+        "low": -0.015132819258513121,
+        "high": 0.008668819113097827,
+        "samples": 12
+      },
+      "delivered_before_expiry_ratio": {
+        "mean": 0.000945537432391406,
+        "low": -0.01613037838924819,
+        "high": 0.016994492260813832,
+        "samples": 12
+      },
+      "undelivered_packets_at_disconnect": {
+        "mean": 7.916666666666667,
+        "low": 1.3333333333333333,
+        "high": 15.25,
+        "samples": 12
+      },
+      "jain_fairness": {
+        "mean": 0.02778148598115598,
+        "low": 0.011901454019543718,
+        "high": 0.05008802069754552,
+        "samples": 12
+      },
+      "demand_normalized_jain_fairness": {
+        "mean": 0.024528749352208373,
+        "low": 0.011127104238379879,
+        "high": 0.038752281327457457,
+        "samples": 12
+      },
+      "mean_scheduled_snr_db": {
+        "mean": -0.9667833749212353,
+        "low": -1.8911584491624447,
+        "high": -0.12178645742015796,
+        "samples": 12
+      },
+      "mean_scheduled_ber": {
+        "mean": 5.2710692505500164e-05,
+        "low": 1.911447764745418e-05,
+        "high": 9.295854701587062e-05,
+        "samples": 12
+      },
+      "mean_scheduled_per": {
+        "mean": 0.14572096920021108,
+        "low": 0.06565917542851152,
+        "high": 0.2289921018184954,
+        "samples": 12
+      },
+      "mean_scheduled_relative_power": {
+        "mean": -0.18705016409735406,
+        "low": -0.40983225513295785,
+        "high": -0.012688748700985882,
+        "samples": 12
+      }
+    },
+    "kalman_predictive": {
+      "goodput_mbps": {
+        "mean": 0.011666666666666695,
+        "low": -0.03741874999999999,
+        "high": 0.06034166666666671,
+        "samples": 12
+      },
+      "packet_delivery_ratio": {
+        "mean": 0.0032782726729619813,
+        "low": -0.010519096554390287,
+        "high": 0.01704320971416374,
+        "samples": 12
+      },
+      "scheduled_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "availability_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "mean_latency_ms": {
+        "mean": 180.05080562884663,
+        "low": 115.1333896106572,
+        "high": 250.07889888265098,
+        "samples": 12
+      },
+      "p50_latency_ms": {
+        "mean": 208.33333333333337,
+        "low": 125.00000000000004,
+        "high": 291.66666666666674,
+        "samples": 12
+      },
+      "p95_latency_ms": {
+        "mean": 233.7500000000015,
+        "low": 158.33333333333337,
+        "high": 316.66666666666663,
+        "samples": 12
+      },
+      "p99_latency_ms": {
+        "mean": 122.83333333333347,
+        "low": 16.666666666666845,
+        "high": 208.3333333333334,
+        "samples": 12
+      },
+      "deadline_miss_ratio": {
+        "mean": -0.010100941847897024,
+        "low": -0.01992397691733258,
+        "high": -0.000591248850373676,
+        "samples": 12
+      },
+      "censored_packet_ratio": {
+        "mean": 0.006822669174935046,
+        "low": 0.0016510560041636323,
+        "high": 0.012646938662699732,
+        "samples": 12
+      },
+      "deadline_or_censored_ratio": {
+        "mean": -0.003278272672961971,
+        "low": -0.01704320971416375,
+        "high": 0.010519096554390319,
+        "samples": 12
+      },
+      "delivered_before_expiry_ratio": {
+        "mean": 0.0013535275954950955,
+        "low": -0.017256132004528444,
+        "high": 0.019722468759941568,
+        "samples": 12
+      },
+      "undelivered_packets_at_disconnect": {
+        "mean": 7.5,
+        "low": 1.0,
+        "high": 14.583333333333334,
+        "samples": 12
+      },
+      "jain_fairness": {
+        "mean": 0.027785846734444175,
+        "low": 0.013936920789383531,
+        "high": 0.047865734992750035,
+        "samples": 12
+      },
+      "demand_normalized_jain_fairness": {
+        "mean": 0.02307348413170973,
+        "low": 0.01005007974811616,
+        "high": 0.037275232038159044,
+        "samples": 12
+      },
+      "mean_scheduled_snr_db": {
+        "mean": -0.9321057749009821,
+        "low": -1.8332385913238103,
+        "high": -0.08763814689501925,
+        "samples": 12
+      },
+      "mean_scheduled_ber": {
+        "mean": 5.276614674146703e-05,
+        "low": 1.9038771455605777e-05,
+        "high": 9.298212446128844e-05,
+        "samples": 12
+      },
+      "mean_scheduled_per": {
+        "mean": 0.14504595725986943,
+        "low": 0.06437470979780505,
+        "high": 0.22781239173503096,
+        "samples": 12
+      },
+      "mean_scheduled_relative_power": {
+        "mean": -0.1718100051651946,
+        "low": -0.3789591494693231,
+        "high": -0.011618318647881423,
+        "samples": 12
+      }
+    },
+    "imm_predictive": {
+      "goodput_mbps": {
+        "mean": 0.014249999999999948,
+        "low": -0.03483541666666673,
+        "high": 0.06308958333333331,
+        "samples": 12
+      },
+      "packet_delivery_ratio": {
+        "mean": 0.004015327188559621,
+        "low": -0.00981770518047072,
+        "high": 0.01779310553464551,
+        "samples": 12
+      },
+      "scheduled_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "availability_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "mean_latency_ms": {
+        "mean": 181.4576434101764,
+        "low": 115.68727461919397,
+        "high": 251.85955226360485,
+        "samples": 12
+      },
+      "p50_latency_ms": {
+        "mean": 208.33333333333337,
+        "low": 125.00000000000004,
+        "high": 291.66666666666674,
+        "samples": 12
+      },
+      "p95_latency_ms": {
+        "mean": 249.16666666666742,
+        "low": 165.83333333333408,
+        "high": 332.50000000000074,
+        "samples": 12
+      },
+      "p99_latency_ms": {
+        "mean": 130.0833333333326,
+        "low": 21.722916666664126,
+        "high": 215.5833333333325,
+        "samples": 12
+      },
+      "deadline_miss_ratio": {
+        "mean": -0.010129624695370501,
+        "low": -0.020051336422430184,
+        "high": -0.00020340577009168861,
+        "samples": 12
+      },
+      "censored_packet_ratio": {
+        "mean": 0.006114297506810876,
+        "low": 0.0013615740670885404,
+        "high": 0.01139192735895586,
+        "samples": 12
+      },
+      "deadline_or_censored_ratio": {
+        "mean": -0.004015327188559639,
+        "low": -0.017793105534645526,
+        "high": 0.00981770518047072,
+        "samples": 12
+      },
+      "delivered_before_expiry_ratio": {
+        "mean": 0.0017675769094492126,
+        "low": -0.016767191723993363,
+        "high": 0.020190946514850632,
+        "samples": 12
+      },
+      "undelivered_packets_at_disconnect": {
+        "mean": 7.5,
+        "low": 1.3333333333333333,
+        "high": 14.5,
+        "samples": 12
+      },
+      "jain_fairness": {
+        "mean": 0.027402356263392297,
+        "low": 0.011769618965383326,
+        "high": 0.049752822398039256,
+        "samples": 12
+      },
+      "demand_normalized_jain_fairness": {
+        "mean": 0.023223574381487266,
+        "low": 0.009528373303625501,
+        "high": 0.03771783085982953,
+        "samples": 12
+      },
+      "mean_scheduled_snr_db": {
+        "mean": -0.9371551029798763,
+        "low": -1.8522520955711261,
+        "high": -0.08180272283604953,
+        "samples": 12
+      },
+      "mean_scheduled_ber": {
+        "mean": 5.273363292172985e-05,
+        "low": 1.898064921437469e-05,
+        "high": 9.294691564529169e-05,
+        "samples": 12
+      },
+      "mean_scheduled_per": {
+        "mean": 0.14527617388364678,
+        "low": 0.06406632923464517,
+        "high": 0.22892682123167626,
+        "samples": 12
+      },
+      "mean_scheduled_relative_power": {
+        "mean": -0.1728204981615464,
+        "low": -0.3805829915590224,
+        "high": -0.011297349387841752,
+        "samples": 12
+      }
+    },
+    "predictive_utility": {
+      "goodput_mbps": {
+        "mean": 0.013333333333333308,
+        "low": -0.032002083333333375,
+        "high": 0.059089583333333306,
+        "samples": 12
+      },
+      "packet_delivery_ratio": {
+        "mean": 0.0037469216060922413,
+        "low": -0.008924679941970758,
+        "high": 0.016524961418017185,
+        "samples": 12
+      },
+      "scheduled_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "availability_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "mean_latency_ms": {
+        "mean": 182.50396557498107,
+        "low": 116.88603320108098,
+        "high": 250.21588732505586,
+        "samples": 12
+      },
+      "p50_latency_ms": {
+        "mean": 208.33333333333334,
+        "low": 125.00000000000004,
+        "high": 291.6666666666667,
+        "samples": 12
+      },
+      "p95_latency_ms": {
+        "mean": 265.8333333333341,
+        "low": 191.66666666666666,
+        "high": 340.84375000000074,
+        "samples": 12
+      },
+      "p99_latency_ms": {
+        "mean": 129.16666666666677,
+        "low": 20.62500000000032,
+        "high": 214.50416666666686,
+        "samples": 12
+      },
+      "deadline_miss_ratio": {
+        "mean": -0.010330471334471751,
+        "low": -0.02072541435643384,
+        "high": 0.00033804128951536597,
+        "samples": 12
+      },
+      "censored_packet_ratio": {
+        "mean": 0.006583549728379501,
+        "low": 0.002659373977905672,
+        "high": 0.011481689938976497,
+        "samples": 12
+      },
+      "deadline_or_censored_ratio": {
+        "mean": -0.00374692160609226,
+        "low": -0.01652496141801723,
+        "high": 0.008924679941970734,
+        "samples": 12
+      },
+      "delivered_before_expiry_ratio": {
+        "mean": 0.0014696904152441033,
+        "low": -0.016208494074321657,
+        "high": 0.018532049062167637,
+        "samples": 12
+      },
+      "undelivered_packets_at_disconnect": {
+        "mean": 7.916666666666667,
+        "low": 1.3333333333333333,
+        "high": 15.25,
+        "samples": 12
+      },
+      "jain_fairness": {
+        "mean": 0.02832675769921981,
+        "low": 0.01164522838663089,
+        "high": 0.05090473631040765,
+        "samples": 12
+      },
+      "demand_normalized_jain_fairness": {
+        "mean": 0.02550048543257608,
+        "low": 0.011718455696641383,
+        "high": 0.039717374872049085,
+        "samples": 12
+      },
+      "mean_scheduled_snr_db": {
+        "mean": -0.9632647289393685,
+        "low": -1.8910677131128566,
+        "high": -0.1169214704875151,
+        "samples": 12
+      },
+      "mean_scheduled_ber": {
+        "mean": 5.31405704387185e-05,
+        "low": 1.9569887014474175e-05,
+        "high": 9.324842559688159e-05,
+        "samples": 12
+      },
+      "mean_scheduled_per": {
+        "mean": 0.1467177965005687,
+        "low": 0.0665206088190969,
+        "high": 0.22957364228308927,
+        "samples": 12
+      },
+      "mean_scheduled_relative_power": {
+        "mean": -0.1859420390517672,
+        "low": -0.40913785933065755,
+        "high": -0.011518716755540875,
+        "samples": 12
+      }
+    },
+    "link_lifetime": {
+      "goodput_mbps": {
+        "mean": 0.013999999999999976,
+        "low": -0.031927083333333404,
+        "high": 0.059258333333333205,
+        "samples": 12
+      },
+      "packet_delivery_ratio": {
+        "mean": 0.003929631494291578,
+        "low": -0.008987648357746335,
+        "high": 0.016604133459374615,
+        "samples": 12
+      },
+      "scheduled_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "availability_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "mean_latency_ms": {
+        "mean": 183.76456826821857,
+        "low": 119.22911433176898,
+        "high": 251.47972516951896,
+        "samples": 12
+      },
+      "p50_latency_ms": {
+        "mean": 208.33333333333334,
+        "low": 125.00000000000004,
+        "high": 291.6666666666667,
+        "samples": 12
+      },
+      "p95_latency_ms": {
+        "mean": 268.75,
+        "low": 188.7291666666638,
+        "high": 351.6666666666651,
+        "samples": 12
+      },
+      "p99_latency_ms": {
+        "mean": 129.16666666666677,
+        "low": 18.833333333333332,
+        "high": 214.50000000000014,
+        "samples": 12
+      },
+      "deadline_miss_ratio": {
+        "mean": -0.010592192270202513,
+        "low": -0.020869772935941052,
+        "high": 6.344876746648749e-06,
+        "samples": 12
+      },
+      "censored_packet_ratio": {
+        "mean": 0.006662560775910921,
+        "low": 0.0023069017620607627,
+        "high": 0.01235201801586098,
+        "samples": 12
+      },
+      "deadline_or_censored_ratio": {
+        "mean": -0.003929631494291605,
+        "low": -0.01660413345937467,
+        "high": 0.008987648357746297,
+        "samples": 12
+      },
+      "delivered_before_expiry_ratio": {
+        "mean": 0.0016769003235982776,
+        "low": -0.01593733743721907,
+        "high": 0.018749454850163366,
+        "samples": 12
+      },
+      "undelivered_packets_at_disconnect": {
+        "mean": 4.5,
+        "low": -0.25,
+        "high": 10.833333333333334,
+        "samples": 12
+      },
+      "jain_fairness": {
+        "mean": 0.030306517933392157,
+        "low": 0.013878398603596902,
+        "high": 0.05273865612768156,
+        "samples": 12
+      },
+      "demand_normalized_jain_fairness": {
+        "mean": 0.02762604718610837,
+        "low": 0.014195527183977359,
+        "high": 0.04111676307428618,
+        "samples": 12
+      },
+      "mean_scheduled_snr_db": {
+        "mean": -0.9841431303622508,
+        "low": -1.882979819915808,
+        "high": -0.1559386533267272,
+        "samples": 12
+      },
+      "mean_scheduled_ber": {
+        "mean": 5.83329360224313e-05,
+        "low": 2.7068619556552572e-05,
+        "high": 9.670223250301662e-05,
+        "samples": 12
+      },
+      "mean_scheduled_per": {
+        "mean": 0.15175269637764602,
+        "low": 0.07488707281909937,
+        "high": 0.23046380844780326,
+        "samples": 12
+      },
+      "mean_scheduled_relative_power": {
+        "mean": -0.18638348726733497,
+        "low": -0.40816031174348477,
+        "high": -0.013229660956133793,
+        "samples": 12
+      }
+    },
+    "oracle": {
+      "goodput_mbps": {
+        "mean": 0.014749999999999985,
+        "low": -0.031168750000000005,
+        "high": 0.060337500000000016,
+        "samples": 12
+      },
+      "packet_delivery_ratio": {
+        "mean": 0.004143550490298423,
+        "low": -0.008689931616779025,
+        "high": 0.016876707133846237,
+        "samples": 12
+      },
+      "scheduled_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "availability_outage_fraction": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "samples": 12
+      },
+      "mean_latency_ms": {
+        "mean": 187.25794254777702,
+        "low": 119.47107130589627,
+        "high": 260.5831798716557,
+        "samples": 12
+      },
+      "p50_latency_ms": {
+        "mean": 216.66666666666666,
+        "low": 133.33333333333334,
+        "high": 308.3333333333333,
+        "samples": 12
+      },
+      "p95_latency_ms": {
+        "mean": 268.75,
+        "low": 188.7291666666638,
+        "high": 351.6666666666651,
+        "samples": 12
+      },
+      "p99_latency_ms": {
+        "mean": 129.16666666666677,
+        "low": 18.833333333333332,
+        "high": 214.50000000000014,
+        "samples": 12
+      },
+      "deadline_miss_ratio": {
+        "mean": -0.010306966942193385,
+        "low": -0.02065743999443708,
+        "high": 0.00029324847513756706,
+        "samples": 12
+      },
+      "censored_packet_ratio": {
+        "mean": 0.006163416451894949,
+        "low": 0.001786757166924173,
+        "high": 0.011890864191908594,
+        "samples": 12
+      },
+      "deadline_or_censored_ratio": {
+        "mean": -0.004143550490298445,
+        "low": -0.016876707133846265,
+        "high": 0.008689931616779025,
+        "samples": 12
+      },
+      "delivered_before_expiry_ratio": {
+        "mean": 0.001898204543132063,
+        "low": -0.015873808613655293,
+        "high": 0.018944692994828725,
+        "samples": 12
+      },
+      "undelivered_packets_at_disconnect": {
+        "mean": 4.5,
+        "low": -0.25,
+        "high": 10.833333333333334,
+        "samples": 12
+      },
+      "jain_fairness": {
+        "mean": 0.03019211657760787,
+        "low": 0.013878398603596902,
+        "high": 0.052395452060328696,
+        "samples": 12
+      },
+      "demand_normalized_jain_fairness": {
+        "mean": 0.02827498330626307,
+        "low": 0.014842008815972838,
+        "high": 0.041467383638116945,
+        "samples": 12
+      },
+      "mean_scheduled_snr_db": {
+        "mean": -0.9962873224191542,
+        "low": -1.9304382193578276,
+        "high": -0.15685904301265255,
+        "samples": 12
+      },
+      "mean_scheduled_ber": {
+        "mean": 5.8491515137936735e-05,
+        "low": 2.7072584034440202e-05,
+        "high": 9.683873752590969e-05,
+        "samples": 12
+      },
+      "mean_scheduled_per": {
+        "mean": 0.1527486450068911,
+        "low": 0.07488847468368864,
+        "high": 0.23345165433553852,
+        "samples": 12
+      },
+      "mean_scheduled_relative_power": {
+        "mean": -0.18695092244228553,
+        "low": -0.41043005244328723,
+        "high": -0.013229660956133793,
+        "samples": 12
+      }
+    }
+  },
+  "paired_statistics_vs_reactive": {
+    "random": {
+      "goodput_mbps": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.4848333333333333,
+        "favorable_mean_difference": -0.4848333333333333,
+        "cluster_mean_favorable_difference": -0.4848333333333333,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.68975625,
+          "high": -0.2840541666666668
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0007947112576892044,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.321158847486833,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "packet_delivery_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.13541667223635748,
+        "favorable_mean_difference": -0.13541667223635748,
+        "cluster_mean_favorable_difference": -0.13541667223635748,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.191784708408454,
+          "high": -0.08044890613326572
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0007235104526569249,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.3377616595768917,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "scheduled_outage_fraction": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.23194444444444443,
+        "favorable_mean_difference": -0.23194444444444443,
+        "cluster_mean_favorable_difference": -0.23194444444444443,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.29168402777777774,
+          "high": -0.16664930555555565
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 3.522832193064533e-05,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.9249928388384112,
+        "wilcoxon_holm_p_value": 0.0009765625
+      },
+      "availability_outage_fraction": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.0,
+        "favorable_mean_difference": 0.0,
+        "cluster_mean_favorable_difference": 0.0,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.0,
+          "high": 0.0
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": NaN,
+        "wilcoxon_p_value": NaN,
+        "cohen_dz_favorable": NaN,
+        "wilcoxon_holm_p_value": NaN
+      },
+      "mean_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 402.3281869729894,
+        "favorable_mean_difference": -402.3281869729894,
+        "cluster_mean_favorable_difference": -402.3281869729894,
+        "bootstrap_95_ci_favorable": {
+          "low": -472.0343332196873,
+          "high": -335.22816848683567
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 3.059156536983214e-07,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -3.151156542833047,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "p50_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 466.6666666666667,
+        "favorable_mean_difference": -466.6666666666667,
+        "cluster_mean_favorable_difference": -466.6666666666667,
+        "bootstrap_95_ci_favorable": {
+          "low": -575.208333333333,
+          "high": -366.6666666666667
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 5.112023387068597e-06,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -2.369511201352155,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "p95_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 592.083333333335,
+        "favorable_mean_difference": -592.083333333335,
+        "cluster_mean_favorable_difference": -592.083333333335,
+        "bootstrap_95_ci_favorable": {
+          "low": -700.8333333333366,
+          "high": -476.2500000000046
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 9.5638872372607e-07,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -2.8131509866780444,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "p99_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 427.1666666666666,
+        "favorable_mean_difference": -427.1666666666666,
+        "cluster_mean_favorable_difference": -427.1666666666666,
+        "bootstrap_95_ci_favorable": {
+          "low": -533.3791666666666,
+          "high": -333.66666666666634
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 7.092294796472862e-06,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -2.2894839006172614,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "deadline_miss_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.10891716811844689,
+        "favorable_mean_difference": -0.10891716811844689,
+        "cluster_mean_favorable_difference": -0.10891716811844689,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.1568581774384056,
+          "high": -0.0628221723932894
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0010076953475001468,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.2795085188474686,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "censored_packet_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.02649950411791055,
+        "favorable_mean_difference": -0.02649950411791055,
+        "cluster_mean_favorable_difference": -0.02649950411791055,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.036755824044209656,
+          "high": -0.016385020750231953
+        },
+        "favorable_win_fraction": 0.08333333333333333,
+        "paired_t_test_p_value": 0.0004157419041019674,
+        "wilcoxon_p_value": 0.0009765625,
+        "cohen_dz_favorable": -1.4374692227692516,
+        "wilcoxon_holm_p_value": 0.0078125
+      },
+      "deadline_or_censored_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.13541667223635748,
+        "favorable_mean_difference": -0.13541667223635748,
+        "cluster_mean_favorable_difference": -0.13541667223635748,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.19178470840845405,
+          "high": -0.08044890613326572
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0007235104526569249,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.337761659576892,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "delivered_before_expiry_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.1664215057658292,
+        "favorable_mean_difference": -0.1664215057658292,
+        "cluster_mean_favorable_difference": -0.1664215057658292,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.23425846598253547,
+          "high": -0.10084212466952144
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0006940869640906062,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.3451310831304417,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "undelivered_packets_at_disconnect": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": -0.8333333333333334,
+        "favorable_mean_difference": 0.8333333333333334,
+        "cluster_mean_favorable_difference": 0.8333333333333334,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.8333333333333334,
+          "high": 3.5833333333333335
+        },
+        "favorable_win_fraction": 0.08333333333333333,
+        "paired_t_test_p_value": 0.5369422391874149,
+        "wilcoxon_p_value": 0.875,
+        "cohen_dz_favorable": 0.18398456467701158,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "jain_fairness": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.0787365697807881,
+        "favorable_mean_difference": 0.0787365697807881,
+        "cluster_mean_favorable_difference": 0.0787365697807881,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.0499626629544738,
+          "high": 0.11136450247225022
+        },
+        "favorable_win_fraction": 1.0,
+        "paired_t_test_p_value": 0.0005225131689217527,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": 1.3959681012532925,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "demand_normalized_jain_fairness": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.04482400401500256,
+        "favorable_mean_difference": 0.04482400401500256,
+        "cluster_mean_favorable_difference": 0.04482400401500256,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.01663895837061839,
+          "high": 0.07345373044528053
+        },
+        "favorable_win_fraction": 0.8333333333333334,
+        "paired_t_test_p_value": 0.0144346426221643,
+        "wilcoxon_p_value": 0.01611328125,
+        "cohen_dz_favorable": 0.8372749680962563,
+        "wilcoxon_holm_p_value": 0.03662109375
+      },
+      "mean_scheduled_snr_db": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -5.748204797761626,
+        "favorable_mean_difference": -5.748204797761626,
+        "cluster_mean_favorable_difference": -5.748204797761626,
+        "bootstrap_95_ci_favorable": {
+          "low": -10.378309317242397,
+          "high": -2.1360094014651705
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.03236308282740345,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -0.7066631246285836,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "mean_scheduled_ber": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.014164835672855985,
+        "favorable_mean_difference": -0.014164835672855985,
+        "cluster_mean_favorable_difference": -0.014164835672855985,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.027782805677913157,
+          "high": -0.003920444704803374
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.06235419044786277,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -0.5986766462370412,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "mean_scheduled_per": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.3487664762227789,
+        "favorable_mean_difference": -0.3487664762227789,
+        "cluster_mean_favorable_difference": -0.3487664762227789,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.4136213528644931,
+          "high": -0.2770554585793981
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 1.1016803443881802e-06,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -2.7733734298441317,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "mean_scheduled_relative_power": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.16682190034360214,
+        "favorable_mean_difference": -0.16682190034360214,
+        "cluster_mean_favorable_difference": -0.16682190034360214,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.28136422399521865,
+          "high": -0.07566342898448337
+        },
+        "favorable_win_fraction": 0.08333333333333333,
+        "paired_t_test_p_value": 0.013001980460722795,
+        "wilcoxon_p_value": 0.00146484375,
+        "cohen_dz_favorable": -0.8541466183072921,
+        "wilcoxon_holm_p_value": 0.01318359375
+      }
+    },
+    "round_robin": {
+      "goodput_mbps": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.30200000000000005,
+        "favorable_mean_difference": -0.30200000000000005,
+        "cluster_mean_favorable_difference": -0.30200000000000005,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.5293354166666666,
+          "high": -0.10350833333333381
+        },
+        "favorable_win_fraction": 0.25,
+        "paired_t_test_p_value": 0.02187561055957974,
+        "wilcoxon_p_value": 0.02099609375,
+        "cohen_dz_favorable": -0.7701585167667284,
+        "wilcoxon_holm_p_value": 0.14697265625
+      },
+      "packet_delivery_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.08396821885699819,
+        "favorable_mean_difference": -0.08396821885699819,
+        "cluster_mean_favorable_difference": -0.08396821885699819,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.14674858051628237,
+          "high": -0.02888444091242371
+        },
+        "favorable_win_fraction": 0.25,
+        "paired_t_test_p_value": 0.02114212135090333,
+        "wilcoxon_p_value": 0.02099609375,
+        "cohen_dz_favorable": -0.7756703479527955,
+        "wilcoxon_holm_p_value": 0.14697265625
+      },
+      "scheduled_outage_fraction": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.2333333333333333,
+        "favorable_mean_difference": -0.2333333333333333,
+        "cluster_mean_favorable_difference": -0.2333333333333333,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.29862847222222216,
+          "high": -0.1625
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 5.764860668642134e-05,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.8212421796463745,
+        "wilcoxon_holm_p_value": 0.0009765625
+      },
+      "availability_outage_fraction": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.0,
+        "favorable_mean_difference": 0.0,
+        "cluster_mean_favorable_difference": 0.0,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.0,
+          "high": 0.0
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": NaN,
+        "wilcoxon_p_value": NaN,
+        "cohen_dz_favorable": NaN,
+        "wilcoxon_holm_p_value": NaN
+      },
+      "mean_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 368.7882467454008,
+        "favorable_mean_difference": -368.7882467454008,
+        "cluster_mean_favorable_difference": -368.7882467454008,
+        "bootstrap_95_ci_favorable": {
+          "low": -492.57497339689183,
+          "high": -260.37179187745295
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.00011020816072458653,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.689971901359254,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "p50_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 383.3333333333333,
+        "favorable_mean_difference": -383.3333333333333,
+        "cluster_mean_favorable_difference": -383.3333333333333,
+        "bootstrap_95_ci_favorable": {
+          "low": -550.0,
+          "high": -249.7916666666678
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0006461842891174952,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.3578621458371947,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "p95_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 483.75000000000153,
+        "favorable_mean_difference": -483.75000000000153,
+        "cluster_mean_favorable_difference": -483.75000000000153,
+        "bootstrap_95_ci_favorable": {
+          "low": -625.0,
+          "high": -343.75000000000756
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 3.481781537664598e-05,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.927506055615018,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "p99_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 281.16666666666674,
+        "favorable_mean_difference": -281.16666666666674,
+        "cluster_mean_favorable_difference": -281.16666666666674,
+        "bootstrap_95_ci_favorable": {
+          "low": -356.1666666666668,
+          "high": -208.33333333333334
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 2.185885382341043e-05,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -2.029051164498515,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "deadline_miss_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.057473682203639305,
+        "favorable_mean_difference": -0.057473682203639305,
+        "cluster_mean_favorable_difference": -0.057473682203639305,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.10917459459576155,
+          "high": -0.011908511607356117
+        },
+        "favorable_win_fraction": 0.4166666666666667,
+        "paired_t_test_p_value": 0.04843426742492232,
+        "wilcoxon_p_value": 0.09228515625,
+        "cohen_dz_favorable": -0.6406239353263422,
+        "wilcoxon_holm_p_value": 0.3837890625
+      },
+      "censored_packet_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.026494536653358863,
+        "favorable_mean_difference": -0.026494536653358863,
+        "cluster_mean_favorable_difference": -0.026494536653358863,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.03743946386865506,
+          "high": -0.016538398018240412
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0007112876248555962,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.3407840117394396,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "deadline_or_censored_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.08396821885699818,
+        "favorable_mean_difference": -0.08396821885699818,
+        "cluster_mean_favorable_difference": -0.08396821885699818,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.14674858051628237,
+          "high": -0.028884440912423683
+        },
+        "favorable_win_fraction": 0.25,
+        "paired_t_test_p_value": 0.0211421213509034,
+        "wilcoxon_p_value": 0.02099609375,
+        "cohen_dz_favorable": -0.7756703479527953,
+        "wilcoxon_holm_p_value": 0.14697265625
+      },
+      "delivered_before_expiry_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.10205296612495902,
+        "favorable_mean_difference": -0.10205296612495902,
+        "cluster_mean_favorable_difference": -0.10205296612495902,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.17526649964376856,
+          "high": -0.037753091158847396
+        },
+        "favorable_win_fraction": 0.25,
+        "paired_t_test_p_value": 0.017600446956671668,
+        "wilcoxon_p_value": 0.02685546875,
+        "cohen_dz_favorable": -0.8052760215236175,
+        "wilcoxon_holm_p_value": 0.18798828125
+      },
+      "undelivered_packets_at_disconnect": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": -1.3333333333333333,
+        "favorable_mean_difference": 1.3333333333333333,
+        "cluster_mean_favorable_difference": 1.3333333333333333,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.0,
+          "high": 3.25
+        },
+        "favorable_win_fraction": 0.25,
+        "paired_t_test_p_value": 0.17683009793683416,
+        "wilcoxon_p_value": 0.25,
+        "cohen_dz_favorable": 0.4166173540838955,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "jain_fairness": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.06947427975528239,
+        "favorable_mean_difference": 0.06947427975528239,
+        "cluster_mean_favorable_difference": 0.06947427975528239,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.05001916512387808,
+          "high": 0.09044673867946337
+        },
+        "favorable_win_fraction": 1.0,
+        "paired_t_test_p_value": 5.545917692783441e-05,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": 1.8292700755436742,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "demand_normalized_jain_fairness": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.047848999851772815,
+        "favorable_mean_difference": 0.047848999851772815,
+        "cluster_mean_favorable_difference": 0.047848999851772815,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.020983837232225237,
+          "high": 0.07573797637815212
+        },
+        "favorable_win_fraction": 0.8333333333333334,
+        "paired_t_test_p_value": 0.008523072879705494,
+        "wilcoxon_p_value": 0.01220703125,
+        "cohen_dz_favorable": 0.9224537640642803,
+        "wilcoxon_holm_p_value": 0.03662109375
+      },
+      "mean_scheduled_snr_db": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -5.76511154033155,
+        "favorable_mean_difference": -5.76511154033155,
+        "cluster_mean_favorable_difference": -5.76511154033155,
+        "bootstrap_95_ci_favorable": {
+          "low": -10.083291494368806,
+          "high": -2.4205258614946494
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0208241548813403,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -0.7781188131786808,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "mean_scheduled_ber": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.014459732785533147,
+        "favorable_mean_difference": -0.014459732785533147,
+        "cluster_mean_favorable_difference": -0.014459732785533147,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.027540493334059783,
+          "high": -0.0051497259935675685
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.039804914303428814,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -0.6728768285687016,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "mean_scheduled_per": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.3544961081027669,
+        "favorable_mean_difference": -0.3544961081027669,
+        "cluster_mean_favorable_difference": -0.3544961081027669,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.42250805370824723,
+          "high": -0.28206941669495256
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 1.199172789057125e-06,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -2.7497421360934444,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "mean_scheduled_relative_power": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.17547459631484616,
+        "favorable_mean_difference": -0.17547459631484616,
+        "cluster_mean_favorable_difference": -0.17547459631484616,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.31052808026525325,
+          "high": -0.07112814791827055
+        },
+        "favorable_win_fraction": 0.08333333333333333,
+        "paired_t_test_p_value": 0.02118508728890935,
+        "wilcoxon_p_value": 0.00244140625,
+        "cohen_dz_favorable": -0.7753422948893699,
+        "wilcoxon_holm_p_value": 0.01953125
+      }
+    },
+    "proportional_fair": {
+      "goodput_mbps": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -1.1991666666666665,
+        "favorable_mean_difference": -1.1991666666666665,
+        "cluster_mean_favorable_difference": -1.1991666666666665,
+        "bootstrap_95_ci_favorable": {
+          "low": -1.47741875,
+          "high": -0.9307770833333336
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 5.207643024480599e-06,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -2.3649272524526643,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "packet_delivery_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.33685769205081084,
+        "favorable_mean_difference": -0.33685769205081084,
+        "cluster_mean_favorable_difference": -0.33685769205081084,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.41459884468968744,
+          "high": -0.26194063719041955
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 5.114455153027399e-06,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -2.369393482539091,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "scheduled_outage_fraction": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.0,
+        "favorable_mean_difference": 0.0,
+        "cluster_mean_favorable_difference": 0.0,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.0,
+          "high": 0.0
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": NaN,
+        "wilcoxon_p_value": NaN,
+        "cohen_dz_favorable": NaN,
+        "wilcoxon_holm_p_value": NaN
+      },
+      "availability_outage_fraction": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.0,
+        "favorable_mean_difference": 0.0,
+        "cluster_mean_favorable_difference": 0.0,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.0,
+          "high": 0.0
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": NaN,
+        "wilcoxon_p_value": NaN,
+        "cohen_dz_favorable": NaN,
+        "wilcoxon_holm_p_value": NaN
+      },
+      "mean_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 228.0548976126075,
+        "favorable_mean_difference": -228.0548976126075,
+        "cluster_mean_favorable_difference": -228.0548976126075,
+        "bootstrap_95_ci_favorable": {
+          "low": -353.66303588659235,
+          "high": -99.07715606680654
+        },
+        "favorable_win_fraction": 0.16666666666666666,
+        "paired_t_test_p_value": 0.006166945172733403,
+        "wilcoxon_p_value": 0.01220703125,
+        "cohen_dz_favorable": -0.975075712738747,
+        "wilcoxon_holm_p_value": 0.01220703125
+      },
+      "p50_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 175.00000000000003,
+        "favorable_mean_difference": -175.00000000000003,
+        "cluster_mean_favorable_difference": -175.00000000000003,
+        "bootstrap_95_ci_favorable": {
+          "low": -341.87499999999966,
+          "high": -33.12500000000114
+        },
+        "favorable_win_fraction": 0.25,
+        "paired_t_test_p_value": 0.0579287844223801,
+        "wilcoxon_p_value": 0.0546875,
+        "cohen_dz_favorable": -0.6109571982233631,
+        "wilcoxon_holm_p_value": 0.0546875
+      },
+      "p95_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 515.0000000000015,
+        "favorable_mean_difference": -515.0000000000015,
+        "cluster_mean_favorable_difference": -515.0000000000015,
+        "bootstrap_95_ci_favorable": {
+          "low": -729.1666666666666,
+          "high": -281.25000000000006
+        },
+        "favorable_win_fraction": 0.08333333333333333,
+        "paired_t_test_p_value": 0.0013549466869678102,
+        "wilcoxon_p_value": 0.00390625,
+        "cohen_dz_favorable": -1.2282335344890318,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "p99_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 382.5833333333331,
+        "favorable_mean_difference": -382.5833333333331,
+        "cluster_mean_favorable_difference": -382.5833333333331,
+        "bootstrap_95_ci_favorable": {
+          "low": -520.510416666667,
+          "high": -234.74583333333314
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0003966031789697048,
+        "wilcoxon_p_value": 0.0009765625,
+        "cohen_dz_favorable": -1.4460920736736718,
+        "wilcoxon_holm_p_value": 0.0068359375
+      },
+      "deadline_miss_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.29894691247629174,
+        "favorable_mean_difference": -0.29894691247629174,
+        "cluster_mean_favorable_difference": -0.29894691247629174,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.37291344131534043,
+          "high": -0.2309155545173823
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 7.65278496455935e-06,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -2.2711798221843322,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "censored_packet_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.037910779574519084,
+        "favorable_mean_difference": -0.037910779574519084,
+        "cluster_mean_favorable_difference": -0.037910779574519084,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.049142054924871795,
+          "high": -0.02635656418927253
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 6.854043660160547e-05,
+        "wilcoxon_p_value": 0.0009765625,
+        "cohen_dz_favorable": -1.7856205524471396,
+        "wilcoxon_holm_p_value": 0.0078125
+      },
+      "deadline_or_censored_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.33685769205081084,
+        "favorable_mean_difference": -0.33685769205081084,
+        "cluster_mean_favorable_difference": -0.33685769205081084,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.41459884468968744,
+          "high": -0.26194063719041955
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 5.114455153027399e-06,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -2.36939348253909,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "delivered_before_expiry_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.4135233747182669,
+        "favorable_mean_difference": -0.4135233747182669,
+        "cluster_mean_favorable_difference": -0.4135233747182669,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.48843262196485066,
+          "high": -0.3393015495395833
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 6.391544420446789e-07,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -2.9290526312314347,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "undelivered_packets_at_disconnect": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.08333333333333333,
+        "favorable_mean_difference": -0.08333333333333333,
+        "cluster_mean_favorable_difference": -0.08333333333333333,
+        "bootstrap_95_ci_favorable": {
+          "low": -7.0,
+          "high": 5.0
+        },
+        "favorable_win_fraction": 0.25,
+        "paired_t_test_p_value": 0.9799356620783218,
+        "wilcoxon_p_value": 0.875,
+        "cohen_dz_favorable": -0.007426826453360915,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "jain_fairness": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.03319972842425253,
+        "favorable_mean_difference": 0.03319972842425253,
+        "cluster_mean_favorable_difference": 0.03319972842425253,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.037304442433450366,
+          "high": 0.0935151418844303
+        },
+        "favorable_win_fraction": 0.75,
+        "paired_t_test_p_value": 0.3593207008871605,
+        "wilcoxon_p_value": 0.2333984375,
+        "cohen_dz_favorable": 0.2761468280531819,
+        "wilcoxon_holm_p_value": 0.2333984375
+      },
+      "demand_normalized_jain_fairness": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.13523367250100837,
+        "favorable_mean_difference": -0.13523367250100837,
+        "cluster_mean_favorable_difference": -0.13523367250100837,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.19790124161124428,
+          "high": -0.07298662786302801
+        },
+        "favorable_win_fraction": 0.08333333333333333,
+        "paired_t_test_p_value": 0.002308139394365263,
+        "wilcoxon_p_value": 0.00341796875,
+        "cohen_dz_favorable": -1.1376634224046969,
+        "wilcoxon_holm_p_value": 0.03076171875
+      },
+      "mean_scheduled_snr_db": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.664391330513118,
+        "favorable_mean_difference": 0.664391330513118,
+        "cluster_mean_favorable_difference": 0.664391330513118,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.2464475764910493,
+          "high": 1.6140814107219918
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.2182093306064732,
+        "wilcoxon_p_value": 0.12939453125,
+        "cohen_dz_favorable": 0.3770044244053727,
+        "wilcoxon_holm_p_value": 0.21240234375
+      },
+      "mean_scheduled_ber": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": -5.124955413009989e-06,
+        "favorable_mean_difference": 5.124955413009989e-06,
+        "cluster_mean_favorable_difference": 5.124955413009989e-06,
+        "bootstrap_95_ci_favorable": {
+          "low": 3.4524483727187302e-06,
+          "high": 6.7026380384822e-06
+        },
+        "favorable_win_fraction": 1.0,
+        "paired_t_test_p_value": 0.00012294181417763395,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": 1.6683748394021913,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "mean_scheduled_per": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": -0.04586160728463273,
+        "favorable_mean_difference": 0.04586160728463273,
+        "cluster_mean_favorable_difference": 0.04586160728463273,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.03136935189442085,
+          "high": 0.05946990595981454
+        },
+        "favorable_win_fraction": 1.0,
+        "paired_t_test_p_value": 9.874102706374439e-05,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": 1.7118301840725973,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "mean_scheduled_relative_power": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.05371992675913397,
+        "favorable_mean_difference": -0.05371992675913397,
+        "cluster_mean_favorable_difference": -0.05371992675913397,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.2921724707078882,
+          "high": 0.14167817993870765
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.6575234699467292,
+        "wilcoxon_p_value": 0.5693359375,
+        "cohen_dz_favorable": -0.13152710852072447,
+        "wilcoxon_holm_p_value": 0.5693359375
+      }
+    },
+    "cv_predictive": {
+      "goodput_mbps": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.012249999999999983,
+        "favorable_mean_difference": 0.012249999999999983,
+        "cluster_mean_favorable_difference": 0.012249999999999983,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.0310854166666667,
+          "high": 0.05376666666666649
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.6131063851136944,
+        "wilcoxon_p_value": 0.5693359375,
+        "cohen_dz_favorable": 0.15022298877824494,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "packet_delivery_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.0034439321123459024,
+        "favorable_mean_difference": 0.0034439321123459024,
+        "cluster_mean_favorable_difference": 0.0034439321123459024,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.008668819113097838,
+          "high": 0.015132819258513078
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.611425182832031,
+        "wilcoxon_p_value": 0.5693359375,
+        "cohen_dz_favorable": 0.15094346553207152,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "scheduled_outage_fraction": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.0,
+        "favorable_mean_difference": 0.0,
+        "cluster_mean_favorable_difference": 0.0,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.0,
+          "high": 0.0
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": NaN,
+        "wilcoxon_p_value": NaN,
+        "cohen_dz_favorable": NaN,
+        "wilcoxon_holm_p_value": NaN
+      },
+      "availability_outage_fraction": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.0,
+        "favorable_mean_difference": 0.0,
+        "cluster_mean_favorable_difference": 0.0,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.0,
+          "high": 0.0
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": NaN,
+        "wilcoxon_p_value": NaN,
+        "cohen_dz_favorable": NaN,
+        "wilcoxon_holm_p_value": NaN
+      },
+      "mean_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 181.28314162889168,
+        "favorable_mean_difference": -181.28314162889168,
+        "cluster_mean_favorable_difference": -181.28314162889168,
+        "bootstrap_95_ci_favorable": {
+          "low": -250.30896498600208,
+          "high": -116.58698871827451
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0003773835642361162,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.455205813156819,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "p50_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 208.33333333333334,
+        "favorable_mean_difference": -208.33333333333334,
+        "cluster_mean_favorable_difference": -208.33333333333334,
+        "bootstrap_95_ci_favorable": {
+          "low": -291.6666666666667,
+          "high": -125.00000000000004
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0005576859984353892,
+        "wilcoxon_p_value": 0.001953125,
+        "cohen_dz_favorable": -1.384235981711852,
+        "wilcoxon_holm_p_value": 0.013671875
+      },
+      "p95_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 249.16666666666742,
+        "favorable_mean_difference": -249.16666666666742,
+        "cluster_mean_favorable_difference": -249.16666666666742,
+        "bootstrap_95_ci_favorable": {
+          "low": -332.50000000000074,
+          "high": -165.83333333333408
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0002369126457476396,
+        "wilcoxon_p_value": 0.0009765625,
+        "cohen_dz_favorable": -1.541922571303287,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "p99_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 122.83333333333347,
+        "favorable_mean_difference": -122.83333333333347,
+        "cluster_mean_favorable_difference": -122.83333333333347,
+        "bootstrap_95_ci_favorable": {
+          "low": -208.3333333333334,
+          "high": -16.666666666666845
+        },
+        "favorable_win_fraction": 0.16666666666666666,
+        "paired_t_test_p_value": 0.03271581825701511,
+        "wilcoxon_p_value": 0.0322265625,
+        "cohen_dz_favorable": -0.7048984586196496,
+        "wilcoxon_holm_p_value": 0.193359375
+      },
+      "deadline_miss_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": -0.009913500352329989,
+        "favorable_mean_difference": 0.009913500352329989,
+        "cluster_mean_favorable_difference": 0.009913500352329989,
+        "bootstrap_95_ci_favorable": {
+          "low": -5.06595207611357e-06,
+          "high": 0.019533915613838278
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.0875013015886338,
+        "wilcoxon_p_value": 0.0771484375,
+        "cohen_dz_favorable": 0.5414051083402968,
+        "wilcoxon_holm_p_value": 0.3837890625
+      },
+      "censored_packet_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.006469568239984086,
+        "favorable_mean_difference": -0.006469568239984086,
+        "cluster_mean_favorable_difference": -0.006469568239984086,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.011398222083269937,
+          "high": -0.002549649552353657
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.02073833978622057,
+        "wilcoxon_p_value": 0.00390625,
+        "cohen_dz_favorable": -0.7787859726723697,
+        "wilcoxon_holm_p_value": 0.0234375
+      },
+      "deadline_or_censored_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": -0.0034439321123459093,
+        "favorable_mean_difference": 0.0034439321123459093,
+        "cluster_mean_favorable_difference": 0.0034439321123459093,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.008668819113097831,
+          "high": 0.015132819258513114
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.6114251828320304,
+        "wilcoxon_p_value": 0.5693359375,
+        "cohen_dz_favorable": 0.1509434655320717,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "delivered_before_expiry_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.000945537432391406,
+        "favorable_mean_difference": 0.000945537432391406,
+        "cluster_mean_favorable_difference": 0.000945537432391406,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.01613037838924819,
+          "high": 0.016994492260813832
+        },
+        "favorable_win_fraction": 0.5833333333333334,
+        "paired_t_test_p_value": 0.9190080345739903,
+        "wilcoxon_p_value": 0.791015625,
+        "cohen_dz_favorable": 0.030034607412545218,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "undelivered_packets_at_disconnect": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 7.916666666666667,
+        "favorable_mean_difference": -7.916666666666667,
+        "cluster_mean_favorable_difference": -7.916666666666667,
+        "bootstrap_95_ci_favorable": {
+          "low": -15.25,
+          "high": -1.3333333333333333
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.06035006783576551,
+        "wilcoxon_p_value": 0.125,
+        "cohen_dz_favorable": -0.6041326430091818,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "jain_fairness": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.02778148598115598,
+        "favorable_mean_difference": 0.02778148598115598,
+        "cluster_mean_favorable_difference": 0.02778148598115598,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.011901454019543718,
+          "high": 0.05008802069754552
+        },
+        "favorable_win_fraction": 0.9166666666666666,
+        "paired_t_test_p_value": 0.023388023743578065,
+        "wilcoxon_p_value": 0.0009765625,
+        "cohen_dz_favorable": 0.7593484101466011,
+        "wilcoxon_holm_p_value": 0.005859375
+      },
+      "demand_normalized_jain_fairness": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.024528749352208373,
+        "favorable_mean_difference": 0.024528749352208373,
+        "cluster_mean_favorable_difference": 0.024528749352208373,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.011127104238379879,
+          "high": 0.038752281327457457
+        },
+        "favorable_win_fraction": 0.8333333333333334,
+        "paired_t_test_p_value": 0.006924054658082259,
+        "wilcoxon_p_value": 0.0048828125,
+        "cohen_dz_favorable": 0.956205968972851,
+        "wilcoxon_holm_p_value": 0.03076171875
+      },
+      "mean_scheduled_snr_db": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.9667833749212353,
+        "favorable_mean_difference": -0.9667833749212353,
+        "cluster_mean_favorable_difference": -0.9667833749212353,
+        "bootstrap_95_ci_favorable": {
+          "low": -1.8911584491624447,
+          "high": -0.12178645742015796
+        },
+        "favorable_win_fraction": 0.16666666666666666,
+        "paired_t_test_p_value": 0.06648181197443596,
+        "wilcoxon_p_value": 0.04248046875,
+        "cohen_dz_favorable": -0.5879412627597922,
+        "wilcoxon_holm_p_value": 0.21240234375
+      },
+      "mean_scheduled_ber": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 5.2710692505500164e-05,
+        "favorable_mean_difference": -5.2710692505500164e-05,
+        "cluster_mean_favorable_difference": -5.2710692505500164e-05,
+        "bootstrap_95_ci_favorable": {
+          "low": -9.295854701587062e-05,
+          "high": -1.9114477647454182e-05
+        },
+        "favorable_win_fraction": 0.16666666666666666,
+        "paired_t_test_p_value": 0.025716280832547744,
+        "wilcoxon_p_value": 0.0048828125,
+        "cohen_dz_favorable": -0.7439863899758008,
+        "wilcoxon_holm_p_value": 0.01953125
+      },
+      "mean_scheduled_per": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.14572096920021108,
+        "favorable_mean_difference": -0.14572096920021108,
+        "cluster_mean_favorable_difference": -0.14572096920021108,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.2289921018184954,
+          "high": -0.06565917542851162
+        },
+        "favorable_win_fraction": 0.16666666666666666,
+        "paired_t_test_p_value": 0.007769631189050731,
+        "wilcoxon_p_value": 0.0048828125,
+        "cohen_dz_favorable": -0.9374734658443398,
+        "wilcoxon_holm_p_value": 0.01953125
+      },
+      "mean_scheduled_relative_power": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.18705016409735406,
+        "favorable_mean_difference": -0.18705016409735406,
+        "cluster_mean_favorable_difference": -0.18705016409735406,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.40983225513295785,
+          "high": -0.012688748700985882
+        },
+        "favorable_win_fraction": 0.25,
+        "paired_t_test_p_value": 0.12384142991363474,
+        "wilcoxon_p_value": 0.0771484375,
+        "cohen_dz_favorable": -0.48102177346676517,
+        "wilcoxon_holm_p_value": 0.3857421875
+      }
+    },
+    "kalman_predictive": {
+      "goodput_mbps": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.011666666666666695,
+        "favorable_mean_difference": 0.011666666666666695,
+        "cluster_mean_favorable_difference": 0.011666666666666695,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.03741874999999999,
+          "high": 0.06034166666666671
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.6742656707935935,
+        "wilcoxon_p_value": 0.5693359375,
+        "cohen_dz_favorable": 0.12463475299624757,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "packet_delivery_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.0032782726729619813,
+        "favorable_mean_difference": 0.0032782726729619813,
+        "cluster_mean_favorable_difference": 0.0032782726729619813,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.010519096554390287,
+          "high": 0.01704320971416374
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.673281544873433,
+        "wilcoxon_p_value": 0.5693359375,
+        "cohen_dz_favorable": 0.1250377526869348,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "scheduled_outage_fraction": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.0,
+        "favorable_mean_difference": 0.0,
+        "cluster_mean_favorable_difference": 0.0,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.0,
+          "high": 0.0
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": NaN,
+        "wilcoxon_p_value": NaN,
+        "cohen_dz_favorable": NaN,
+        "wilcoxon_holm_p_value": NaN
+      },
+      "availability_outage_fraction": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.0,
+        "favorable_mean_difference": 0.0,
+        "cluster_mean_favorable_difference": 0.0,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.0,
+          "high": 0.0
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": NaN,
+        "wilcoxon_p_value": NaN,
+        "cohen_dz_favorable": NaN,
+        "wilcoxon_holm_p_value": NaN
+      },
+      "mean_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 180.05080562884663,
+        "favorable_mean_difference": -180.05080562884663,
+        "cluster_mean_favorable_difference": -180.05080562884663,
+        "bootstrap_95_ci_favorable": {
+          "low": -250.07889888265098,
+          "high": -115.13338961065722
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.00042168383704745973,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.434877242663407,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "p50_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 208.33333333333337,
+        "favorable_mean_difference": -208.33333333333337,
+        "cluster_mean_favorable_difference": -208.33333333333337,
+        "bootstrap_95_ci_favorable": {
+          "low": -291.66666666666674,
+          "high": -125.00000000000004
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0007482017054482448,
+        "wilcoxon_p_value": 0.001953125,
+        "cohen_dz_favorable": -1.331816732930443,
+        "wilcoxon_holm_p_value": 0.013671875
+      },
+      "p95_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 233.7500000000015,
+        "favorable_mean_difference": -233.7500000000015,
+        "cluster_mean_favorable_difference": -233.7500000000015,
+        "bootstrap_95_ci_favorable": {
+          "low": -316.66666666666663,
+          "high": -158.33333333333337
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0002096181851656606,
+        "wilcoxon_p_value": 0.0009765625,
+        "cohen_dz_favorable": -1.565126336707729,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "p99_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 122.83333333333347,
+        "favorable_mean_difference": -122.83333333333347,
+        "cluster_mean_favorable_difference": -122.83333333333347,
+        "bootstrap_95_ci_favorable": {
+          "low": -208.3333333333334,
+          "high": -16.666666666666845
+        },
+        "favorable_win_fraction": 0.16666666666666666,
+        "paired_t_test_p_value": 0.03271581825701511,
+        "wilcoxon_p_value": 0.0322265625,
+        "cohen_dz_favorable": -0.7048984586196496,
+        "wilcoxon_holm_p_value": 0.193359375
+      },
+      "deadline_miss_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": -0.010100941847897024,
+        "favorable_mean_difference": 0.010100941847897024,
+        "cluster_mean_favorable_difference": 0.010100941847897024,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.0005912488503736736,
+          "high": 0.019923976917332577
+        },
+        "favorable_win_fraction": 0.75,
+        "paired_t_test_p_value": 0.08227516416944507,
+        "wilcoxon_p_value": 0.05224609375,
+        "cohen_dz_favorable": 0.5519182387889452,
+        "wilcoxon_holm_p_value": 0.36572265625
+      },
+      "censored_packet_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.006822669174935046,
+        "favorable_mean_difference": -0.006822669174935046,
+        "cluster_mean_favorable_difference": -0.006822669174935046,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.012646938662699734,
+          "high": -0.001651056004163633
+        },
+        "favorable_win_fraction": 0.08333333333333333,
+        "paired_t_test_p_value": 0.0432085282523095,
+        "wilcoxon_p_value": 0.0234375,
+        "cohen_dz_favorable": -0.6594202738354068,
+        "wilcoxon_holm_p_value": 0.046875
+      },
+      "deadline_or_censored_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": -0.003278272672961971,
+        "favorable_mean_difference": 0.003278272672961971,
+        "cluster_mean_favorable_difference": 0.003278272672961971,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.010519096554390322,
+          "high": 0.01704320971416375
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.6732815448734342,
+        "wilcoxon_p_value": 0.5693359375,
+        "cohen_dz_favorable": 0.12503775268693426,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "delivered_before_expiry_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.0013535275954950955,
+        "favorable_mean_difference": 0.0013535275954950955,
+        "cluster_mean_favorable_difference": 0.0013535275954950955,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.017256132004528444,
+          "high": 0.019722468759941568
+        },
+        "favorable_win_fraction": 0.5833333333333334,
+        "paired_t_test_p_value": 0.8961157613016069,
+        "wilcoxon_p_value": 0.7333984375,
+        "cohen_dz_favorable": 0.03857297778673798,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "undelivered_packets_at_disconnect": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 7.5,
+        "favorable_mean_difference": -7.5,
+        "cluster_mean_favorable_difference": -7.5,
+        "bootstrap_95_ci_favorable": {
+          "low": -14.583333333333334,
+          "high": -1.0
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0678507829295325,
+        "wilcoxon_p_value": 0.125,
+        "cohen_dz_favorable": -0.5845186610856591,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "jain_fairness": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.027785846734444175,
+        "favorable_mean_difference": 0.027785846734444175,
+        "cluster_mean_favorable_difference": 0.027785846734444175,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.013936920789383531,
+          "high": 0.047865734992750035
+        },
+        "favorable_win_fraction": 1.0,
+        "paired_t_test_p_value": 0.013294200356569976,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": 0.8505585883387887,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "demand_normalized_jain_fairness": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.02307348413170973,
+        "favorable_mean_difference": 0.02307348413170973,
+        "cluster_mean_favorable_difference": 0.02307348413170973,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.01005007974811616,
+          "high": 0.037275232038159044
+        },
+        "favorable_win_fraction": 0.8333333333333334,
+        "paired_t_test_p_value": 0.009388776855400401,
+        "wilcoxon_p_value": 0.0068359375,
+        "cohen_dz_favorable": 0.9067780816833152,
+        "wilcoxon_holm_p_value": 0.03076171875
+      },
+      "mean_scheduled_snr_db": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.9321057749009821,
+        "favorable_mean_difference": -0.9321057749009821,
+        "cluster_mean_favorable_difference": -0.9321057749009821,
+        "bootstrap_95_ci_favorable": {
+          "low": -1.8332385913238103,
+          "high": -0.08763814689501925
+        },
+        "favorable_win_fraction": 0.25,
+        "paired_t_test_p_value": 0.07273417800772378,
+        "wilcoxon_p_value": 0.06396484375,
+        "cohen_dz_favorable": -0.572814392512685,
+        "wilcoxon_holm_p_value": 0.21240234375
+      },
+      "mean_scheduled_ber": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 5.276614674146703e-05,
+        "favorable_mean_difference": -5.276614674146703e-05,
+        "cluster_mean_favorable_difference": -5.276614674146703e-05,
+        "bootstrap_95_ci_favorable": {
+          "low": -9.298212446128846e-05,
+          "high": -1.9038771455605777e-05
+        },
+        "favorable_win_fraction": 0.16666666666666666,
+        "paired_t_test_p_value": 0.02568395616806437,
+        "wilcoxon_p_value": 0.0048828125,
+        "cohen_dz_favorable": -0.7441901352582717,
+        "wilcoxon_holm_p_value": 0.01953125
+      },
+      "mean_scheduled_per": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.14504595725986943,
+        "favorable_mean_difference": -0.14504595725986943,
+        "cluster_mean_favorable_difference": -0.14504595725986943,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.22781239173503098,
+          "high": -0.06437470979780505
+        },
+        "favorable_win_fraction": 0.16666666666666666,
+        "paired_t_test_p_value": 0.007840331119154753,
+        "wilcoxon_p_value": 0.0048828125,
+        "cohen_dz_favorable": -0.9360024419017884,
+        "wilcoxon_holm_p_value": 0.01953125
+      },
+      "mean_scheduled_relative_power": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.1718100051651946,
+        "favorable_mean_difference": -0.1718100051651946,
+        "cluster_mean_favorable_difference": -0.1718100051651946,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.3789591494693231,
+          "high": -0.011618318647881423
+        },
+        "favorable_win_fraction": 0.25,
+        "paired_t_test_p_value": 0.12312924262979023,
+        "wilcoxon_p_value": 0.0771484375,
+        "cohen_dz_favorable": -0.48204160130819657,
+        "wilcoxon_holm_p_value": 0.3857421875
+      }
+    },
+    "imm_predictive": {
+      "goodput_mbps": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.014249999999999948,
+        "favorable_mean_difference": 0.014249999999999948,
+        "cluster_mean_favorable_difference": 0.014249999999999948,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.03483541666666673,
+          "high": 0.06308958333333331
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.6068703062376232,
+        "wilcoxon_p_value": 0.5693359375,
+        "cohen_dz_favorable": 0.15290050826961718,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "packet_delivery_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.004015327188559621,
+        "favorable_mean_difference": 0.004015327188559621,
+        "cluster_mean_favorable_difference": 0.004015327188559621,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.00981770518047072,
+          "high": 0.01779310553464551
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.604336416539576,
+        "wilcoxon_p_value": 0.5185546875,
+        "cohen_dz_favorable": 0.15399245518564914,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "scheduled_outage_fraction": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.0,
+        "favorable_mean_difference": 0.0,
+        "cluster_mean_favorable_difference": 0.0,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.0,
+          "high": 0.0
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": NaN,
+        "wilcoxon_p_value": NaN,
+        "cohen_dz_favorable": NaN,
+        "wilcoxon_holm_p_value": NaN
+      },
+      "availability_outage_fraction": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.0,
+        "favorable_mean_difference": 0.0,
+        "cluster_mean_favorable_difference": 0.0,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.0,
+          "high": 0.0
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": NaN,
+        "wilcoxon_p_value": NaN,
+        "cohen_dz_favorable": NaN,
+        "wilcoxon_holm_p_value": NaN
+      },
+      "mean_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 181.4576434101764,
+        "favorable_mean_difference": -181.4576434101764,
+        "cluster_mean_favorable_difference": -181.4576434101764,
+        "bootstrap_95_ci_favorable": {
+          "low": -251.85955226360488,
+          "high": -115.68727461919399
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0004270088528329123,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.4325869499992108,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "p50_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 208.33333333333337,
+        "favorable_mean_difference": -208.33333333333337,
+        "cluster_mean_favorable_difference": -208.33333333333337,
+        "bootstrap_95_ci_favorable": {
+          "low": -291.66666666666674,
+          "high": -125.00000000000004
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0007482017054482448,
+        "wilcoxon_p_value": 0.001953125,
+        "cohen_dz_favorable": -1.331816732930443,
+        "wilcoxon_holm_p_value": 0.013671875
+      },
+      "p95_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 249.16666666666742,
+        "favorable_mean_difference": -249.16666666666742,
+        "cluster_mean_favorable_difference": -249.16666666666742,
+        "bootstrap_95_ci_favorable": {
+          "low": -332.50000000000074,
+          "high": -165.83333333333408
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0002369126457476396,
+        "wilcoxon_p_value": 0.0009765625,
+        "cohen_dz_favorable": -1.541922571303287,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "p99_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 130.0833333333326,
+        "favorable_mean_difference": -130.0833333333326,
+        "cluster_mean_favorable_difference": -130.0833333333326,
+        "bootstrap_95_ci_favorable": {
+          "low": -215.5833333333325,
+          "high": -21.722916666664226
+        },
+        "favorable_win_fraction": 0.16666666666666666,
+        "paired_t_test_p_value": 0.026298118032626723,
+        "wilcoxon_p_value": 0.033203125,
+        "cohen_dz_favorable": -0.7403614607337736,
+        "wilcoxon_holm_p_value": 0.193359375
+      },
+      "deadline_miss_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": -0.010129624695370501,
+        "favorable_mean_difference": 0.010129624695370501,
+        "cluster_mean_favorable_difference": 0.010129624695370501,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.00020340577009168493,
+          "high": 0.020051336422430184
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.08470068244455754,
+        "wilcoxon_p_value": 0.0771484375,
+        "cohen_dz_favorable": 0.5469646841394471,
+        "wilcoxon_holm_p_value": 0.3837890625
+      },
+      "censored_packet_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.006114297506810876,
+        "favorable_mean_difference": -0.006114297506810876,
+        "cluster_mean_favorable_difference": -0.006114297506810876,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.011391927358955863,
+          "high": -0.0013615740670885406
+        },
+        "favorable_win_fraction": 0.08333333333333333,
+        "paired_t_test_p_value": 0.0454673577992826,
+        "wilcoxon_p_value": 0.0546875,
+        "cohen_dz_favorable": -0.6510418693117219,
+        "wilcoxon_holm_p_value": 0.0546875
+      },
+      "deadline_or_censored_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": -0.004015327188559639,
+        "favorable_mean_difference": 0.004015327188559639,
+        "cluster_mean_favorable_difference": 0.004015327188559639,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.009817705180470721,
+          "high": 0.017793105534645522
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.6043364165395746,
+        "wilcoxon_p_value": 0.5185546875,
+        "cohen_dz_favorable": 0.1539924551856498,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "delivered_before_expiry_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.0017675769094492126,
+        "favorable_mean_difference": 0.0017675769094492126,
+        "cluster_mean_favorable_difference": 0.0017675769094492126,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.016767191723993363,
+          "high": 0.020190946514850632
+        },
+        "favorable_win_fraction": 0.5833333333333334,
+        "paired_t_test_p_value": 0.8647664537430284,
+        "wilcoxon_p_value": 0.67724609375,
+        "cohen_dz_favorable": 0.050327265539459036,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "undelivered_packets_at_disconnect": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 7.5,
+        "favorable_mean_difference": -7.5,
+        "cluster_mean_favorable_difference": -7.5,
+        "bootstrap_95_ci_favorable": {
+          "low": -14.5,
+          "high": -1.3333333333333333
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.06265456817022631,
+        "wilcoxon_p_value": 0.125,
+        "cohen_dz_favorable": -0.5978731802715702,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "jain_fairness": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.027402356263392297,
+        "favorable_mean_difference": 0.027402356263392297,
+        "cluster_mean_favorable_difference": 0.027402356263392297,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.011769618965383326,
+          "high": 0.049752822398039256
+        },
+        "favorable_win_fraction": 0.9166666666666666,
+        "paired_t_test_p_value": 0.023726790820809127,
+        "wilcoxon_p_value": 0.0009765625,
+        "cohen_dz_favorable": 0.7570218479554462,
+        "wilcoxon_holm_p_value": 0.005859375
+      },
+      "demand_normalized_jain_fairness": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.023223574381487266,
+        "favorable_mean_difference": 0.023223574381487266,
+        "cluster_mean_favorable_difference": 0.023223574381487266,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.009528373303625501,
+          "high": 0.03771783085982953
+        },
+        "favorable_win_fraction": 0.75,
+        "paired_t_test_p_value": 0.010945798662532981,
+        "wilcoxon_p_value": 0.01220703125,
+        "cohen_dz_favorable": 0.8819540869376457,
+        "wilcoxon_holm_p_value": 0.03662109375
+      },
+      "mean_scheduled_snr_db": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.9371551029798763,
+        "favorable_mean_difference": -0.9371551029798763,
+        "cluster_mean_favorable_difference": -0.9371551029798763,
+        "bootstrap_95_ci_favorable": {
+          "low": -1.8522520955711261,
+          "high": -0.08180272283604953
+        },
+        "favorable_win_fraction": 0.16666666666666666,
+        "paired_t_test_p_value": 0.0739948627653627,
+        "wilcoxon_p_value": 0.04248046875,
+        "cohen_dz_favorable": -0.569912081737414,
+        "wilcoxon_holm_p_value": 0.21240234375
+      },
+      "mean_scheduled_ber": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 5.273363292172985e-05,
+        "favorable_mean_difference": -5.273363292172985e-05,
+        "cluster_mean_favorable_difference": -5.273363292172985e-05,
+        "bootstrap_95_ci_favorable": {
+          "low": -9.294691564529169e-05,
+          "high": -1.898064921437469e-05
+        },
+        "favorable_win_fraction": 0.16666666666666666,
+        "paired_t_test_p_value": 0.025793022187718534,
+        "wilcoxon_p_value": 0.0048828125,
+        "cohen_dz_favorable": -0.7435036895086202,
+        "wilcoxon_holm_p_value": 0.01953125
+      },
+      "mean_scheduled_per": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.14527617388364678,
+        "favorable_mean_difference": -0.14527617388364678,
+        "cluster_mean_favorable_difference": -0.14527617388364678,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.22892682123167626,
+          "high": -0.06406632923464521
+        },
+        "favorable_win_fraction": 0.16666666666666666,
+        "paired_t_test_p_value": 0.008125522138211301,
+        "wilcoxon_p_value": 0.0048828125,
+        "cohen_dz_favorable": -0.930202512409648,
+        "wilcoxon_holm_p_value": 0.01953125
+      },
+      "mean_scheduled_relative_power": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.1728204981615464,
+        "favorable_mean_difference": -0.1728204981615464,
+        "cluster_mean_favorable_difference": -0.1728204981615464,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.3805829915590224,
+          "high": -0.011297349387841752
+        },
+        "favorable_win_fraction": 0.25,
+        "paired_t_test_p_value": 0.12203449914683065,
+        "wilcoxon_p_value": 0.0771484375,
+        "cohen_dz_favorable": -0.4836195205955595,
+        "wilcoxon_holm_p_value": 0.3857421875
+      }
+    },
+    "predictive_utility": {
+      "goodput_mbps": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.013333333333333308,
+        "favorable_mean_difference": 0.013333333333333308,
+        "cluster_mean_favorable_difference": 0.013333333333333308,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.032002083333333375,
+          "high": 0.059089583333333306
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.6034795298412764,
+        "wilcoxon_p_value": 0.5693359375,
+        "cohen_dz_favorable": 0.1543622493949028,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "packet_delivery_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.0037469216060922413,
+        "favorable_mean_difference": 0.0037469216060922413,
+        "cluster_mean_favorable_difference": 0.0037469216060922413,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.008924679941970758,
+          "high": 0.016524961418017185
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.6017097820749796,
+        "wilcoxon_p_value": 0.5693359375,
+        "cohen_dz_favorable": 0.15512684816929348,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "scheduled_outage_fraction": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.0,
+        "favorable_mean_difference": 0.0,
+        "cluster_mean_favorable_difference": 0.0,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.0,
+          "high": 0.0
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": NaN,
+        "wilcoxon_p_value": NaN,
+        "cohen_dz_favorable": NaN,
+        "wilcoxon_holm_p_value": NaN
+      },
+      "availability_outage_fraction": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.0,
+        "favorable_mean_difference": 0.0,
+        "cluster_mean_favorable_difference": 0.0,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.0,
+          "high": 0.0
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": NaN,
+        "wilcoxon_p_value": NaN,
+        "cohen_dz_favorable": NaN,
+        "wilcoxon_holm_p_value": NaN
+      },
+      "mean_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 182.50396557498107,
+        "favorable_mean_difference": -182.50396557498107,
+        "cluster_mean_favorable_difference": -182.50396557498107,
+        "bootstrap_95_ci_favorable": {
+          "low": -250.21588732505597,
+          "high": -116.88603320108098
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.000342350918376282,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.473156349078094,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "p50_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 208.33333333333334,
+        "favorable_mean_difference": -208.33333333333334,
+        "cluster_mean_favorable_difference": -208.33333333333334,
+        "bootstrap_95_ci_favorable": {
+          "low": -291.6666666666667,
+          "high": -125.00000000000004
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0005576859984353892,
+        "wilcoxon_p_value": 0.001953125,
+        "cohen_dz_favorable": -1.384235981711852,
+        "wilcoxon_holm_p_value": 0.013671875
+      },
+      "p95_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 265.8333333333341,
+        "favorable_mean_difference": -265.8333333333341,
+        "cluster_mean_favorable_difference": -265.8333333333341,
+        "bootstrap_95_ci_favorable": {
+          "low": -340.8437500000008,
+          "high": -191.66666666666666
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 4.838733848817669e-05,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.8577249482369413,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "p99_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 129.16666666666677,
+        "favorable_mean_difference": -129.16666666666677,
+        "cluster_mean_favorable_difference": -129.16666666666677,
+        "bootstrap_95_ci_favorable": {
+          "low": -214.5041666666669,
+          "high": -20.625000000000473
+        },
+        "favorable_win_fraction": 0.16666666666666666,
+        "paired_t_test_p_value": 0.027350461768723463,
+        "wilcoxon_p_value": 0.033203125,
+        "cohen_dz_favorable": -0.7340009724269076,
+        "wilcoxon_holm_p_value": 0.193359375
+      },
+      "deadline_miss_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": -0.010330471334471751,
+        "favorable_mean_difference": 0.010330471334471751,
+        "cluster_mean_favorable_difference": 0.010330471334471751,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.00033804128951536754,
+          "high": 0.020725414356433824
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.09667857435905601,
+        "wilcoxon_p_value": 0.0771484375,
+        "cohen_dz_favorable": 0.5242657095005967,
+        "wilcoxon_holm_p_value": 0.3837890625
+      },
+      "censored_packet_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.006583549728379501,
+        "favorable_mean_difference": -0.006583549728379501,
+        "cluster_mean_favorable_difference": -0.006583549728379501,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.0114816899389765,
+          "high": -0.0026593739779056723
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.018052989446769432,
+        "wilcoxon_p_value": 0.00390625,
+        "cohen_dz_favorable": -0.8011784542241172,
+        "wilcoxon_holm_p_value": 0.0234375
+      },
+      "deadline_or_censored_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": -0.00374692160609226,
+        "favorable_mean_difference": 0.00374692160609226,
+        "cluster_mean_favorable_difference": 0.00374692160609226,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.008924679941970735,
+          "high": 0.016524961418017223
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.6017097820749779,
+        "wilcoxon_p_value": 0.5693359375,
+        "cohen_dz_favorable": 0.15512684816929417,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "delivered_before_expiry_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.0014696904152441033,
+        "favorable_mean_difference": 0.0014696904152441033,
+        "cluster_mean_favorable_difference": 0.0014696904152441033,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.016208494074321657,
+          "high": 0.018532049062167637
+        },
+        "favorable_win_fraction": 0.5833333333333334,
+        "paired_t_test_p_value": 0.8803256679336406,
+        "wilcoxon_p_value": 0.7333984375,
+        "cohen_dz_favorable": 0.044483375800544296,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "undelivered_packets_at_disconnect": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 7.916666666666667,
+        "favorable_mean_difference": -7.916666666666667,
+        "cluster_mean_favorable_difference": -7.916666666666667,
+        "bootstrap_95_ci_favorable": {
+          "low": -15.25,
+          "high": -1.3333333333333333
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.06035006783576551,
+        "wilcoxon_p_value": 0.125,
+        "cohen_dz_favorable": -0.6041326430091818,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "jain_fairness": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.02832675769921981,
+        "favorable_mean_difference": 0.02832675769921981,
+        "cluster_mean_favorable_difference": 0.02832675769921981,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.01164522838663089,
+          "high": 0.05090473631040765
+        },
+        "favorable_win_fraction": 0.9166666666666666,
+        "paired_t_test_p_value": 0.023313296598546952,
+        "wilcoxon_p_value": 0.0009765625,
+        "cohen_dz_favorable": 0.7598660925951699,
+        "wilcoxon_holm_p_value": 0.005859375
+      },
+      "demand_normalized_jain_fairness": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.02550048543257608,
+        "favorable_mean_difference": 0.02550048543257608,
+        "cluster_mean_favorable_difference": 0.02550048543257608,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.011718455696641383,
+          "high": 0.039717374872049085
+        },
+        "favorable_win_fraction": 0.8333333333333334,
+        "paired_t_test_p_value": 0.00573765570288169,
+        "wilcoxon_p_value": 0.0048828125,
+        "cohen_dz_favorable": 0.9868576638887836,
+        "wilcoxon_holm_p_value": 0.03076171875
+      },
+      "mean_scheduled_snr_db": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.9632647289393685,
+        "favorable_mean_difference": -0.9632647289393685,
+        "cluster_mean_favorable_difference": -0.9632647289393685,
+        "bootstrap_95_ci_favorable": {
+          "low": -1.8910677131128566,
+          "high": -0.1169214704875151
+        },
+        "favorable_win_fraction": 0.25,
+        "paired_t_test_p_value": 0.06789254269687263,
+        "wilcoxon_p_value": 0.06396484375,
+        "cohen_dz_favorable": -0.5844152766520643,
+        "wilcoxon_holm_p_value": 0.21240234375
+      },
+      "mean_scheduled_ber": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 5.31405704387185e-05,
+        "favorable_mean_difference": -5.31405704387185e-05,
+        "cluster_mean_favorable_difference": -5.31405704387185e-05,
+        "bootstrap_95_ci_favorable": {
+          "low": -9.32484255968816e-05,
+          "high": -1.9569887014474175e-05
+        },
+        "favorable_win_fraction": 0.16666666666666666,
+        "paired_t_test_p_value": 0.024439371599609617,
+        "wilcoxon_p_value": 0.0048828125,
+        "cohen_dz_favorable": -0.7522331585744656,
+        "wilcoxon_holm_p_value": 0.01953125
+      },
+      "mean_scheduled_per": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.1467177965005687,
+        "favorable_mean_difference": -0.1467177965005687,
+        "cluster_mean_favorable_difference": -0.1467177965005687,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.22957364228308927,
+          "high": -0.06652060881909698
+        },
+        "favorable_win_fraction": 0.16666666666666666,
+        "paired_t_test_p_value": 0.007350287148097983,
+        "wilcoxon_p_value": 0.0048828125,
+        "cohen_dz_favorable": -0.9464888162729795,
+        "wilcoxon_holm_p_value": 0.01953125
+      },
+      "mean_scheduled_relative_power": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.1859420390517672,
+        "favorable_mean_difference": -0.1859420390517672,
+        "cluster_mean_favorable_difference": -0.1859420390517672,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.40913785933065755,
+          "high": -0.011518716755540875
+        },
+        "favorable_win_fraction": 0.3333333333333333,
+        "paired_t_test_p_value": 0.12643556145527024,
+        "wilcoxon_p_value": 0.09228515625,
+        "cohen_dz_favorable": -0.4773506158122839,
+        "wilcoxon_holm_p_value": 0.3857421875
+      }
+    },
+    "link_lifetime": {
+      "goodput_mbps": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.013999999999999976,
+        "favorable_mean_difference": 0.013999999999999976,
+        "cluster_mean_favorable_difference": 0.013999999999999976,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.031927083333333404,
+          "high": 0.059258333333333205
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.5873583619103794,
+        "wilcoxon_p_value": 0.67724609375,
+        "cohen_dz_favorable": 0.16137079766251688,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "packet_delivery_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.003929631494291578,
+        "favorable_mean_difference": 0.003929631494291578,
+        "cluster_mean_favorable_difference": 0.003929631494291578,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.008987648357746335,
+          "high": 0.016604133459374615
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.5863405056055622,
+        "wilcoxon_p_value": 0.6220703125,
+        "cohen_dz_favorable": 0.16181666329752126,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "scheduled_outage_fraction": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.0,
+        "favorable_mean_difference": 0.0,
+        "cluster_mean_favorable_difference": 0.0,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.0,
+          "high": 0.0
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": NaN,
+        "wilcoxon_p_value": NaN,
+        "cohen_dz_favorable": NaN,
+        "wilcoxon_holm_p_value": NaN
+      },
+      "availability_outage_fraction": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.0,
+        "favorable_mean_difference": 0.0,
+        "cluster_mean_favorable_difference": 0.0,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.0,
+          "high": 0.0
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": NaN,
+        "wilcoxon_p_value": NaN,
+        "cohen_dz_favorable": NaN,
+        "wilcoxon_holm_p_value": NaN
+      },
+      "mean_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 183.76456826821857,
+        "favorable_mean_difference": -183.76456826821857,
+        "cluster_mean_favorable_difference": -183.76456826821857,
+        "bootstrap_95_ci_favorable": {
+          "low": -251.47972516951904,
+          "high": -119.22911433176898
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0002975386612334031,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.4991845289261205,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "p50_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 208.33333333333334,
+        "favorable_mean_difference": -208.33333333333334,
+        "cluster_mean_favorable_difference": -208.33333333333334,
+        "bootstrap_95_ci_favorable": {
+          "low": -291.6666666666667,
+          "high": -125.00000000000004
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0005576859984353892,
+        "wilcoxon_p_value": 0.001953125,
+        "cohen_dz_favorable": -1.384235981711852,
+        "wilcoxon_holm_p_value": 0.013671875
+      },
+      "p95_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 268.75,
+        "favorable_mean_difference": -268.75,
+        "cluster_mean_favorable_difference": -268.75,
+        "bootstrap_95_ci_favorable": {
+          "low": -351.6666666666651,
+          "high": -188.72916666666384
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 8.763910913125855e-05,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.7357397288543384,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "p99_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 129.16666666666677,
+        "favorable_mean_difference": -129.16666666666677,
+        "cluster_mean_favorable_difference": -129.16666666666677,
+        "bootstrap_95_ci_favorable": {
+          "low": -214.50000000000014,
+          "high": -18.833333333333332
+        },
+        "favorable_win_fraction": 0.16666666666666666,
+        "paired_t_test_p_value": 0.027350461768723463,
+        "wilcoxon_p_value": 0.033203125,
+        "cohen_dz_favorable": -0.7340009724269076,
+        "wilcoxon_holm_p_value": 0.193359375
+      },
+      "deadline_miss_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": -0.010592192270202513,
+        "favorable_mean_difference": 0.010592192270202513,
+        "cluster_mean_favorable_difference": 0.010592192270202513,
+        "bootstrap_95_ci_favorable": {
+          "low": -6.344876746653894e-06,
+          "high": 0.020869772935941045
+        },
+        "favorable_win_fraction": 0.75,
+        "paired_t_test_p_value": 0.08865296146254141,
+        "wilcoxon_p_value": 0.06396484375,
+        "cohen_dz_favorable": 0.5391662742510478,
+        "wilcoxon_holm_p_value": 0.3837890625
+      },
+      "censored_packet_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.006662560775910921,
+        "favorable_mean_difference": -0.006662560775910921,
+        "cluster_mean_favorable_difference": -0.006662560775910921,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.012352018015860982,
+          "high": -0.0023069017620607627
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.032493639143146395,
+        "wilcoxon_p_value": 0.00390625,
+        "cohen_dz_favorable": -0.706007802017712,
+        "wilcoxon_holm_p_value": 0.0234375
+      },
+      "deadline_or_censored_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": -0.003929631494291605,
+        "favorable_mean_difference": 0.003929631494291605,
+        "cluster_mean_favorable_difference": 0.003929631494291605,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.008987648357746304,
+          "high": 0.016604133459374667
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.58634050560556,
+        "wilcoxon_p_value": 0.6220703125,
+        "cohen_dz_favorable": 0.16181666329752223,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "delivered_before_expiry_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.0016769003235982776,
+        "favorable_mean_difference": 0.0016769003235982776,
+        "cluster_mean_favorable_difference": 0.0016769003235982776,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.01593733743721907,
+          "high": 0.018749454850163366
+        },
+        "favorable_win_fraction": 0.5833333333333334,
+        "paired_t_test_p_value": 0.8645750007122436,
+        "wilcoxon_p_value": 0.85009765625,
+        "cohen_dz_favorable": 0.050399308035698975,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "undelivered_packets_at_disconnect": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 4.5,
+        "favorable_mean_difference": -4.5,
+        "cluster_mean_favorable_difference": -4.5,
+        "bootstrap_95_ci_favorable": {
+          "low": -10.833333333333334,
+          "high": 0.25
+        },
+        "favorable_win_fraction": 0.08333333333333333,
+        "paired_t_test_p_value": 0.1544377893293779,
+        "wilcoxon_p_value": 0.25,
+        "cohen_dz_favorable": -0.4414542895519077,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "jain_fairness": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.030306517933392157,
+        "favorable_mean_difference": 0.030306517933392157,
+        "cluster_mean_favorable_difference": 0.030306517933392157,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.013878398603596902,
+          "high": 0.05273865612768156
+        },
+        "favorable_win_fraction": 0.9166666666666666,
+        "paired_t_test_p_value": 0.015498767407664,
+        "wilcoxon_p_value": 0.0009765625,
+        "cohen_dz_favorable": 0.8257968849871666,
+        "wilcoxon_holm_p_value": 0.005859375
+      },
+      "demand_normalized_jain_fairness": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.02762604718610837,
+        "favorable_mean_difference": 0.02762604718610837,
+        "cluster_mean_favorable_difference": 0.02762604718610837,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.014195527183977359,
+          "high": 0.04111676307428618
+        },
+        "favorable_win_fraction": 0.8333333333333334,
+        "paired_t_test_p_value": 0.0028853262573684535,
+        "wilcoxon_p_value": 0.00341796875,
+        "cohen_dz_favorable": 1.1002816503274842,
+        "wilcoxon_holm_p_value": 0.03076171875
+      },
+      "mean_scheduled_snr_db": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.9841431303622508,
+        "favorable_mean_difference": -0.9841431303622508,
+        "cluster_mean_favorable_difference": -0.9841431303622508,
+        "bootstrap_95_ci_favorable": {
+          "low": -1.882979819915808,
+          "high": -0.1559386533267272
+        },
+        "favorable_win_fraction": 0.16666666666666666,
+        "paired_t_test_p_value": 0.06000200893839783,
+        "wilcoxon_p_value": 0.02099609375,
+        "cohen_dz_favorable": -0.6050975767366786,
+        "wilcoxon_holm_p_value": 0.14697265625
+      },
+      "mean_scheduled_ber": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 5.83329360224313e-05,
+        "favorable_mean_difference": -5.83329360224313e-05,
+        "cluster_mean_favorable_difference": -5.83329360224313e-05,
+        "bootstrap_95_ci_favorable": {
+          "low": -9.670223250301663e-05,
+          "high": -2.706861955655259e-05
+        },
+        "favorable_win_fraction": 0.08333333333333333,
+        "paired_t_test_p_value": 0.012713546390219729,
+        "wilcoxon_p_value": 0.00146484375,
+        "cohen_dz_favorable": -0.8577685522739427,
+        "wilcoxon_holm_p_value": 0.0087890625
+      },
+      "mean_scheduled_per": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.15175269637764602,
+        "favorable_mean_difference": -0.15175269637764602,
+        "cluster_mean_favorable_difference": -0.15175269637764602,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.23046380844780326,
+          "high": -0.07488707281909947
+        },
+        "favorable_win_fraction": 0.08333333333333333,
+        "paired_t_test_p_value": 0.0048225472768793215,
+        "wilcoxon_p_value": 0.00146484375,
+        "cohen_dz_favorable": -1.015314343820437,
+        "wilcoxon_holm_p_value": 0.0087890625
+      },
+      "mean_scheduled_relative_power": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.18638348726733497,
+        "favorable_mean_difference": -0.18638348726733497,
+        "cluster_mean_favorable_difference": -0.18638348726733497,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.40816031174348477,
+          "high": -0.013229660956133793
+        },
+        "favorable_win_fraction": 0.25,
+        "paired_t_test_p_value": 0.12527470453551318,
+        "wilcoxon_p_value": 0.04248046875,
+        "cohen_dz_favorable": -0.47898508329351697,
+        "wilcoxon_holm_p_value": 0.29736328125
+      }
+    },
+    "oracle": {
+      "goodput_mbps": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.014749999999999985,
+        "favorable_mean_difference": 0.014749999999999985,
+        "cluster_mean_favorable_difference": 0.014749999999999985,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.031168750000000005,
+          "high": 0.060337500000000016
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.568127716941849,
+        "wilcoxon_p_value": 0.6220703125,
+        "cohen_dz_favorable": 0.16986569988446432,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "packet_delivery_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.004143550490298423,
+        "favorable_mean_difference": 0.004143550490298423,
+        "cluster_mean_favorable_difference": 0.004143550490298423,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.008689931616779025,
+          "high": 0.016876707133846237
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.5667840654289475,
+        "wilcoxon_p_value": 0.6220703125,
+        "cohen_dz_favorable": 0.17046501076845327,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "scheduled_outage_fraction": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.0,
+        "favorable_mean_difference": 0.0,
+        "cluster_mean_favorable_difference": 0.0,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.0,
+          "high": 0.0
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": NaN,
+        "wilcoxon_p_value": NaN,
+        "cohen_dz_favorable": NaN,
+        "wilcoxon_holm_p_value": NaN
+      },
+      "availability_outage_fraction": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.0,
+        "favorable_mean_difference": 0.0,
+        "cluster_mean_favorable_difference": 0.0,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.0,
+          "high": 0.0
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": NaN,
+        "wilcoxon_p_value": NaN,
+        "cohen_dz_favorable": NaN,
+        "wilcoxon_holm_p_value": NaN
+      },
+      "mean_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 187.25794254777702,
+        "favorable_mean_difference": -187.25794254777702,
+        "cluster_mean_favorable_difference": -187.25794254777702,
+        "bootstrap_95_ci_favorable": {
+          "low": -260.5831798716557,
+          "high": -119.47107130589629
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.00041770134670326617,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.436610176044469,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "p50_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 216.66666666666666,
+        "favorable_mean_difference": -216.66666666666666,
+        "cluster_mean_favorable_difference": -216.66666666666666,
+        "bootstrap_95_ci_favorable": {
+          "low": -308.3333333333333,
+          "high": -133.33333333333334
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.0010223631915410052,
+        "wilcoxon_p_value": 0.001953125,
+        "cohen_dz_favorable": -1.2769893321347536,
+        "wilcoxon_holm_p_value": 0.013671875
+      },
+      "p95_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 268.75,
+        "favorable_mean_difference": -268.75,
+        "cluster_mean_favorable_difference": -268.75,
+        "bootstrap_95_ci_favorable": {
+          "low": -351.6666666666651,
+          "high": -188.72916666666384
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 8.763910913125855e-05,
+        "wilcoxon_p_value": 0.00048828125,
+        "cohen_dz_favorable": -1.7357397288543384,
+        "wilcoxon_holm_p_value": 0.00439453125
+      },
+      "p99_latency_ms": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 129.16666666666677,
+        "favorable_mean_difference": -129.16666666666677,
+        "cluster_mean_favorable_difference": -129.16666666666677,
+        "bootstrap_95_ci_favorable": {
+          "low": -214.50000000000014,
+          "high": -18.833333333333332
+        },
+        "favorable_win_fraction": 0.16666666666666666,
+        "paired_t_test_p_value": 0.027350461768723463,
+        "wilcoxon_p_value": 0.033203125,
+        "cohen_dz_favorable": -0.7340009724269076,
+        "wilcoxon_holm_p_value": 0.193359375
+      },
+      "deadline_miss_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": -0.010306966942193385,
+        "favorable_mean_difference": 0.010306966942193385,
+        "cluster_mean_favorable_difference": 0.010306966942193385,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.0002932484751375689,
+          "high": 0.02065743999443707
+        },
+        "favorable_win_fraction": 0.75,
+        "paired_t_test_p_value": 0.09637283724631639,
+        "wilcoxon_p_value": 0.06396484375,
+        "cohen_dz_favorable": 0.5248122759535834,
+        "wilcoxon_holm_p_value": 0.3837890625
+      },
+      "censored_packet_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.006163416451894949,
+        "favorable_mean_difference": -0.006163416451894949,
+        "cluster_mean_favorable_difference": -0.006163416451894949,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.011890864191908605,
+          "high": -0.001786757166924173
+        },
+        "favorable_win_fraction": 0.0,
+        "paired_t_test_p_value": 0.047079516579858184,
+        "wilcoxon_p_value": 0.00390625,
+        "cohen_dz_favorable": -0.6453028947836902,
+        "wilcoxon_holm_p_value": 0.0234375
+      },
+      "deadline_or_censored_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": -0.004143550490298445,
+        "favorable_mean_difference": 0.004143550490298445,
+        "cluster_mean_favorable_difference": 0.004143550490298445,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.008689931616779032,
+          "high": 0.01687670713384625
+        },
+        "favorable_win_fraction": 0.6666666666666666,
+        "paired_t_test_p_value": 0.5667840654289454,
+        "wilcoxon_p_value": 0.6220703125,
+        "cohen_dz_favorable": 0.1704650107684541,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "delivered_before_expiry_ratio": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.001898204543132063,
+        "favorable_mean_difference": 0.001898204543132063,
+        "cluster_mean_favorable_difference": 0.001898204543132063,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.015873808613655293,
+          "high": 0.018944692994828725
+        },
+        "favorable_win_fraction": 0.5833333333333334,
+        "paired_t_test_p_value": 0.847099275717914,
+        "wilcoxon_p_value": 0.791015625,
+        "cohen_dz_favorable": 0.0569903501324309,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "undelivered_packets_at_disconnect": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 4.5,
+        "favorable_mean_difference": -4.5,
+        "cluster_mean_favorable_difference": -4.5,
+        "bootstrap_95_ci_favorable": {
+          "low": -10.833333333333334,
+          "high": 0.25
+        },
+        "favorable_win_fraction": 0.08333333333333333,
+        "paired_t_test_p_value": 0.1544377893293779,
+        "wilcoxon_p_value": 0.25,
+        "cohen_dz_favorable": -0.4414542895519077,
+        "wilcoxon_holm_p_value": 1.0
+      },
+      "jain_fairness": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.03019211657760787,
+        "favorable_mean_difference": 0.03019211657760787,
+        "cluster_mean_favorable_difference": 0.03019211657760787,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.013878398603596902,
+          "high": 0.052395452060328696
+        },
+        "favorable_win_fraction": 0.9166666666666666,
+        "paired_t_test_p_value": 0.015041104860841955,
+        "wilcoxon_p_value": 0.0009765625,
+        "cohen_dz_favorable": 0.8306335893697929,
+        "wilcoxon_holm_p_value": 0.005859375
+      },
+      "demand_normalized_jain_fairness": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": 0.02827498330626307,
+        "favorable_mean_difference": 0.02827498330626307,
+        "cluster_mean_favorable_difference": 0.02827498330626307,
+        "bootstrap_95_ci_favorable": {
+          "low": 0.014842008815972838,
+          "high": 0.041467383638116945
+        },
+        "favorable_win_fraction": 0.8333333333333334,
+        "paired_t_test_p_value": 0.0025154580644025713,
+        "wilcoxon_p_value": 0.00341796875,
+        "cohen_dz_favorable": 1.1232209840828897,
+        "wilcoxon_holm_p_value": 0.03076171875
+      },
+      "mean_scheduled_snr_db": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.9962873224191542,
+        "favorable_mean_difference": -0.9962873224191542,
+        "cluster_mean_favorable_difference": -0.9962873224191542,
+        "bootstrap_95_ci_favorable": {
+          "low": -1.9304382193578276,
+          "high": -0.15685904301265255
+        },
+        "favorable_win_fraction": 0.16666666666666666,
+        "paired_t_test_p_value": 0.0610783165378258,
+        "wilcoxon_p_value": 0.02099609375,
+        "cohen_dz_favorable": -0.602130573054774,
+        "wilcoxon_holm_p_value": 0.14697265625
+      },
+      "mean_scheduled_ber": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 5.8491515137936735e-05,
+        "favorable_mean_difference": -5.8491515137936735e-05,
+        "cluster_mean_favorable_difference": -5.8491515137936735e-05,
+        "bootstrap_95_ci_favorable": {
+          "low": -9.683873752590969e-05,
+          "high": -2.7072584034440202e-05
+        },
+        "favorable_win_fraction": 0.08333333333333333,
+        "paired_t_test_p_value": 0.012645570612637411,
+        "wilcoxon_p_value": 0.00146484375,
+        "cohen_dz_favorable": -0.8586341700142455,
+        "wilcoxon_holm_p_value": 0.0087890625
+      },
+      "mean_scheduled_per": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": false,
+        "raw_mean_difference": 0.1527486450068911,
+        "favorable_mean_difference": -0.1527486450068911,
+        "cluster_mean_favorable_difference": -0.1527486450068911,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.23345165433553852,
+          "high": -0.07488847468368874
+        },
+        "favorable_win_fraction": 0.08333333333333333,
+        "paired_t_test_p_value": 0.004991204668653579,
+        "wilcoxon_p_value": 0.00146484375,
+        "cohen_dz_favorable": -1.0096742997846313,
+        "wilcoxon_holm_p_value": 0.0087890625
+      },
+      "mean_scheduled_relative_power": {
+        "pairs": 12,
+        "independent_clusters": 12,
+        "higher_is_better": true,
+        "raw_mean_difference": -0.18695092244228553,
+        "favorable_mean_difference": -0.18695092244228553,
+        "cluster_mean_favorable_difference": -0.18695092244228553,
+        "bootstrap_95_ci_favorable": {
+          "low": -0.41043005244328723,
+          "high": -0.013229660956133793
+        },
+        "favorable_win_fraction": 0.25,
+        "paired_t_test_p_value": 0.12517888790276796,
+        "wilcoxon_p_value": 0.04248046875,
+        "cohen_dz_favorable": -0.47912059163779114,
+        "wilcoxon_holm_p_value": 0.29736328125
+      }
+    }
+  }
+}

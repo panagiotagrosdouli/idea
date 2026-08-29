@@ -1,0 +1,16 @@
+scenario_id,actor_id,approaching,receding,straight,lane_change_or_merge,turn,fov_edge,dense,range_change_m,lateral_change_m,heading_change_deg,labels
+52dafd686fe77b21,383,False,False,False,True,True,False,False,0.012394507283877587,2.2509333991624922,48.81407483429035,lane_change_or_merge;turn
+52dafd686fe77b21,387,False,False,False,True,True,True,False,-0.012256170119241183,7.648569488669365,105.1540680503126,lane_change_or_merge;turn;fov_edge
+52dafd686fe77b21,391,False,False,False,True,True,False,False,-0.02035171344747244,8.386426392532535,70.70995378081128,lane_change_or_merge;turn
+52dafd686fe77b21,395,False,False,False,True,True,True,False,0.8649604336910368,5.390168252342774,87.35745470593528,lane_change_or_merge;turn;fov_edge
+52dafd686fe77b21,408,False,False,False,True,True,True,False,-0.003943328932318302,-6.095339559135488,126.86989764584402,lane_change_or_merge;turn;fov_edge
+75ae707721eb23b4,4356,False,True,True,False,False,False,False,2.4895959327199844,0.3489758827520735,0.7928568392717897,receding;straight
+75ae707721eb23b4,1502,False,False,True,False,False,False,False,1.8149442016503627,0.40428780889424987,0.6236397949248347,straight
+75ae707721eb23b4,1503,True,False,False,False,False,False,False,-6.565154466983255,-0.7509305109093858,1.8059406155136046,approaching
+75ae707721eb23b4,1505,True,False,True,False,False,False,False,-3.9790757855968266,0.6580946331943373,0.7505482621757514,approaching;straight
+75ae707721eb23b4,1504,True,False,True,False,False,False,False,-7.085554294963082,-0.46552301770996873,0.2508079626610501,approaching;straight
+b85e1bd6cc8e74c0,1807,False,True,False,True,True,False,False,3.0523669118165078,10.490736937812802,87.37182949074457,receding;lane_change_or_merge;turn
+b85e1bd6cc8e74c0,1817,False,True,True,False,False,False,False,32.42123635627493,0.039865954936594505,0.0,receding;straight
+b85e1bd6cc8e74c0,1816,False,True,False,True,False,False,False,33.45742927808233,-4.749159747717975,0.0,receding;lane_change_or_merge
+b85e1bd6cc8e74c0,1825,False,True,False,True,False,False,False,30.697695270836654,-41.507634652029566,0.0,receding;lane_change_or_merge
+b85e1bd6cc8e74c0,1819,False,True,False,True,False,False,False,34.19752592816533,-42.33261421493327,0.0,receding;lane_change_or_merge

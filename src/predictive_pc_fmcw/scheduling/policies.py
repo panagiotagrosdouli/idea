@@ -67,14 +67,18 @@ class ReactiveGreedyScheduler:
 
 @dataclass(frozen=True)
 class ProportionalFairScheduler:
+    """Current rate divided by historical normalized service per slot."""
+
     name: str = "proportional_fair"
     forecast_mode: str = "reactive"
 
     def select(self, context: SchedulerContext) -> SchedulerDecision:
-        mean_delivered = max(float(context.delivered_bits.mean()), 1.0)
-        normalized_history = context.delivered_bits / mean_delivered
+        elapsed_slots = max(1, context.slot)
+        normalized_service = (
+            context.delivered_bits / context.data_rate_bps / elapsed_slots
+        )
         scores = (context.current_goodput_bps / context.data_rate_bps) / (
-            0.1 + normalized_history
+            1e-3 + normalized_service
         )
         scores -= context.current_outage.astype(float)
         return choose_best(scores, eligible_mask(context), self.name)
@@ -161,16 +165,13 @@ class LinkLifetimeScheduler(PredictiveUtilityScheduler):
             (horizon - context.predicted_lifetime_steps) / max(1, horizon), 0.0, 1.0
         )
         currently_usable = (~context.current_outage).astype(float)
-        lifetime_urgency = (
-            closing_pressure * queue * currently_usable
-            + queue / (1.0 + context.predicted_lifetime_steps)
-        )
+        lifetime_urgency = closing_pressure * queue * currently_usable
         return scores + self.config.lifetime_weight * lifetime_urgency
 
 
 @dataclass(frozen=True)
 class OracleScheduler(LinkLifetimeScheduler):
-    """Perfect-future upper bound with the proposed lifetime-aware objective."""
+    """Perfect-future information reference using the same heuristic utility."""
 
     name: str = "oracle"
     forecast_mode: str = "oracle"

@@ -27,6 +27,18 @@ class TrafficAndSchedulerTest(unittest.TestCase):
                 active_slots = np.flatnonzero(first.arrivals.sum(axis=1))
                 self.assertTrue(np.all(active_slots % 4 == 0))
 
+    def test_physical_deadline_is_invariant_to_slot_duration(self):
+        config = TrafficConfig(
+            model="saturated", deadline_s=1.2, deadline_jitter_s=0.0
+        )
+        slow = generate_traffic_trace(3, 3, 2, 20, config, slot_duration_s=0.1)
+        fast = generate_traffic_trace(3, 3, 2, 20, config, slot_duration_s=0.05)
+        slow_deadline = slow.deadlines[0][0][0] * 0.1
+        fast_deadline = fast.deadlines[0][0][0] * 0.05
+        self.assertAlmostEqual(slow_deadline, 1.2)
+        self.assertAlmostEqual(fast_deadline, 1.2)
+        self.assertTrue(np.all(slow.arrivals > 0))
+
     def test_all_policies_choose_at_most_one_eligible_vehicle(self):
         context = SchedulerContext(
             slot=0,
@@ -58,6 +70,28 @@ class TrafficAndSchedulerTest(unittest.TestCase):
         for name in names:
             decision = build_scheduler(name, SchedulerConfig(), 9).select(context)
             self.assertIn(decision.vehicle, {1, 2})
+
+    def test_lifetime_urgency_is_horizon_scale_invariant(self):
+        def context(horizon, lifetime):
+            return SchedulerContext(
+                slot=3,
+                queue_lengths=np.asarray([4, 4]),
+                time_to_deadline=np.asarray([4.0, 4.0]),
+                current_goodput_bps=np.asarray([8e8, 8e8]),
+                current_outage=np.asarray([False, False]),
+                predicted_goodput_bps=np.full((2, horizon), 8e8),
+                predicted_outage=np.zeros((2, horizon), dtype=bool),
+                predicted_lifetime_steps=np.asarray(lifetime),
+                delivered_bits=np.asarray([1e6, 1e6]),
+                previous_vehicle=None,
+                data_rate_bps=1e9,
+                discount=1.0,
+            )
+
+        scheduler = build_scheduler("link_lifetime", SchedulerConfig(), 2)
+        short = scheduler._score(context(4, [2, 4]))
+        long = scheduler._score(context(8, [4, 8]))
+        np.testing.assert_allclose(short, long)
 
 
 if __name__ == "__main__":

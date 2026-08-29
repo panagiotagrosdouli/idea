@@ -1,54 +1,64 @@
 # Data provenance and claim boundaries
 
-## Assignment 1
+## Part A physical-layer reference
 
-`reference/assignment1` is an unchanged copy of the supplied GitHub archive. It
-contains the original PC-FMCW/DPSK notebook, technical report and requirements.
-The new package does not rewrite its results. It reuses the 1 Gbit/s DPSK
-communication premise and the physical interpretation of phase-coded FMCW.
+The user-supplied Assignment-1 repository contains the PC-FMCW notebook and
+technical report. Frozen provenance is recorded in
+`configs/part_a_physical_layer.json`:
+
+- upstream commit `44d62e3478e3818d1757b00971890f844cb032f7`;
+- notebook SHA-256
+  `b5a80a6d3441de6d571db4f65b4a43ed4052cc2b3ccba935ad31b5dd51316ef3`;
+- 193.4 THz carrier, 10 GHz bandwidth, 10 μs chirp and 1 Gbit/s data rate.
+
+The supplied notebook contains no stored executed code-cell outputs. The local
+pipeline uses a reference-SNR abstraction and does not relabel it as the full
+waveform receiver or a measured link budget.
 
 ## Compact WOMD export
 
-`data/example/womd_trajectories.json` is copied from the supplied Part-B archive.
-It contains 56 actors across three scenario IDs, with ten past and ten future
-positions per actor. It supports integration testing with real motion.
+`data/example/womd_trajectories.json` contains 56 actors in three scenario IDs,
+with ten past and ten future XY samples. It was copied from the supplied Part-B
+archive.
 
-The export does not contain:
+It omits raw TFRecords, official SDC identity, validity masks, map context,
+optical measurements and compatible trained checkpoints. The compact adapter
+therefore chooses a deterministic medoid proxy ego. Every artifact carries the
+source label `real_WOMD_motion_proxy_ego_geometry`.
 
-- raw WOMD TFRecords;
-- the SDC/ego track identifier;
-- Stage-4 trained checkpoints;
-- optical received-power measurements;
-- PC-FMCW/DPSK packets or channel impulse responses.
+These results mean “real motion + proxy geometry + model-based communication,”
+not real optical validation and not official-WOMD generalization.
 
-The adapter therefore selects the current-position medoid as a deterministic
-proxy ego. Every resulting artifact records the source string
-`real_WOMD_motion_proxy_ego_geometry`.
+## Official WOMD adapter
 
-`pcfmcw dataset-manifest` records the input SHA256, record/scenario counts,
-declared release, license boundary and deterministic SHA256 scenario split.
-The supplied compact file has 56 actor records across three scenarios. This
-manifest must be regenerated with the exact official release label when full
-WOMD data are supplied.
+`data/womd_official.py` reads TFRecord payloads without TensorFlow, parses Waymo
+Scenario protos when the optional proto package is installed, uses the true
+`sdc_track_index`, filters vehicle tracks and requires valid finite states over
+the entire retained window.
 
-## Large upstream results
+No official shard is present in the supplied files, so this path is implemented
+and unit-tested with a schema-compatible fixture but not empirically executed.
 
-The supplied Part-B archive reports later Stage-4 Gaussian/GMM results, but the
-referenced `.pt` checkpoints and TFRecord shards are absent. This repository
-does not relabel those report files as rerun results. The included PyTorch code
-can train and evaluate communication-aware checkpoints when the real data is
-provided.
+## Supplied Stage-4 reports
+
+`reference/part_b_stage4/` preserves five supplied JSON reports. The archive
+reports WOMD/WOMD-LiDAR v1.3.0, 116,182 selected scenarios and trained-model
+metrics. The raw shards and `.pt`/`.pth`/`.ckpt` files are absent.
+
+The upstream model interface uses eight state features; the local optional GRU
+uses ego-relative XY histories and explicit ego heading for link loss. Upstream
+numbers are provenance only. They are not local reruns, scheduler results or
+compatible checkpoints.
 
 ## Controlled motion
 
-The synthetic generator creates closing-range vehicles, acceleration and lane
-changes. It exists to validate causality and exercise predictive scheduling
-opportunities under exactly controlled conditions. These results are software
-and mechanism evidence, not a real-world performance claim.
+Synthetic scenes provide repeatable closing, receding, acceleration and lateral
+motion. They support invariants and mechanism tests. Their numerical effect
+sizes do not establish real-world performance.
 
-## Communication model
+## Sensing and communication outputs
 
-All link, BER, PER and packet-delivery outputs are simulated. Absolute values
-depend on the declared reference SNR, packet size, field of view, offered load
-and resource fraction in `configs/default.json`. Sensitivity sweeps must precede
-any publication claim.
+All observation-noise, link, BER, PER, packet and scheduling outcomes are
+simulated. The assumed range/bearing sensing model is explicitly marked
+`measured_data=false`. Absolute optical power is uncalibrated. Any paper must
+state these boundaries beside the relevant results.

@@ -1,39 +1,43 @@
 # Non-Joint PDF requirements traceability
 
-This repository follows only the three predictive PC-FMCW/DPSK communication
-plans supplied for this assignment. The separate *Joint uncertainty-aware
-trajectory-to-beam-and-ADB control* direction is explicitly excluded.
+The three supplied predictive PC-FMCW/DPSK plans define the scope. The separate
+Joint trajectory-to-beam-and-ADB document is excluded.
 
-| PDF requirement | Implementation | Verification / artifact | Status |
-|---|---|---|---|
-| Causal WOMD history to future trajectory | `predictors.py`, WOMD adapter | future-mutation tests | Implemented |
-| Last/CV/Kalman/IMM/CA/oracle baselines | `predictors.py` | forecast summary, unit tests | Implemented |
-| ADE/FDE | `forecast_evaluation.py` | motion forecast summary | Implemented |
-| Trajectory to range/bearing/link | `geometry.py`, `link.py` | perfect-forecast and monotonicity tests | Implemented |
-| SNR/BER/PER/goodput/outage | analytical DBPSK plus LUT | validation report and LUT | Implemented |
-| Range/SNR/outage/lifetime metrics | `forecast_evaluation.py` | MAE, F1, AUROC, lifetime error | Implemented |
-| Link-lifetime prediction | `LinkModel.link_lifetime_steps` | oracle zero-error test | Implemented |
-| Queue, deadlines and conservation | `traffic.py`, simulation engine | conservation tests | Implemented |
-| Poisson/periodic/Markov traffic | traffic generator | reproducibility tests | Implemented |
-| Random/RR/current/PF baselines | scheduling policies | common-random benchmark | Implemented |
-| CV/Kalman/IMM predictive scheduling | scheduling policies | benchmark and ablation rows | Implemented |
-| Predictive utility/lifetime scheduling | scheduling policies | paired matrix | Implemented |
-| Perfect-future information reference | lifetime-aware oracle | forecast/scheduler artifacts | Implemented |
-| Delivered before expiry / left at disconnect | simulation metrics | benchmark summaries | Implemented |
-| Channel fidelity ablations | range, pointing/FoV, atmosphere | ablation summary/figure | Implemented |
-| Part-A BER calibration path | Monte Carlo LUT | LUT-source ablation | Implemented |
-| Sensing/forecast robustness | deterministic noise injection | 0.5/1/2 m sweeps | Implemented |
-| Horizon/load/vehicles/slot/seeds matrix | paper matrix JSON | quick/full commands | Implemented |
-| Paired statistics | bootstrap, t-test, Wilcoxon, Cohen dz | matrix summary | Implemented |
-| Communication-aware GRU objective | PyTorch training/inference | NumPy loss tests | Implemented, optional ML dependency |
-| Scenario split and manifest | deterministic SHA256 grouping | dataset manifest | Implemented |
-| Numbered reproducibility scripts | `scripts/00` through `07` | one-command pipeline | Implemented |
-| LaTeX tables and paper figures | `paper_artifacts.py` | `artifacts/paper_run` | Implemented |
-| Official full WOMD evaluation | requires official shards/SDC metadata | absent from supplied files | Blocked by input data |
-| Frozen upstream trained checkpoint | requires original `.pt` file | absent from supplied archives | Blocked by input data |
-| Measured optical-channel validation | requires measurement campaign | outside WOMD/supplied code | Out of available evidence |
+| Requirement | Implementation / evidence | Status |
+|---|---|---|
+| Causal trajectory prediction | `predictors.py`, future-mutation gates | Complete |
+| Last/CV/CA/Kalman/IMM/Oracle | predictor library and forecast artifacts | Complete |
+| ADE/FDE | `forecast_evaluation.py` | Complete |
+| Range and ego-relative bearing | `geometry.py`, rotation/heading tests | Complete |
+| SNR/BER/PER/goodput | `link.py`, analytical and adaptive LUT | Complete, model-based |
+| Explicit outage definition | BER/PER/goodput modes and tests | Complete |
+| Link lifetime in steps/seconds | link and forecast modules | Complete |
+| Packet queues/deadlines/retries | traffic and simulation engine | Complete |
+| Poisson/periodic/Markov/saturated traffic | traffic generator | Complete |
+| Random/RR/Reactive/PF | scheduling policies | Complete |
+| CV/Kalman/IMM predictive policies | scheduling policies and benchmark | Complete |
+| Predictive utility and lifetime urgency | scheduling policies and exact tests | Complete |
+| Oracle-information reference | perfect future with heuristic utility | Complete |
+| Common random numbers | shared trace and per-attempt uniforms | Complete |
+| Ground-truth delivery evaluation | current true geometry drives PER | Complete |
+| P50/P95/P99, censoring and normalized fairness | expanded metrics | Complete |
+| Scheduled SNR/BER/PER/power | expanded metrics | Complete |
+| Bearing/lifetime/support forecast metrics | forecast evaluator | Complete |
+| Scenario regimes | deterministic slices and figures | Complete |
+| PC-FMCW-like sensing uncertainty | declared range/bearing + AR(1) model | Complete, assumed |
+| Covariance-aware Kalman robustness | equivalent `R` integration | Complete, assumed |
+| Adaptive BER confidence | error-targeted LUT and Wilson upper bound | Complete |
+| Physical deadline/duration invariance | configs and regression tests | Complete |
+| Clustered paired statistics and Holm | metrics and staged summaries | Complete |
+| Staged load/horizon/traffic/channel studies | 43-setting runner | Complete; quick run only |
+| Four communication-aware objectives | GRU training ablation runner | Infrastructure complete |
+| Scenario-safe split/checkpoint schema | hashes and version validation | Complete |
+| True-SDC official WOMD adapter | optional TFRecord/proto path | Complete, data blocked |
+| Official full-WOMD experiment | raw shards absent | Blocked |
+| Frozen compatible learned checkpoint | no checkpoint supplied | Blocked |
+| Multi-seed learned result | data/checkpoint/PyTorch absent | Blocked |
+| Measured optical-channel validation | no measurements supplied | Outside evidence |
+| Final submission paper | evidence/metadata gates remain | Not complete |
 
-“Implemented” means the code path and a reproducible verification exist. It
-does not mean a final scientific claim has been established on the full WOMD
-benchmark. The three blocked rows define the remaining evidence gap before a
-submission-quality paper.
+“Complete” means an executable code path plus relevant test or artifact. It
+does not mean that a favorable scientific hypothesis was observed.

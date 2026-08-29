@@ -1,0 +1,1083 @@
+[
+  {
+    "scenario_id": "synthetic-20260827-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-0",
+    "approaching": false,
+    "receding": true,
+    "straight": true,
+    "lane_change_or_merge": false,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 23.41708592013802,
+    "lateral_change_m": 0.5336651718905099,
+    "heading_change_deg": 0.4862326341554108,
+    "labels": [
+      "receding",
+      "straight"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260827-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-1",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -8.205172976946002,
+    "lateral_change_m": 2.338383098973381,
+    "heading_change_deg": 0.15774377660020633,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260827-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-2",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -19.788406080220383,
+    "lateral_change_m": 4.283738007718811,
+    "heading_change_deg": 0.7006903803108443,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260827-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-3",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -15.001376996750281,
+    "lateral_change_m": 5.697837460247509,
+    "heading_change_deg": 0.7255842187194169,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260827-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-4",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 31.120222796155332,
+    "lateral_change_m": -1.8047065317310937,
+    "heading_change_deg": 0.5695682149668075,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260828-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-0",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": true,
+    "dense": false,
+    "range_change_m": -46.249356020263605,
+    "lateral_change_m": -4.752524892284377,
+    "heading_change_deg": 0.7350206766421266,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge",
+      "fov_edge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260828-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-1",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": false,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -56.99459435302007,
+    "lateral_change_m": -0.9203748666573999,
+    "heading_change_deg": 0.9307942982384526,
+    "labels": [
+      "approaching"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260828-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-2",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -72.88455049984948,
+    "lateral_change_m": 2.22905050052805,
+    "heading_change_deg": 0.733635365286631,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260828-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-3",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 36.57585398249779,
+    "lateral_change_m": -7.329182879665105,
+    "heading_change_deg": 0.008097427636041049,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260828-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-4",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -9.171880688833852,
+    "lateral_change_m": 6.384902683671179,
+    "heading_change_deg": 0.5118253428354077,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260829-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-0",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 36.43487567647221,
+    "lateral_change_m": -6.705883752576004,
+    "heading_change_deg": 0.3773261931477206,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260829-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-1",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": true,
+    "dense": false,
+    "range_change_m": -55.58890496983448,
+    "lateral_change_m": 5.929972030277662,
+    "heading_change_deg": 0.9074355919044114,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge",
+      "fov_edge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260829-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-2",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 9.19908799668913,
+    "lateral_change_m": 3.366781413351181,
+    "heading_change_deg": 0.4743279387428072,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260829-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-3",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 25.721466709656482,
+    "lateral_change_m": 4.472181948209702,
+    "heading_change_deg": 0.2751255205709201,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260829-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-4",
+    "approaching": true,
+    "receding": false,
+    "straight": true,
+    "lane_change_or_merge": false,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -62.654480448275294,
+    "lateral_change_m": 0.4802735999237244,
+    "heading_change_deg": 0.9125942964858846,
+    "labels": [
+      "approaching",
+      "straight"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260830-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-0",
+    "approaching": false,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -0.2929888051340086,
+    "lateral_change_m": -5.418961761059305,
+    "heading_change_deg": 0.45725835924909064,
+    "labels": [
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260830-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-1",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 25.956519729137483,
+    "lateral_change_m": -1.7106436322419816,
+    "heading_change_deg": 0.5386218241780095,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260830-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-2",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 14.514106136864513,
+    "lateral_change_m": 5.264721992970742,
+    "heading_change_deg": 0.7415157767680058,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260830-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-3",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -19.359062470716083,
+    "lateral_change_m": -4.911366015044889,
+    "heading_change_deg": 0.061346954579978796,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260830-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-4",
+    "approaching": false,
+    "receding": true,
+    "straight": true,
+    "lane_change_or_merge": false,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 11.559505064508954,
+    "lateral_change_m": 0.3659291644271188,
+    "heading_change_deg": 0.20964702690867912,
+    "labels": [
+      "receding",
+      "straight"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260831-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-0",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 36.88417905554985,
+    "lateral_change_m": 5.262975698788596,
+    "heading_change_deg": 0.46131165560118714,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260831-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-1",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": false,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -14.595447359061453,
+    "lateral_change_m": -0.7734817178407702,
+    "heading_change_deg": 0.7601011073205111,
+    "labels": [
+      "approaching"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260831-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-2",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": true,
+    "dense": false,
+    "range_change_m": -47.605688334674824,
+    "lateral_change_m": -5.489834685671494,
+    "heading_change_deg": 0.541663423286209,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge",
+      "fov_edge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260831-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-3",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -20.64628322722926,
+    "lateral_change_m": 4.294515408871824,
+    "heading_change_deg": 0.6643482959241268,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260831-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-4",
+    "approaching": true,
+    "receding": false,
+    "straight": true,
+    "lane_change_or_merge": false,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -6.759403097055525,
+    "lateral_change_m": -0.2369011578616882,
+    "heading_change_deg": 0.5796978360022714,
+    "labels": [
+      "approaching",
+      "straight"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260832-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-0",
+    "approaching": true,
+    "receding": false,
+    "straight": true,
+    "lane_change_or_merge": false,
+    "turn": false,
+    "fov_edge": true,
+    "dense": false,
+    "range_change_m": -56.304218123627834,
+    "lateral_change_m": -0.5572246910177183,
+    "heading_change_deg": 0.8166270494635498,
+    "labels": [
+      "approaching",
+      "straight",
+      "fov_edge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260832-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-1",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -51.4015962490068,
+    "lateral_change_m": -2.992032697540793,
+    "heading_change_deg": 0.20869476879610885,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260832-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-2",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": true,
+    "dense": false,
+    "range_change_m": -35.74980131793717,
+    "lateral_change_m": 3.1012982823595623,
+    "heading_change_deg": 1.4142851940540742,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge",
+      "fov_edge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260832-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-3",
+    "approaching": false,
+    "receding": true,
+    "straight": true,
+    "lane_change_or_merge": false,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 16.151242298876852,
+    "lateral_change_m": 0.4611341209934321,
+    "heading_change_deg": 0.6449913539628879,
+    "labels": [
+      "receding",
+      "straight"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260832-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-4",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 16.46377078881997,
+    "lateral_change_m": -4.221541175831654,
+    "heading_change_deg": 0.16875591695096603,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260833-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-0",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -30.764099193737664,
+    "lateral_change_m": -1.928346814427507,
+    "heading_change_deg": 1.0065846077410932,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260833-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-1",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 12.845314446217614,
+    "lateral_change_m": 4.174465920487539,
+    "heading_change_deg": 0.6136052433471066,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260833-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-2",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 29.262300925478726,
+    "lateral_change_m": -1.8355490040052205,
+    "heading_change_deg": 0.01289405307082946,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260833-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-3",
+    "approaching": false,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 0.5719947157342062,
+    "lateral_change_m": -5.236690432342502,
+    "heading_change_deg": 0.6919270589764088,
+    "labels": [
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260833-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-4",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": false,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 21.303122766256067,
+    "lateral_change_m": 0.8917094205477794,
+    "heading_change_deg": 0.7610536293647197,
+    "labels": [
+      "receding"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260834-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-0",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": true,
+    "dense": false,
+    "range_change_m": 24.969729701513103,
+    "lateral_change_m": -4.025631096142334,
+    "heading_change_deg": 1.8314080872201048,
+    "labels": [
+      "receding",
+      "lane_change_or_merge",
+      "fov_edge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260834-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-1",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 48.41573282049293,
+    "lateral_change_m": 2.5697048107113742,
+    "heading_change_deg": 0.018782725735905663,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260834-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-2",
+    "approaching": false,
+    "receding": true,
+    "straight": true,
+    "lane_change_or_merge": false,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 9.37099937424204,
+    "lateral_change_m": 0.6222442792299803,
+    "heading_change_deg": 0.173861270330929,
+    "labels": [
+      "receding",
+      "straight"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260834-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-3",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -95.89751692363897,
+    "lateral_change_m": 7.316235774310174,
+    "heading_change_deg": 1.4312326214305888,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260834-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-4",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -44.19137294330088,
+    "lateral_change_m": 7.01357358575085,
+    "heading_change_deg": 1.1976175691269473,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260835-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-0",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -46.88931809502211,
+    "lateral_change_m": 3.159672728985192,
+    "heading_change_deg": 1.2419441466788885,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260835-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-1",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -69.50330644563863,
+    "lateral_change_m": 2.1513819468356044,
+    "heading_change_deg": 0.849106352573392,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260835-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-2",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -45.66803465189389,
+    "lateral_change_m": -3.794139439372318,
+    "heading_change_deg": 0.6016913455146295,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260835-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-3",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 73.74742415576148,
+    "lateral_change_m": 4.65204446222566,
+    "heading_change_deg": 0.10483841733059389,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260835-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-4",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 2.7057897620664306,
+    "lateral_change_m": -2.954520044306558,
+    "heading_change_deg": 0.6654040771299816,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260836-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-0",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 68.13316067944697,
+    "lateral_change_m": -4.040555957882717,
+    "heading_change_deg": 0.3890686938812648,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260836-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-1",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -34.48515041302926,
+    "lateral_change_m": 4.469908401230569,
+    "heading_change_deg": 0.3171185374087666,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260836-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-2",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -57.372957299520735,
+    "lateral_change_m": -4.871071307324982,
+    "heading_change_deg": 0.0815885241287095,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260836-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-3",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 34.260144751835156,
+    "lateral_change_m": -5.3201429736904835,
+    "heading_change_deg": 0.4364443531616249,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260836-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-4",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 63.61224479561352,
+    "lateral_change_m": -6.302185661968691,
+    "heading_change_deg": 0.03830619047425119,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260837-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-0",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 50.67352129626728,
+    "lateral_change_m": -7.53029868601932,
+    "heading_change_deg": 0.28799924057624876,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260837-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-1",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -9.392979376984172,
+    "lateral_change_m": -4.005519901635774,
+    "heading_change_deg": 0.014542637799398406,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260837-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-2",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 43.28753563362267,
+    "lateral_change_m": 5.857938667591309,
+    "heading_change_deg": 0.24318553867818943,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260837-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-3",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 76.0214701022896,
+    "lateral_change_m": -3.2588315584040917,
+    "heading_change_deg": 0.45618619037902614,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260837-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-4",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 41.387357704413816,
+    "lateral_change_m": 3.7862074396918652,
+    "heading_change_deg": 0.3565631152093599,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260838-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-0",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 52.006923616252294,
+    "lateral_change_m": -5.331908545611752,
+    "heading_change_deg": 0.4135498125522455,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260838-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-1",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 10.62487699838772,
+    "lateral_change_m": 3.045800053630143,
+    "heading_change_deg": 2.1545183744537975e-05,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260838-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-2",
+    "approaching": true,
+    "receding": false,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -79.48919498320778,
+    "lateral_change_m": -5.668226313101719,
+    "heading_change_deg": 0.989631277455999,
+    "labels": [
+      "approaching",
+      "lane_change_or_merge"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260838-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-3",
+    "approaching": true,
+    "receding": false,
+    "straight": true,
+    "lane_change_or_merge": false,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": -38.89114368894448,
+    "lateral_change_m": -0.6697161724218592,
+    "heading_change_deg": 0.6290719403329024,
+    "labels": [
+      "approaching",
+      "straight"
+    ]
+  },
+  {
+    "scenario_id": "synthetic-20260838-v5-slots120-dt0.100000",
+    "actor_id": "vehicle-4",
+    "approaching": false,
+    "receding": true,
+    "straight": false,
+    "lane_change_or_merge": true,
+    "turn": false,
+    "fov_edge": false,
+    "dense": false,
+    "range_change_m": 54.87927433948826,
+    "lateral_change_m": 5.350802984346387,
+    "heading_change_deg": 0.2726961510247789,
+    "labels": [
+      "receding",
+      "lane_change_or_merge"
+    ]
+  }
+]

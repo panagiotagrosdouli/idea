@@ -1,11 +1,15 @@
-.PHONY: install test validate benchmark womd ablation matrix paper-quick \
-	paper-full motion manifest paper-ablation reproduce
+.PHONY: install test lint validate benchmark womd ablation matrix paper-quick \
+	paper-full motion manifest paper-ablation staged corrected-quick \
+	corrected-full paper-draft reproducibility reproduce
 
 install:
 	python -m pip install -e ".[dev]"
 
 test:
-	python -m unittest discover -s tests -v
+	PYTHONPATH=src python -m unittest discover -s tests -v
+
+lint:
+	ruff check src tests scripts
 
 validate:
 	pcfmcw validate --config configs/default.json --output artifacts/validation.json
@@ -48,4 +52,24 @@ paper-full:
 	PYTHONPATH=src python scripts/run_paper_pipeline.py \
 		--output artifacts/paper_run_full
 
-reproduce: test validate paper-quick
+staged:
+	PYTHONPATH=src python scripts/07_run_staged_experiments.py \
+		--config configs/default.json \
+		--output artifacts/staged_experiments
+
+corrected-quick:
+	PYTHONPATH=src python scripts/run_corrected_pipeline.py --quick \
+		--output artifacts/corrected_v1
+
+corrected-full:
+	PYTHONPATH=src python scripts/run_corrected_pipeline.py \
+		--output artifacts/corrected_v1_full
+
+paper-draft:
+	PYTHONPATH=src python scripts/build_paper_pdf.py
+
+reproducibility:
+	PYTHONPATH=src python scripts/build_reproducibility_manifest.py \
+		--output artifacts/corrected_v1/reproducibility_manifest.json
+
+reproduce: test lint corrected-quick paper-draft reproducibility

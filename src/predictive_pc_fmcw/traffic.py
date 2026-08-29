@@ -30,7 +30,10 @@ def generate_traffic_trace(
     vehicles: int,
     nominal_capacity_packets: int,
     config: TrafficConfig,
+    slot_duration_s: float = 0.1,
 ) -> TrafficTrace:
+    if slot_duration_s <= 0:
+        raise ValueError("slot_duration_s must be positive.")
     rng = np.random.default_rng(seed)
     mean_total = config.offered_load * nominal_capacity_packets
     weights = rng.dirichlet(np.full(vehicles, 2.0))
@@ -43,21 +46,42 @@ def generate_traffic_trace(
         interval = config.periodic_interval_slots
         for slot in range(0, slots, interval):
             arrivals[slot] = rng.poisson(mean_total * interval * weights)
-    else:
+    elif config.model == "markov_modulated":
         arrivals = _markov_modulated_arrivals(
             rng, slots, mean_total, weights, config
         )
+    else:
+        per_vehicle = max(
+            1,
+            int(
+                np.ceil(
+                    max(1.0, config.offered_load)
+                    * nominal_capacity_packets
+                    / vehicles
+                )
+            ),
+        )
+        arrivals = np.full((slots, vehicles), per_vehicle, dtype=np.int64)
+    if config.deadline_s is not None:
+        base_deadline_slots = max(
+            1, int(round(config.deadline_s / slot_duration_s))
+        )
+        jitter_seconds = config.deadline_jitter_s or 0.0
+        jitter_slots = max(0, int(round(jitter_seconds / slot_duration_s)))
+    else:
+        base_deadline_slots = config.deadline_slots
+        jitter_slots = config.deadline_jitter_slots
     deadline_rows: list[tuple[tuple[int, ...], ...]] = []
     for slot in range(slots):
         vehicle_rows: list[tuple[int, ...]] = []
         for vehicle in range(vehicles):
             count = int(arrivals[slot, vehicle])
             jitter = rng.integers(
-                -config.deadline_jitter_slots,
-                config.deadline_jitter_slots + 1,
+                -jitter_slots,
+                jitter_slots + 1,
                 size=count,
             )
-            deadlines = slot + np.maximum(1, config.deadline_slots + jitter)
+            deadlines = slot + np.maximum(1, base_deadline_slots + jitter)
             vehicle_rows.append(tuple(int(value) for value in deadlines))
         deadline_rows.append(tuple(vehicle_rows))
     success_uniforms = rng.random(

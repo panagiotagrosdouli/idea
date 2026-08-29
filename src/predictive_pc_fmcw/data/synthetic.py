@@ -45,7 +45,9 @@ def generate_synthetic_scenario(
         targets[:, vehicle, 0] = ego[:, 0] + x_relative
         targets[:, vehicle, 1] = ego[:, 1] + y_relative
     return MotionScenario(
-        scenario_id=f"synthetic-{seed}",
+        scenario_id=(
+            f"synthetic-{seed}-v{vehicles}-slots{slots}-dt{dt_s:.6f}"
+        ),
         timestamps_s=time,
         ego_positions_xy=ego,
         vehicle_positions_xy=targets,
@@ -53,4 +55,3 @@ def generate_synthetic_scenario(
         start_index=history_steps,
         source="controlled_synthetic_motion",
     )
-

@@ -30,9 +30,20 @@ reference/**/*.ipynb
 # products. Compact summaries/manifests are versioned; `make reproduce`
 # regenerates the complete set locally.
 artifacts/**/*.png
+!artifacts/corrected_v1/figures/
+!artifacts/corrected_v1/figures/*.png
 artifacts/experiment_matrix/experiment_matrix_results.json
 artifacts/experiment_matrix/experiment_matrix_results.csv
 artifacts/horizon_ablation/horizon_ablation.json
+artifacts/corrected_v1/**/forecast_metrics.json
+artifacts/corrected_v1/**/forecast_metrics.csv
+artifacts/corrected_v1/**/episode_metrics.json
+artifacts/corrected_v1/**/episode_metrics.csv
+artifacts/corrected_v1/**/paper_ablation_rows.json
+artifacts/corrected_v1/**/paper_ablation_rows.csv
+artifacts/corrected_v1/staged_experiments/staged_experiment_rows.json
+artifacts/corrected_v1/staged_experiments/staged_experiment_rows.csv
+artifacts/corrected_v1/staged_experiments/staged_experiment_summary.json
 artifacts/paper_run/**/forecast_metrics.json
 artifacts/paper_run/**/forecast_metrics.csv
 artifacts/paper_run/**/episode_metrics.json
