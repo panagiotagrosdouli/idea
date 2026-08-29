@@ -1,7 +1,8 @@
 {
   "status": "PASS",
   "generated_utc": "2026-08-29T19:58:58.976680+00:00",
-  "git_commit": "uncommitted-workspace",
+  "git_commit": "909e1adabada2abb85ad90adb1b2eba5e2e8f0e1",
+  "git_commit_role": "verified source revision containing the bilingual README implementation; this manifest-only provenance update is excluded from its own file inventory",
   "environment": {
     "python": "3.12.13",
     "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
