@@ -1,7 +1,8 @@
 {
   "status": "PASS",
   "generated_utc": "2026-08-29T19:41:07.172359+00:00",
-  "git_commit": "uncommitted-workspace",
+  "git_commit": "6200eca549ef69a3a5ed8931e93646be353fb212",
+  "git_commit_role": "verified source revision used to generate corrected_v1; this manifest-only provenance update is excluded from its own file inventory",
   "environment": {
     "python": "3.12.13",
     "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
