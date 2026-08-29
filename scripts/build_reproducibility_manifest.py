@@ -30,6 +30,7 @@ INCLUDED_FILES = (
     ".gitignore",
     ".github/workflows/ci.yml",
     "README.md",
+    "README_GR.md",
     "Makefile",
     "pyproject.toml",
     "requirements.txt",

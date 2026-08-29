@@ -1,8 +1,7 @@
 {
   "status": "PASS",
-  "generated_utc": "2026-08-29T19:41:07.172359+00:00",
-  "git_commit": "6200eca549ef69a3a5ed8931e93646be353fb212",
-  "git_commit_role": "verified source revision used to generate corrected_v1; this manifest-only provenance update is excluded from its own file inventory",
+  "generated_utc": "2026-08-29T19:58:58.976680+00:00",
+  "git_commit": "uncommitted-workspace",
   "environment": {
     "python": "3.12.13",
     "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
@@ -19,7 +18,7 @@
     "measured_optical_channel": false,
     "true_womd_ego_in_compact_export": false
   },
-  "file_count": 106,
+  "file_count": 107,
   "files": [
     {
       "path": "src/predictive_pc_fmcw/__init__.py",
@@ -378,8 +377,8 @@
     },
     {
       "path": "scripts/build_reproducibility_manifest.py",
-      "bytes": 3661,
-      "sha256": "1949627255c1fa0e5c74afffce5f55f9acc501d0042704a227d64bc6c851dab3"
+      "bytes": 3681,
+      "sha256": "a222f6f04c797e4a00ce29918f2186727a0131695f2e9c09c5f3413b3de429f8"
     },
     {
       "path": "scripts/run_corrected_pipeline.py",
@@ -528,8 +527,13 @@
     },
     {
       "path": "README.md",
-      "bytes": 13303,
-      "sha256": "d94a58a8bf785aa061e12308f0860650b683d2acf1021c1a39c11f545922273a"
+      "bytes": 11118,
+      "sha256": "9c29622f874191985868f0235233cbab6ef07532f53e43980fc684d78296a7eb"
+    },
+    {
+      "path": "README_GR.md",
+      "bytes": 13348,
+      "sha256": "274af12338b0093a9f13db0a1e7339c4ac6d2dbaa43b7153cec88500ba2e7b90"
     },
     {
       "path": "Makefile",
