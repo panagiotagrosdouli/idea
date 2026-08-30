@@ -1,26 +1,20 @@
 # Corrected reproduced results
 
-All values on this page come from `artifacts/corrected_v1/`. They were produced
-after the frame, stationary-heading, horizon-tail, physical-time, outage,
-power-label, censoring and inference corrections. Older artifacts elsewhere in
-the repository are retained as historical pre-fix evidence and are not mixed
-with these results.
+All values on this page come from the isolated full run
+`artifacts/corrected_v2/`. The manifest records that the Part-A receiver LUT
+was used and that official WOMD, a learned checkpoint, and a measured optical
+channel were **not** used.
 
-## Validation
+## Verification
 
-| Gate | Result |
-|---|---|
-| Distance reduces link quality | PASS |
-| Pointing error reduces link quality | PASS |
-| BER decreases with SNR | PASS |
-| Deployable forecast is future-invariant | PASS |
-| Oracle changes when hidden future changes | PASS |
-
-The complete deterministic suite passes 45/45 tests.
+All 51 deterministic tests pass. Five scientific gates also pass: link quality
+decreases with distance and pointing error; BER decreases with SNR; deployable
+forecasts are invariant to hidden-future changes; the oracle changes when the
+hidden future changes.
 
 ## Controlled 12-episode benchmark
 
-| Policy | Goodput (Mbps) | PDR | P95 (ms) | Deadline+censored | Demand-normalized Jain |
+| Policy | Goodput (Mbps) | PDR | P95 (ms) | Deadline+censored | Demand Jain |
 |---|---:|---:|---:|---:|---:|
 | Reactive Greedy | 2.2930 | 0.6439 | 699.6 | 0.3561 | 0.6717 |
 | CV Predictive | 2.3053 | 0.6473 | 948.7 | 0.3527 | 0.6962 |
@@ -28,36 +22,17 @@ The complete deterministic suite passes 45/45 tests.
 | IMM Predictive | 2.3073 | 0.6479 | 948.7 | 0.3521 | 0.6949 |
 | Predictive Utility | 2.3063 | 0.6476 | 965.4 | 0.3524 | 0.6972 |
 | Link Lifetime | 2.3070 | 0.6478 | 968.3 | 0.3522 | 0.6993 |
-| Oracle-information | 2.3078 | 0.6480 | 968.3 | 0.3520 | 0.7000 |
+| Oracle information | 2.3078 | 0.6480 | 968.3 | 0.3520 | 0.7000 |
 
-For Link Lifetime versus Reactive:
+Link Lifetime minus Reactive has mean goodput +0.0140 Mbps, bootstrap 95%
+interval [-0.0319, +0.0593], win fraction 8/12, Cohen `dz=0.161`, raw
+Wilcoxon `p=0.677` and Holm-adjusted `p=1.0`. Mean P95 latency is +268.8 ms
+(worse), with Holm-adjusted `p=0.00439`. The default case therefore establishes
+a tail-latency cost, not a goodput gain.
 
-- mean goodput difference: +0.0140 Mbps;
-- bootstrap 95% CI: [−0.0319, +0.0593] Mbps;
-- goodput win fraction: 8/12 = 66.7%;
-- paired Cohen `dz`: 0.161;
-- Wilcoxon `p=0.677`, Holm-adjusted `p=1.0`;
-- mean P95 latency difference: +268.8 ms, unfavorable;
-- latency Wilcoxon `p=0.00049`, Holm-adjusted `p=0.00439`.
+![Controlled benchmark](../artifacts/corrected_v2/figures/corrected_benchmark_tradeoff.png)
 
-Therefore the corrected default benchmark does **not** establish a goodput
-improvement. It does establish a tail-latency cost in this configuration.
-
-![Corrected benchmark](../artifacts/corrected_v1/figures/corrected_benchmark_tradeoff.png)
-
-## Lifetime-mechanism ablation
-
-In the two-episode quick ablation, Predictive Utility, Link Lifetime and Link
-Lifetime with `lifetime_weight=0` all produce 2.1655 Mbps. The explicit lifetime
-term is inactive because no additional within-horizon link closure changes the
-decisions in those episodes. This is a null ablation and is preserved.
-
-It does not mean the code path is missing: exact scheduler tests verify that
-shorter normalized lifetime increases urgency, and staged settings contain
-cases where the policy decisions differ. It means the default operating point
-does not isolate that mechanism.
-
-## Motion and derived-link forecasting
+## Motion and link prediction
 
 | Predictor | Synthetic ADE (m) | Synthetic SNR MAE (dB) | Proxy ADE (m) | Proxy lifetime error (s) |
 |---|---:|---:|---:|---:|
@@ -68,55 +43,79 @@ does not isolate that mechanism.
 | Constant Acceleration | 0.028 | 0.002 | 0.196 | 0.051 |
 | Oracle | 0.000 | 0.000 | 0.000 | 0.000 |
 
-On the compact proxy scenes, Kalman has worse ADE than Constant Velocity but
-lower lifetime error. This supports the methodological point that ADE ranking
-and communication ranking need not coincide. Absolute proxy SNR MAE is large
-near hard FoV transitions and must be interpreted with boundary slices.
+Kalman ranks worse than Constant Velocity in proxy ADE but better in lifetime
+error. This is direct evidence that geometric and communication-relevant
+rankings need not coincide. Optical-boundary outliers are exposed separately:
 
-## Compact real-WOMD motion with proxy ego
+![Forecast failures](../artifacts/corrected_v2/figures/forecast_failure_cases.png)
 
-| Policy | Goodput (Mbps) | PDR | P95 (ms) | Censored+deadline |
+## Compact real-motion proxy
+
+Reactive obtains 1.160 Mbps and 0.329 PDR; Link Lifetime obtains 1.056 Mbps and
+0.299 PDR. The mean difference is -0.104 Mbps across only three scenes. This is
+a negative integration result, not official WOMD generalization.
+
+## Classical probabilistic calibration
+
+Gaussian residual wrappers were calibrated on six controlled scenario IDs and
+evaluated on six disjoint IDs (7,050 target-step samples each). CV obtains RMSE
+0.167 m, mean NLL -2.859 and calibration error 0.118; CA obtains RMSE 0.078 m,
+mean NLL -4.522 and calibration error 0.121. Negative continuous-density NLL is
+valid when a narrow Gaussian assigns density greater than one. Both baselines
+over-cover the nominal 50% region and under-cover near 95%, so calibration is
+not presented as perfect.
+
+![Gaussian calibration](../artifacts/corrected_v2/figures/probabilistic_calibration.png)
+
+## Full five-seed staged study
+
+The staged artifact contains 1,125 rows over 12 study axes. Selected paired
+Link-Lifetime minus Reactive goodput results are:
+
+| Setting | Mean difference (Mbps) | Bootstrap 95% interval | Win fraction | Holm p |
 |---|---:|---:|---:|---:|
-| Reactive Greedy | 1.160 | 0.329 | 368.3 | 0.671 |
-| Proportional Fair | 1.088 | 0.308 | 433.3 | 0.692 |
-| Link Lifetime | 1.056 | 0.299 | 400.0 | 0.701 |
-| Oracle-information | 1.056 | 0.299 | 400.0 | 0.701 |
+| Deadline 0.5 s | +0.1392 | [+0.0920, +0.1872] | 1.0 | 0.375 |
+| Reference SNR +3 dB | +0.0504 | [+0.0442, +0.0560] | 1.0 | 0.375 |
+| Reference SNR +6 dB | +0.0428 | [+0.0244, +0.0612] | 1.0 | 0.375 |
+| Horizon 0.1 s | +0.0342 | [-0.0752, +0.1176] | 0.6 | 1.000 |
+| Horizon 2 s | +0.0174 | [-0.0584, +0.1098] | 0.4 | 1.000 |
+| Load 1.1 | -0.1644 | [-0.2572, -0.0626] | 0.2 | 0.625 |
+| Deadline 0.05 s | -0.2318 | [-0.3438, -0.1032] | 0.2 | 0.375 |
+| Urgent/bulk traffic | -0.1356 | [-0.2746, -0.0268] | 0.2 | 0.500 |
 
-Link Lifetime is −0.104 Mbps below Reactive on average. The interval
-[−0.276, 0.000] and three scenes are not enough for final inference, but the
-direction is negative. Roughly 70% of generated packets are deadline-dropped or
-right-censored because the proxy evaluation window is only one second.
+The positive bootstrap intervals at 0.5 s deadline and +3/+6 dB SNR are
+hypothesis-generating, not corrected significance. With five paired values the
+minimum two-sided signed-rank p-value is 0.0625; Holm correction further reduces
+power.
 
-## Quick robustness ablations
+![Operating regions](../artifacts/corrected_v2/figures/staged_operating_region_diagnostic.png)
 
-These are two-episode diagnostics:
+## Urgent/bulk finding
 
-- full-channel Link Lifetime: 2.1655 Mbps;
-- 0.5/1/2 m legacy coordinate-history noise: 2.0425/1.9760/1.9515 Mbps;
-- 0.5/1/2 m direct forecast degradation: 2.1720/2.1520/2.1490 Mbps;
-- range-only/range+pointing/full: 2.9835/2.9600/2.1655 Mbps;
-- analytical BER versus adaptive LUT: 2.1655 versus 2.1430 Mbps.
+Under the configured mixed-class setting, Reactive averages 2.167 Mbps, urgent
+PDR 0.497 and bulk PDR 0.676. Link Lifetime averages 2.031 Mbps, urgent PDR
+0.293 and bulk PDR 0.730. Its urgency rule prioritizes impending link closure,
+not packet class, so it improves bulk service while seriously harming urgent
+delivery. This is a concrete failure mode and motivates a class-aware utility.
 
-Channel assumptions materially affect the numerical operating region.
+## Part-A BER and complexity
 
-## Staged operating-region diagnostic
+The BER LUT uses the supplied FFT-carrier/DPSK receiver with waveform-sample
+SNR. Zero-error points are confidence-limited; they are not reported as exact
+zero BER.
 
-The corrected staged run contains 430 rows: 43 one-axis settings × 2 seeds × 5
-policies. Physical duration, deadline and horizon are held fixed except in the
-study that intentionally changes each quantity.
+![BER calibration](../artifacts/corrected_v2/figures/dpsk_ber_curve.png)
 
-The Link-Lifetime − Reactive mean goodput difference changes sign across load,
-horizon, deadline, SNR, traffic and sensing settings. Examples include +0.018
-Mbps at load 0.3, −0.172 Mbps at load 0.9, +0.104 Mbps at 0.5 s deadline and
-−0.328 Mbps at 0.05 s deadline. With only two independent seeds these are
-diagnostic signposts, not effect estimates.
-
-![Staged diagnostic](../artifacts/corrected_v1/figures/staged_operating_region_diagnostic.png)
+On the recorded Linux/Python CPU run, median runtime per call was about 1.8 us
+for Last Position, 6.4 us for CV, 17.5 us for CA, 976 us for Kalman and 1,029 us
+for IMM. Reactive scheduling took 9.7 us and Link Lifetime 37.8 us. These are
+machine-specific diagnostics. The GRU has 169,620 parameters, but no honest GRU
+runtime exists without the learned runtime/checkpoint path.
 
 ## Defensible conclusion
 
-The current evidence supports a causal, packet-level mechanism study and shows
-that prediction can change throughput/fairness/latency trade-offs. It does not
-support “prediction improves communication” as a general claim. The strongest
-honest hypothesis for full evaluation is that value depends on scheduling
-flexibility, link-closure geometry, deadline pressure and model uncertainty.
+Causal prediction changes the scheduling operating point, but it does not
+universally improve communication. Its value is conditional on scheduling
+flexibility, deadline pressure, link-boundary geometry, channel assumptions and
+traffic class. Official WOMD and learned-model experiments are still required
+for a submission claim.

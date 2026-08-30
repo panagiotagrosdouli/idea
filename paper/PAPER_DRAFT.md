@@ -1,124 +1,129 @@
 # When Does Trajectory Prediction Help PC-FMCW/DPSK Vehicular Optical Scheduling?
 
-**Manuscript status:** corrected reproducible research draft; authors,
-affiliations and target venue remain to be inserted.
+**Manuscript status:** reproducible research draft. Authors, affiliations,
+target venue, official WOMD results and learned-model results remain to be
+inserted before submission.
 
 ## Abstract
 
 Phase-coded frequency-modulated continuous-wave (PC-FMCW) laser headlamps can
-combine sensing, illumination and differential phase-shift-keying communication,
-but the corresponding optical link is strongly geometry dependent. This work
-studies a non-Joint communication-control question: whether a scheduler should
-serve a receiver now because causal trajectory prediction indicates that its
-link will soon become unusable. We implement a packet-level pipeline from
-observed motion to trajectory forecasts, ego-relative range and bearing,
-normalized optical gain, SNR, DBPSK bit and packet errors, link lifetime, queues,
-deadlines and receiver scheduling. Frame consistency, stationary headings,
-end-of-record horizons, physical time units, censoring and clustered statistics
-are covered by 44 regression tests and five scientific gates. In a corrected
-12-episode controlled benchmark, Link-Lifetime scheduling changes mean goodput
-from 2.293 to 2.307 Mbps relative to Reactive Greedy, but the paired bootstrap
-95% interval [-0.0319, 0.0593] Mbps includes zero and Holm-adjusted Wilcoxon
-`p=1.0`. Its P95 latency is 269 ms worse on average. A three-scene compact WOMD
-proxy benchmark is also negative: 1.056 versus 1.160 Mbps. A 430-row two-seed
-staged diagnostic shows operating-region sign changes but is insufficient for
-inference. The current evidence therefore rejects a universal prediction-gain
-claim and motivates a narrower question: under which link-closure, traffic and
-uncertainty regimes does future mobility information have communication value?
-Official WOMD shards and a compatible learned checkpoint are still required for
-a submission-quality empirical answer.
+combine sensing, illumination and differential phase-shift-keying (DPSK)
+communication, but their optical link is strongly geometry dependent. This
+work studies whether a packet scheduler should serve a receiver now because a
+causal trajectory forecast indicates that its link will soon disappear. We
+implement an auditable packet-level path from observed motion to future
+trajectory, ego-relative range and bearing, normalized optical gain, SNR,
+DPSK BER, packet error, link lifetime, queues, deadlines and receiver
+scheduling. The BER calibration reproduces the supplied Part-A FFT-carrier and
+differential receiver with confidence-limited Monte Carlo estimates. Fifty-one
+regression tests and five scientific gates protect causality, coordinate/time
+consistency, queue conservation and monotonicity. In 12 controlled episodes,
+Link-Lifetime scheduling changes mean goodput from 2.293 to 2.307 Mbps versus
+Reactive Greedy, but the paired bootstrap 95% interval [-0.0319, 0.0593] Mbps
+includes zero and Holm-adjusted Wilcoxon `p=1.0`; P95 latency is 269 ms worse.
+A compact three-scene WOMD proxy is also negative. A full 1,125-row, five-seed
+staged study reveals positive and negative operating regions, but no cited
+family survives Holm correction. In urgent/bulk traffic, Link Lifetime harms
+urgent PDR because link urgency is not packet-class urgency. The evidence
+rejects a universal prediction-gain claim and supports a conditional research
+question. Official WOMD shards and a compatible learned checkpoint remain
+necessary for submission-quality empirical evidence.
 
 **Index terms:** predictive communication, vehicular optical communication,
 PC-FMCW, DPSK, trajectory forecasting, link lifetime, packet scheduling.
 
 ## I. Introduction
 
-Integrated sensing, communication and illumination can reuse an optical vehicle
-front end for ranging, lighting and high-rate data transmission. The supplied
-Part-A PC-FMCW study provides a physical-layer premise with a 193.4 THz optical
-carrier, 10 GHz chirp bandwidth, 10 μs chirp duration and 1 Gbit/s DPSK data
+Integrated sensing, communication and illumination can reuse an optical
+vehicle front end for ranging, lighting and data transmission. The supplied
+Part-A PC-FMCW study provides the physical-layer premise: a 193.4 THz optical
+carrier, 10 GHz chirp bandwidth, 10 us chirp duration and 1 Gbit/s DPSK data
 rate. It does not define a mobility-aware packet scheduler.
 
-A current-link scheduler sees only the instantaneous communication opportunity.
-If one receiver is approaching an optical field-of-view boundary, packets left
-in its queue may soon become undeliverable. A predictor could expose that
-closing window. Prediction can also harm scheduling: trajectory error can cross
-a hard optical boundary, an urgency heuristic can sacrifice low-latency service,
-and traffic saturation can eliminate scheduling flexibility.
+A current-link scheduler sees only the instantaneous opportunity. If a
+receiver is approaching the optical field-of-view boundary, packets left in
+its queue may soon become undeliverable. A predictor could expose that closing
+window. Prediction can also hurt: position error can cross a hard boundary, a
+link-urgency rule can conflict with packet deadlines, and saturation can remove
+the flexibility needed to prefetch traffic.
 
-This paper asks: **when does causal future-motion information improve receiver
-scheduling for a PC-FMCW/DPSK-informed optical link?** The decision is the
-receiver served in the current slot. Beam-index selection, adaptive driving-beam
-control and illumination optimization are explicitly excluded.
+This paper asks: **under which conditions does causal future-motion information
+improve receiver scheduling for a PC-FMCW/DPSK-informed optical link?** The
+decision variable is the receiver served in the current slot. Beam-index
+selection, Adaptive Driving Beam control and illumination optimization belong
+to the separate Joint project and are excluded.
 
 The contributions are:
 
-- an auditable causal motion-to-link-to-packet pipeline;
-- frame- and time-consistent link-aware prediction and scheduling;
-- classical, reactive, predictive and perfect-future information references;
-- explicit BER/PER/goodput outage semantics and normalized-power boundaries;
-- packet censoring, scenario slices and cluster-aware paired inference;
-- a true-SDC official-WOMD adapter and versioned learned-checkpoint contract;
-- corrected controlled and compact-proxy results, including null and negative
-  findings.
+- a causal trajectory-to-link-to-packet implementation with ground-truth link
+  realization separated from the forecast used for decision-making;
+- a notebook-derived Part-A FFT/DPSK receiver LUT with explicit SNR semantics
+  and confidence handling;
+- classical motion baselines, ten scheduling policies, urgent/bulk traffic,
+  censoring and boundary-sensitive communication metrics;
+- a true-SDC official-WOMD adapter and a versioned communication-aware GRU
+  training/checkpoint contract;
+- controlled, compact-proxy and five-seed staged results that preserve null and
+  negative findings.
 
-## II. System Model
+![System architecture](artifacts/corrected_v2/figures/system_architecture.png)
+
+*Fig. 1. Executed system boundary. Forecasts inform decisions; current
+ground-truth-derived links determine realized packet outcomes.*
+
+## II. System Model and Causality
 
 At slot `t`, the system observes ego and target positions through `t`, packet
 queues, deadlines and past service. A deployable predictor estimates the next
-`H` positions. Predicted target and ego trajectories are converted to range
-`d(i,k) = ||p_hat(i,t+k) - p_hat(e,t+k)||_2` and wrapped ego-relative bearing
-`phi(i,k) = wrap[atan2(delta_y, delta_x) - psi(e,t+k)]`.
+`H` target positions. For target `i` and horizon step `k`, predicted range and
+ego-relative bearing are
 
-Stationary ego samples retain their last valid heading. Unavailable future
-steps are truncated for every policy. A deployable predictor never receives a
-ground-truth sample after `t`; future-mutation tests enforce this invariant.
+`d(i,k)=||p_hat(i,t+k)-p_hat(e,t+k)||_2`,
 
-The scheduler selects at most one target. Its forecast may influence the
-decision, but packet success is sampled from the current ground-truth-derived
-link. This separates decision information from evaluation and prevents
-self-confirming results.
+`phi(i,k)=wrap[atan2(delta_y,delta_x)-psi(e,t+k)]`.
 
-## III. PC-FMCW/DPSK-Informed Link
+Stationary ego samples retain the last valid heading. When a record contains
+fewer than `H` future samples, every method is truncated consistently. No
+deployable policy receives repeated hidden tail samples. Tests mutate the
+entire future after `t` and require deployable outputs to remain invariant.
+The perfect-future Oracle must change under the same mutation. At `H=0`, future
+arrays cannot change Reactive Greedy's decision.
 
-Because the supplied files contain no calibrated vehicle-to-vehicle optical
-budget, the model is anchored by a declared reference SNR rather than absolute
-measurement. Relative gain combines inverse footprint area, atmospheric loss,
-Gaussian pointing loss and a hard field of view. In compact notation,
-`h(d,phi)` is proportional to inverse footprint area multiplied by
-`exp(-kappa*d)`, Gaussian pointing loss and the indicator
-`1(|phi| <= FOV/2)`.
+## III. Part-A PC-FMCW/DPSK Link Abstraction
 
-The SNR is `gamma_ref h(d,phi)/h(d_ref,0)`. The power output is a normalized
-reference quantity with `received_power_calibrated=false`.
+The supplied inputs contain no calibrated end-to-end vehicle optical budget.
+Relative gain therefore combines inverse footprint area, atmospheric loss,
+Gaussian pointing loss and a hard field of view, normalized at a declared
+reference distance and bearing. SNR is `gamma_ref*h(d,phi)/h(d_ref,0)`. The
+reported power is explicitly relative and carries
+`received_power_calibrated=false`.
 
-Analytical DBPSK uses `P_b=0.5 exp(-gamma)`. For `L` packet bits,
-`PER=1-(1-P_b)^L`, and successful goodput is `R_b(1-PER)`. A second BER path
-uses fixed-seed symbol-level Monte Carlo from -5 to 25 dB with adaptive bit
-counts and a Wilson 95% upper bound when no error is observed.
+The analytical DBPSK ablation uses `P_b=0.5*exp(-gamma)`. For packet length
+`L`, `PER=1-(1-P_b)^L`, and successful goodput is `R_b*(1-PER)`.
 
-BER, PER and minimum-goodput outage flags are all stored. The configured mode
-determines link lifetime, defined as the first predicted outage step, or the
-censored horizon if no outage is predicted.
+The primary LUT reproduces the Part-A receiver sequence: PC-FMCW chirp
+construction, FFT carrier-bin extraction, parabolic sub-bin refinement,
+rotation compensation and differential phase decisions. Its axis is named
+**waveform-sample SNR**, not `Eb/N0`. Monte Carlo runs use adaptive bit support;
+when zero errors are observed, the LUT uses a one-sided 95% Wilson upper bound
+and never claims exact zero BER. A conservative monotone envelope prevents
+sampling noise from making modeled BER improve in the wrong direction.
 
-## IV. Motion, Sensing and Learning
+![DPSK BER calibration](artifacts/corrected_v2/figures/dpsk_ber_curve.png)
 
-The deterministic baselines are Last Position, Constant Velocity, Constant
+*Fig. 2. Part-A receiver BER LUT. Zero-error samples are confidence-limited.*
+
+BER-, PER- and minimum-goodput outage flags are stored separately. The selected
+mode defines link lifetime: the first predicted outage step, or a censored
+horizon when no outage occurs.
+
+## IV. Motion, Sensing and Communication-Aware Learning
+
+The deployable baselines are Last Position, Constant Velocity, Constant
 Acceleration, a position-only Kalman CV filter and a lightweight causal CV/CA
-IMM. Perfect future motion is an information reference.
-
-The optional GRU can be trained under four objectives: trajectory-only,
-trajectory+link, trajectory+outage and full. The link loss receives explicit ego
-heading; the outage loss combines a smooth field-of-view surrogate for gradient
-flow with exact hard-boundary evaluation. Each local checkpoint records its
-feature schema, dataset hash, split and seed. The upstream Stage-4 reports use a
-different eight-feature interface and no compatible checkpoint was supplied.
-
-Robustness studies distinguish future forecast degradation from observation
-uncertainty. The declared sensing model supports IID Cartesian noise and
-range/bearing noise with range-dependent radial variance and AR(1) temporal
-correlation. The Kalman path can use an isotropic-equivalent covariance. These
-are simulation assumptions, not measured sensor specifications.
+IMM. Perfect Future is an information reference. Motion evaluation reports
+ADE/FDE, while link evaluation reports range/bearing/SNR error, outage
+F1/AUROC and link-lifetime error.
 
 | Predictor | Synthetic ADE (m) | Synthetic SNR MAE (dB) | Proxy ADE (m) | Proxy lifetime MAE (s) |
 |---|---:|---:|---:|---:|
@@ -129,54 +134,90 @@ are simulation assumptions, not measured sensor specifications.
 | Constant Acceleration | 0.028 | 0.002 | 0.196 | 0.051 |
 | Perfect Future | 0.000 | 0.000 | 0.000 | 0.000 |
 
-![Forecast trade-off](artifacts/corrected_v1/figures/forecast_link_tradeoff.png)
+![Forecast trade-off](artifacts/corrected_v2/figures/forecast_link_tradeoff.png)
 
-*Fig. 1. Motion ADE and derived-link SNR error on controlled trajectories. Link
-metrics are evaluated separately because a small position error can cross a hard
-FoV boundary.*
+*Fig. 3. Geometric accuracy and derived-link accuracy are related but not
+identical objectives.*
+
+To provide an executable uncertainty baseline without inventing a missing
+neural checkpoint, per-horizon isotropic residual variance is fitted for CV and
+CA on six controlled scenario IDs and evaluated on six disjoint IDs. Each test
+set contains 7,050 target-step samples. CV obtains RMSE 0.167 m, mean NLL
+-2.859 and calibration error 0.118; CA obtains RMSE 0.078 m, mean NLL -4.522
+and calibration error 0.121. A negative continuous-density NLL is possible for
+narrow distributions. Both models over-cover at nominal 50% and under-cover at
+95%; calibration is therefore diagnosed rather than assumed.
+
+![Probabilistic calibration](artifacts/corrected_v2/figures/probabilistic_calibration.png)
+
+*Fig. 4. Scenario-safe held-out coverage of classical Gaussian CV/CA residual
+wrappers. These are not the missing learned Gaussian/GMM checkpoints.*
+
+The optional GRU supports four preregistered objectives: trajectory-only,
+trajectory+link, trajectory+outage and full. Link loss uses the same ego frame
+as evaluation; outage loss uses a smooth FoV surrogate during optimization and
+the hard boundary at test time. Every checkpoint records feature schema,
+dataset SHA-256, scenario split, seed and objective. The supplied Stage-4 file
+contains 70 causal predictions but no weights or paired future ground truth, so
+it cannot be used as a compatible checkpoint or honest accuracy dataset.
+
+Sensing robustness is separated from forecast degradation. Supported declared
+assumptions are perfect observations, IID Cartesian error, and range/bearing
+error with range-dependent radial variance and AR(1) temporal correlation.
+They are simulation assumptions, not sensor measurements.
 
 ## V. Traffic and Scheduling
 
 Each target has a bounded FIFO queue. Poisson, periodic, Markov-modulated and
-saturated arrivals are supported. Deadlines and episode duration are expressed
-in physical seconds and converted only after slot duration is chosen. Failed
-packets return to the queue. Packets remaining at termination are censored and
-reported explicitly.
+saturated arrivals are supported. The simulator also supports a best-effort
+class or urgent/bulk classes with distinct physical deadlines. Failed packets
+return to the queue; delivered, deadline-dropped, overflow-dropped and remaining
+packets must conserve total generation. Remaining packets are right-censored.
 
-Reactive references are Random, Round Robin, Reactive Greedy and Proportional
+Reactive baselines are Random, Round Robin, Reactive Greedy and Proportional
 Fair. Predictive policies apply CV, Kalman, IMM or constant-acceleration
-forecasts to a utility containing discounted future goodput, outage, queue,
-deadline, fairness, opportunity and switching terms.
+forecasts to discounted future goodput, outage, queue, deadline, fairness,
+opportunity and switching terms. Link Lifetime adds
 
-Link Lifetime adds
-`U_life(i) = w_life * normalized_queue(i) * max[0, 1 - T_link(i)/H]`
-only when the current link is usable. The term is dimensionless and invariant
-to proportional rescaling of horizon steps. The Oracle receives perfect future
-positions but uses the same heuristic; it is not a global scheduling optimum.
+`U_life(i)=w_life*Q_tilde(i)*max(0,1-T_link(i)/H)`
 
-## VI. Experimental Protocol
+only when the current link is usable. Oracle uses perfect future positions but
+the same heuristic utility; it is not a global offline optimum.
+
+![Trajectory to link](artifacts/corrected_v2/figures/trajectory_to_link_trace.png)
+
+*Fig. 5. Example mapping from real-motion proxy geometry to the modeled optical
+link. Hard FoV transitions amplify small bearing errors.*
+
+![Scheduler timeline](artifacts/corrected_v2/figures/scheduler_timeline.png)
+
+*Fig. 6. Exact controlled-episode SNR, receiver selection and queue timeline.*
+
+## VI. Experimental and Statistical Protocol
 
 The controlled benchmark has 12 independent 12 s episodes, five receivers,
-100 ms slots, 1 s horizon, load 0.72 and packet deadlines of 1.2 +/- 0.4 s. All
-policies share motion seeds, arrivals, deadlines and per-attempt random draws.
+100 ms slots, 1 s horizon, offered load 0.72 and packet deadlines of
+1.2+/-0.4 s. All policies share scenarios, arrivals, deadlines and packet
+success uniform draws.
 
 The compact export contains 56 actors and three WOMD scenario IDs with one
-second of history and one second of future. Because it omits the official SDC,
-the adapter uses a deterministic medoid proxy ego. The communication link is
-simulated.
+second of history and future. Because it omits official SDC identity, a
+deterministic medoid proxy ego is used. The optical link remains simulated.
 
-A staged design changes one axis around the reference: load, physical horizon,
-slot duration, receiver count, traffic model, packet size, deadline, reference
-SNR, FoV, outage mode or sensing model. Its quick run uses two seeds and is
-diagnostic. Final inference requires five seeds and official held-out scenes.
+The full staged study changes one axis around the reference: load, horizon,
+slot duration, receiver count, traffic model, traffic class, packet size,
+deadline, reference SNR, FoV, outage definition or sensing model. It contains
+45 settings, five seeds and five policies: 1,125 episode rows.
 
-Metrics include goodput, PDR, availability and scheduled outage, P50/P95/P99
-latency, deadline miss, censoring, delivered-before-expiry, queue at first
-disconnection, demand-normalized fairness, and scheduled SNR/BER/PER. Paired
-statistics operate at independent scenario/seed level, use metric-specific
-direction and apply Holm correction.
+Communication metrics include goodput, PDR, scheduled/availability outage,
+P50/P95/P99 latency, miss and censoring, delivered-before-expiry, queue at
+disconnection, urgent/bulk PDR, demand-normalized Jain fairness and scheduled
+SNR/BER/PER. Policy tests operate on paired scenario/seed clusters and receive
+Holm correction. With only five pairs, even five same-direction differences
+have minimum two-sided Wilcoxon `p=0.0625`, so staged results identify candidate
+regions rather than final official-WOMD effects.
 
-## VII. Corrected Results
+## VII. Controlled and Proxy Results
 
 | Policy | Goodput (Mbps) | PDR | P95 latency (ms) | Deadline+censored | Demand Jain |
 |---|---:|---:|---:|---:|---:|
@@ -186,81 +227,102 @@ direction and apply Holm correction.
 | IMM Predictive | 2.3073 | 0.6479 | 948.7 | 0.3521 | 0.6949 |
 | Predictive Utility | 2.3063 | 0.6476 | 965.4 | 0.3524 | 0.6972 |
 | Link Lifetime | 2.3070 | 0.6478 | 968.3 | 0.3522 | 0.6993 |
-| Oracle Information | 2.3078 | 0.6480 | 968.3 | 0.3520 | 0.7000 |
+| Oracle information | 2.3078 | 0.6480 | 968.3 | 0.3520 | 0.7000 |
 
-![Corrected benchmark](artifacts/corrected_v1/figures/corrected_benchmark_tradeoff.png)
+![Corrected benchmark](artifacts/corrected_v2/figures/corrected_benchmark_tradeoff.png)
 
-*Fig. 2. Corrected controlled benchmark. Predictive policies show slightly
-higher mean goodput and fairness but substantially worse P95 latency.*
+*Fig. 7. Predictive policies slightly change mean goodput and fairness but
+substantially worsen tail latency at the default point.*
 
 Link Lifetime minus Reactive goodput is +0.0140 Mbps with paired bootstrap 95%
-interval [-0.0319, 0.0593], win fraction 66.7%, Cohen `dz=0.161`, Wilcoxon
-`p=0.677` and Holm-adjusted `p=1.0`. The data do not establish a goodput gain.
+interval [-0.0319, 0.0593], win fraction 66.7%, Cohen `dz=0.161`, raw
+Wilcoxon `p=0.677` and Holm-adjusted `p=1.0`. P95 latency is +268.8 ms worse,
+with Holm-adjusted `p=0.00439`. The explicit lifetime-weight ablation is null at
+this operating point because predicted closure inside the horizon does not
+change additional decisions.
 
-The P95 difference is +268.8 ms, unfavorable. Its paired interval is entirely
-positive; Holm-adjusted Wilcoxon `p=0.00439`. Thus the clearest controlled
-effect is a latency cost, not a throughput improvement.
+![Goodput ECDF](artifacts/corrected_v2/figures/policy_goodput_ecdf.png)
 
-![Paired gain ECDF](artifacts/corrected_v1/figures/paired_goodput_difference_ecdf.png)
+*Fig. 8. Policy-level goodput distributions preserve episode variability.*
 
-*Fig. 3. Episode-level Link-Lifetime minus Reactive goodput differences include
-both positive and negative outcomes.*
+In the compact real-motion proxy, Reactive obtains 1.160 Mbps and 0.329 PDR,
+whereas Link Lifetime obtains 1.056 Mbps and 0.299 PDR. Roughly 70% of packets
+are deadline-dropped or censored in the short window. Three proxy scenes cannot
+establish generalization.
 
-In the quick lifetime ablation, Predictive Utility, Link Lifetime and Link
-Lifetime with zero lifetime weight all obtain 2.1655 Mbps. The explicit lifetime
-term is inactive in those default episodes because it does not change a
-decision inside the available closure horizon. This null result prevents the
-earlier interpretation that lifetime urgency explained a default gain.
+## VIII. Conditional Operating Regions and Failure Cases
 
-The compact WOMD proxy result is also negative: Reactive obtains 1.160 Mbps and
-0.329 PDR, while Link Lifetime obtains 1.056 Mbps and 0.299 PDR. Approximately
-70% of packets are deadline-dropped or censored in the one-second evaluation
-window. The three scenes cannot establish generalization.
+| Setting | Link Lifetime - Reactive (Mbps) | Bootstrap 95% interval | Win fraction | Holm p |
+|---|---:|---:|---:|---:|
+| Deadline 0.5 s | +0.1392 | [+0.0920, +0.1872] | 1.0 | 0.375 |
+| Reference SNR +3 dB | +0.0504 | [+0.0442, +0.0560] | 1.0 | 0.375 |
+| Reference SNR +6 dB | +0.0428 | [+0.0244, +0.0612] | 1.0 | 0.375 |
+| Load 1.1 | -0.1644 | [-0.2572, -0.0626] | 0.2 | 0.625 |
+| Deadline 0.05 s | -0.2318 | [-0.3438, -0.1032] | 0.2 | 0.375 |
+| Urgent/bulk | -0.1356 | [-0.2746, -0.0268] | 0.2 | 0.500 |
 
-![Compact WOMD example](artifacts/corrected_v1/figures/example_womd_motion.png)
+![Staged regions](artifacts/corrected_v2/figures/staged_operating_region_diagnostic.png)
 
-*Fig. 4. Compact real-motion example. The proxy ego is an integration device,
-not the official SDC identity.*
+*Fig. 9. Five-seed operating-region sign changes. Shading spans the seed range,
+not a publication confidence band.*
 
-The 430-row staged quick run contains 43 settings, two seeds and five policies.
-The Link-Lifetime minus Reactive difference changes sign across axes - for
-example, +0.018 Mbps at load 0.3 and -0.172 Mbps at load 0.9. Such changes are
-hypothesis-generating only because two seeds do not identify an effect.
+Urgent/bulk traffic exposes a mechanism failure. Reactive averages 2.167 Mbps,
+urgent PDR 0.497 and bulk PDR 0.676. Link Lifetime averages 2.031 Mbps, urgent
+PDR 0.293 and bulk PDR 0.730. Link-closure urgency serves bulk opportunities at
+the expense of short-deadline urgent packets; a class-aware utility is required.
 
-![Staged operating region](artifacts/corrected_v1/figures/staged_operating_region_diagnostic.png)
+![Forecast failures](artifacts/corrected_v2/figures/forecast_failure_cases.png)
 
-*Fig. 5. Two-seed staged diagnostic. Shading spans the two seed outcomes, not a
-publication confidence interval.*
+*Fig. 10. Largest uncensored link-lifetime errors reveal optical-boundary cases
+where a modest geometric error can cause a large communication error.*
 
-## VIII. Limitations
+![Throughput fairness](artifacts/corrected_v2/figures/throughput_fairness_pareto.png)
 
-WOMD provides motion, not optical measurements. Every link and packet outcome
-is model-based. The normalized power reference cannot support an absolute watt
-claim. The compact export lacks true SDC identity, raw validity masks, map
-context and a long evaluation window.
+*Fig. 11. Throughput-fairness operating points; highlighted points are
+nondominated within the evaluated heuristic set.*
 
-The official-WOMD adapter and learned ablation runner are implemented, but raw
-WOMD shards, a compatible checkpoint and PyTorch were unavailable in the
-executed environment. No learned result is reported. The supplied Stage-4 JSON
-reports are provenance rather than locally reproduced evidence.
+## IX. Complexity and Reproducibility
 
-The Oracle is only an information reference and can be worse than Reactive
-because the heuristic is not an exact offline optimum. A small-instance exact
-optimizer remains future work. Channel parameters, traffic and scheduler
-weights require development-set freezing before final testing.
+| Component | Median runtime (us) | P95 runtime (us) |
+|---|---:|---:|
+| Last Position | 1.8 | 4.9 |
+| Constant Velocity | 6.4 | 11.6 |
+| Constant Acceleration | 17.5 | 33.6 |
+| Kalman CV | 976.4 | 2919.7 |
+| IMM | 1028.7 | 3435.2 |
+| Reactive Greedy scheduler | 9.7 | 16.9 |
+| Link Lifetime scheduler | 37.8 | 53.0 |
 
-## IX. Conclusion
+These are single-process CPU diagnostics on the recorded runtime, not hardware-
+independent guarantees. The GRU architecture has 169,620 analytical parameters;
+its runtime is intentionally absent because the learned execution path was not
+run. Machine-readable manifests hash code/configuration and record whether
+official data, checkpoints and measured channels were used.
 
-The corrected codebase demonstrates how causal mobility forecasts can be
-translated into optical-link forecasts and packet scheduling decisions. It also
-shows why a favorable controlled result cannot be assumed: the mean goodput
-difference is uncertain, tail latency is worse, the explicit lifetime ablation
-is null at the default point and the compact proxy benchmark is negative.
+## X. Limitations and Publication Gate
 
-The scientifically useful next question is conditional rather than universal:
-which link-closure geometries, deadline pressures and uncertainty levels create
-enough scheduling flexibility for prediction to help? Answering it requires the
-official WOMD held-out evaluation and a real multi-seed learned-model ablation.
+WOMD supplies motion, not optical measurements. All link and packet outcomes
+are model-based, and normalized power cannot support an absolute watt claim.
+The compact export lacks the true SDC, raw masks, map context and a long test
+window. Although the official loader and GRU ablation code exist, the supplied
+files do not include official WOMD TFRecord shards, a compatible checkpoint or
+paired ground truth for the Stage-4 forecasts. Consequently no learned result,
+probabilistic calibration or official-WOMD generalization is reported.
+
+Before submission, the official shards must be hashed and split by scenario;
+the four learned objectives must be trained for at least three seeds; frozen
+checkpoints must be evaluated on held-out motion, boundary-link and packet
+metrics; and authors, affiliations and venue formatting must be added.
+
+## XI. Conclusion
+
+The project demonstrates a complete causal translation from mobility forecasts
+to PC-FMCW/DPSK-informed packet scheduling. It also shows why prediction cannot
+be assumed beneficial: default goodput uncertainty, increased tail latency, a
+negative compact proxy, deadline/load sign changes and urgent-class harm all
+appear in the executed evidence. The publishable question is conditional:
+which geometries, deadline pressures, channel regimes and uncertainty levels
+create enough scheduling flexibility for future motion to be valuable?
 
 ## References
 
@@ -269,8 +331,47 @@ Headlamp for Integrated Sensing, Communication, and Illumination," IEEE
 Photonics Technology Letters, DOI: 10.1109/LPT.2025.3649597, 2025.
 
 [2] S. Ettinger et al., "Large Scale Interactive Motion Forecasting for
-Autonomous Driving: The Waymo Open Motion Dataset," Proceedings of the IEEE/CVF
-International Conference on Computer Vision, 2021.
+Autonomous Driving: The Waymo Open Motion Dataset," ICCV, 2021.
 
-[3] Project methodology, data provenance, experiment protocol and corrected
-machine-readable artifacts in this repository, 2026.
+[3] S. Shi et al., "Motion Transformer with Global Intention Localization and
+Local Movement Refinement," NeurIPS, 2022.
+
+[4] F. P. Kelly, A. K. Maulloo, and D. K. H. Tan, "Rate Control for
+Communication Networks: Shadow Prices, Proportional Fairness and Stability,"
+Journal of the Operational Research Society, vol. 49, no. 3, 1998.
+
+[5] Supplied Part-A PC-FMCW/DPSK notebook, source code and research-plan
+documents archived with this repository's provenance notes, 2026.
+
+## Appendix A. Reproduction and Artifact Contract
+
+The controlled evidence can be regenerated from a clean environment with
+`make test`, `make lint`, `make corrected-full`, `make paper-draft` and
+`make reproducibility`. The full run writes only to `artifacts/corrected_v2/`;
+the quick integration target writes to a different directory and cannot
+overwrite it.
+
+Every policy in a paired episode receives the same motion, packet arrivals,
+deadlines and per-attempt random numbers. The corrected-run manifest declares
+whether official WOMD, a learned checkpoint, a measured optical channel and the
+Part-A notebook receiver were used. Machine-readable outputs are retained in
+CSV and JSON; the PDF reads only current corrected artifacts.
+
+| Artifact group | Primary content |
+|---|---|
+| `synthetic_benchmark` | 12-scenario policy rows and paired statistics |
+| `motion_baselines` | ADE/FDE and derived-link errors |
+| `probabilistic` | disjoint-scenario Gaussian NLL/coverage |
+| `staged_experiments` | 1,125 one-axis study rows |
+| `complexity` | CPU runtime and parameter diagnostics |
+| `figures` | exact publication plots generated from those rows |
+
+## Appendix B. Open Evidence Gates
+
+The repository intentionally fails the publication gate until all of the
+following are present: hashed official WOMD TFRecords; true-SDC scenario-safe
+train/development/test lists; at least three seeds for every learned objective;
+a compatible versioned checkpoint; held-out motion, link-boundary and packet
+evaluation; and author/venue metadata. A measured optical link is required only
+for absolute-power or real-channel claims. The missing learned K=5 GMM is not
+silently replaced by the classical Gaussian residual baseline.

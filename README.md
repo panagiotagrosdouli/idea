@@ -21,7 +21,7 @@ the current slot**.
 |---|---|
 | Trajectory → geometry → link → packets → scheduler | Implemented |
 | Classical predictors and 10 schedulers | Implemented |
-| Automated tests and scientific sanity gates | 45/45 PASS and 5/5 PASS |
+| Automated tests and scientific sanity gates | 51/51 PASS and 5/5 PASS |
 | Corrected synthetic benchmark | Executed on 12 independent episodes |
 | Compact WOMD proxy benchmark | Executed on only 3 scenes |
 | Official-WOMD true-SDC adapter | Implemented; TFRecord shards not supplied |
@@ -68,7 +68,7 @@ flowchart TD
 | Official WOMD loader | True `sdc_track_index` and validity masks | Ready when the shards are supplied |
 | PC-FMCW constants | Supplied Part-A notebook/report | Frozen physical assumptions |
 | Optical power/SNR/channel | Reference-SNR model | Model-based, not a measurement |
-| BER | Analytical DBPSK or adaptive Monte Carlo LUT | Reproducible simulation |
+| BER | Analytical DBPSK or supplied Part-A FFT/DPSK receiver LUT | Reproducible simulation |
 | Packet delivery | PER and common random numbers | Controlled paired comparison |
 
 `received_power_w` is a normalized reference quantity and is accompanied by
@@ -84,6 +84,12 @@ Trajectory predictors:
 - optional versioned GRU checkpoint;
 - perfect-future information reference.
 
+Uncertainty evaluation also includes scenario-safe residual Gaussian wrappers
+for CV and CA. Six controlled scenarios calibrate per-horizon variance and six
+disjoint scenarios evaluate NLL and 50/90/95% coverage. This is a classical
+probabilistic baseline, not a replacement for the missing trained Gaussian/GMM
+checkpoint.
+
 Schedulers:
 
 - Random, Round Robin, Reactive Greedy, and Proportional Fair;
@@ -98,7 +104,7 @@ offline schedule.
 
 ## Corrected results
 
-The following values come only from `artifacts/corrected_v1/`, after correcting
+The following values come only from `artifacts/corrected_v2/`, after correcting
 coordinate frames, stationary heading, horizon truncation, physical deadlines,
 outage semantics, censoring, and clustered inference.
 
@@ -124,16 +130,20 @@ Compact WOMD proxy benchmark:
 | Link Lifetime | 1.056 | 0.299 | 400.0 |
 | Oracle-information | 1.056 | 0.299 | 400.0 |
 
-This negative result is retained. The two-seed staged diagnostic also finds
-sign changes across load, deadline, horizon, channel, and sensing assumptions.
-The research question is therefore not “does prediction always win?” but
-“when, and under which conditions, does prediction help?”
+This negative result is retained. The full staged run contains **1,125 policy
+episodes** (45 settings × 5 seeds × 5 policies) and finds sign changes across
+load, deadline, horizon, channel, sensing, and traffic-class assumptions. For
+example, Link Lifetime minus Reactive is +0.139 Mbps at a 0.5 s deadline, but
+−0.232 Mbps at 0.05–0.1 s deadlines and −0.136 Mbps with urgent/bulk traffic.
+No reported family survives Holm correction with only five seeds. The research
+question is therefore not “does prediction always win?” but “when, and under
+which conditions, does prediction help?”
 
-![Corrected benchmark](artifacts/corrected_v1/figures/corrected_benchmark_tradeoff.png)
+![Corrected benchmark](artifacts/corrected_v2/figures/corrected_benchmark_tradeoff.png)
 
 ## Reading guide
 
-- [`output/pdf/predictive_pc_fmcw_corrected_research_draft.pdf`](output/pdf/predictive_pc_fmcw_corrected_research_draft.pdf): six-page corrected research draft.
+- [`output/pdf/predictive_pc_fmcw_corrected_research_draft.pdf`](output/pdf/predictive_pc_fmcw_corrected_research_draft.pdf): corrected research draft.
 - [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md): model, equations, and experimental protocol.
 - [`docs/RESULTS.md`](docs/RESULTS.md): corrected results, paired statistics, and negative findings.
 - [`docs/PDF_REQUIREMENTS_TRACEABILITY.md`](docs/PDF_REQUIREMENTS_TRACEABILITY.md): requirement-to-code/test/artifact mapping.
@@ -170,7 +180,7 @@ make lint
 make validate
 ```
 
-Expected outcome: 45 tests and every scientific gate in `PASS` state.
+Expected outcome: 51 tests and every scientific gate in `PASS` state.
 
 ## Reproducing the corrected artifacts
 
@@ -182,15 +192,18 @@ make corrected-quick
 
 It creates a fresh and isolated run directory containing:
 
-- an adaptive DBPSK BER LUT from -5 to 25 dB;
+- a DBPSK BER LUT from -5 to 25 dB using the supplied Part-A
+  FFT-carrier/DPSK receiver and confidence-limited zero-error points;
 - controlled and compact-WOMD proxy benchmarks;
 - motion and link forecast metrics;
 - traffic, channel, and sensing-noise ablations;
-- a 430-row, two-seed staged diagnostic;
+- an urgent/bulk deadline-traffic study;
+- a 1,125-row, five-seed staged experiment in the full run;
 - mobility and FoV scenario slices;
 - CSV, JSON, LaTeX, figures, and a run manifest.
 
-For five staged seeds and all ablation episodes:
+The repository already contains the completed five-seed run under
+`artifacts/corrected_v2/`. To regenerate it:
 
 ```bash
 make corrected-full
@@ -252,7 +265,7 @@ src/predictive_pc_fmcw/       core library
 configs/                      frozen assumptions and experiment designs
 scripts/                      numbered and one-command runners
 tests/                        deterministic scientific regressions
-artifacts/corrected_v1/       post-audit reproduced evidence
+artifacts/corrected_v2/       full post-audit reproduced evidence
 paper/                        current manuscript source
 docs/                         methods, provenance, results, traceability
 reference/                    supplied Part-A and Stage-4 provenance
@@ -268,7 +281,7 @@ reference/                    supplied Part-A and Stage-4 provenance
   correction.
 - No-outage horizons and packets remaining in queues are recorded as censoring.
 - Sensing noise is a declared synthetic assumption, not a sensor measurement.
-- Pre-fix artifacts are never mixed with `corrected_v1` results.
+- Pre-fix and quick artifacts are never mixed with `corrected_v2` results.
 
 ## Documentation
 

@@ -1,9 +1,9 @@
 # Scientific repository audit and publication plan
 
 > **Historical audit snapshot.** This document records the initial gap analysis
-> before the corrected-v1 implementation pass. Counts and readiness statements
+> before the corrected implementation passes. Counts and readiness statements
 > below are intentionally preserved as audit evidence and must not be read as the
-> current repository status. For the current 45-test implementation state, use
+> current repository status. For the current 51-test, five-seed state, use
 > [`IMPLEMENTATION_STATUS.md`](IMPLEMENTATION_STATUS.md),
 > [`RESULTS.md`](RESULTS.md), and [`PAPER_READINESS.md`](PAPER_READINESS.md).
 

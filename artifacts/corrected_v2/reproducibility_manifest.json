@@ -1,0 +1,589 @@
+{
+  "status": "PASS",
+  "generated_utc": "2026-08-30T05:30:37.827827+00:00",
+  "git_commit": "uncommitted-workspace",
+  "environment": {
+    "python": "3.12.13",
+    "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "cpu_count": 9,
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "matplotlib": "3.10.8",
+    "pytorch_available": false
+  },
+  "scientific_scope": {
+    "mobility": "controlled synthetic and compact real-WOMD export",
+    "communication": "model-based PC-FMCW/DPSK simulation",
+    "measured_optical_channel": false,
+    "true_womd_ego_in_compact_export": false
+  },
+  "file_count": 113,
+  "files": [
+    {
+      "path": "src/predictive_pc_fmcw/__init__.py",
+      "bytes": 258,
+      "sha256": "9acfe61a81d5a86c725497e26346c3cf3dfa19f075117f0ee708d4aa53327aaf"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/__main__.py",
+      "bytes": 49,
+      "sha256": "76fa916e93e0ae1a6c1bb51dcc0bcf289c014e9f760a47165f8a84401ccf41d7"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/ablations.py",
+      "bytes": 6486,
+      "sha256": "928ed4521f6c7f2584624e7930755288dcca5debe84f34ea144e4f76ba441c66"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/benchmark.py",
+      "bytes": 12128,
+      "sha256": "7f61b2aca5db8b8f5dad66408c8eb0140dae3679869f082ed3d24c0d8e400b53"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/ber.py",
+      "bytes": 14167,
+      "sha256": "098ba32776de3ad5ab4bd7a5b747f25c70b4eda5b21bb03afd703b333379ab0a"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/cli.py",
+      "bytes": 15602,
+      "sha256": "c3452c7172cbba41898f69c41c26a6476c99938ea56b24ba560bf478cf167030"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/complexity.py",
+      "bytes": 6464,
+      "sha256": "8451399a98b9e3c2b42b3aa34c731119da9dbb43be58360ef15d77e4cc557341"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/config.py",
+      "bytes": 10102,
+      "sha256": "03c9ec0d8616b87d4a956a03668284d45c899dfd839cc1e828e2856004d3c92e"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/data/__init__.py",
+      "bytes": 247,
+      "sha256": "fdfdbda350585dbf8f3aad0ff80e5b2310488d68fe60f08c9fa912a4f4ccec74"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/data/manifest.py",
+      "bytes": 2621,
+      "sha256": "30937e324ebd054e0a7c51d0c03f35ec61a48ec7557515b561af1cad520db07a"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/data/scenario.py",
+      "bytes": 2021,
+      "sha256": "c75897dcfef2a282a262ff3dc1f56a6a4fe1617ab6e4f7eadbfc14de17eaa7ba"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/data/synthetic.py",
+      "bytes": 2175,
+      "sha256": "534347bf689d211703aac09b8e18cce7c157918c1f6226fbd34e2b97356e5333"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/data/training_export.py",
+      "bytes": 2733,
+      "sha256": "9568bb949636763645859b2407da928f0e650fc0fd6d02d92726bf243aa9dfb2"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/data/womd_export.py",
+      "bytes": 3115,
+      "sha256": "df7ae8a5015d65506f0f4815c1e48deb5640614f7691580d75cd1b85e34eb654"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/data/womd_official.py",
+      "bytes": 5069,
+      "sha256": "bc926542a6dc6e3c1545a87605a3efa0d3d2e324a6e65ad8c037ce29ac90108b"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/experiment_matrix.py",
+      "bytes": 12625,
+      "sha256": "8f1316f67b814e9c120afa961019450060eec0dbac7146cfdc1ba17165e95c74"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/forecast_evaluation.py",
+      "bytes": 9823,
+      "sha256": "8da0aaa60913c082d904f27e7e2e499340d01eced0381d8f614c7f8fbe8b2ab6"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/geometry.py",
+      "bytes": 1678,
+      "sha256": "c5930b2dc9dd2f98e4290ccd776c181812feff521a1b940894263a4acdbed5c4"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/learning/__init__.py",
+      "bytes": 144,
+      "sha256": "888226888336e3af5355425edb0441d78c0489bf15c2ece3b31f5a93a8454f84"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/learning/ablation.py",
+      "bytes": 2581,
+      "sha256": "3f8066007706461d8ed69b7c55f162c37642339b728014c5f8552a61b08b45bb"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/learning/inference.py",
+      "bytes": 2997,
+      "sha256": "7c228a945432c27d941828c811efaaaf310dd6e472e80031774e80e1e6d52c7a"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/learning/losses.py",
+      "bytes": 2560,
+      "sha256": "37d4697b32624c1028f06fef4a75bcb02d4a367c717af08399a7a9dd6248a393"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/learning/torch_model.py",
+      "bytes": 5155,
+      "sha256": "c6656e13681d645a1cf5f574b45cf8c683536df76e38394742b0ecec146aec21"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/learning/train.py",
+      "bytes": 11010,
+      "sha256": "78c18dd148415c86d5c577fdc545fb90a0c5abef3905c98226c086509c42a72d"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/link.py",
+      "bytes": 7564,
+      "sha256": "3ce54689a25b53394652a4e28327158b5e33591a5d6acb8a46be7ae8349ee68e"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/metrics.py",
+      "bytes": 7183,
+      "sha256": "1dbf892f675e5821c865f741644db8a97ec8af835a1f1fa269220791a96ba45a"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/paper_artifacts.py",
+      "bytes": 34879,
+      "sha256": "49254c71774f3ca9fb292a80b99ed9d03fba76d8a36d08a5ad084697244eedac"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/predictors.py",
+      "bytes": 8414,
+      "sha256": "35d27cecb92ab90c67fc7e1ed8de1d5a8398806861e981d3a88e80f9de6f26c4"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/probabilistic.py",
+      "bytes": 8415,
+      "sha256": "31f219af14da8f7eb64108c7b44d5fa97c4e08295ccb5c9f2cdebc6817521a7d"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/scenario_slices.py",
+      "bytes": 4442,
+      "sha256": "83923184cd67c791859bfdcafc9bb1314272ba1301ed8020a4275bb60a73c3ad"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/scheduling/__init__.py",
+      "bytes": 165,
+      "sha256": "35402ab653f9aae0f7ff1836dc5f250dd54251dcd1697e01c10808b1d03672d7"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/scheduling/base.py",
+      "bytes": 1445,
+      "sha256": "7d5cbcfd29a06c1296202e6a9dda8fb9a6371397607a2b9e742a430f06d5287a"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/scheduling/policies.py",
+      "bytes": 7627,
+      "sha256": "94f9efd579ef00c50c588e8ffb350a5efd15177326822cd83d64ab70b7e95b79"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/sensing.py",
+      "bytes": 3602,
+      "sha256": "33aa31ace83e3360129a4d05295287677e11e548635f027a68a00703d442312b"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/simulation/__init__.py",
+      "bytes": 104,
+      "sha256": "064936839ead138ca3fa1280066b6c0aaf162be8c6c27e533c9194a88c6d7004"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/simulation/engine.py",
+      "bytes": 15428,
+      "sha256": "09f19d9bc9ecae00ab9b9d02bfef10875871760a21906491b9998f93ed210edb"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/staged_experiments.py",
+      "bytes": 11428,
+      "sha256": "0173b8cd9635371e34c2d13bc82801f5b9e431b72d015daee39e987b87bd5351"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/traffic.py",
+      "bytes": 9203,
+      "sha256": "e592ce4ec87e595f7ccff68eaa28b65c2044f3d15bec3288256975f0ba406278"
+    },
+    {
+      "path": "src/predictive_pc_fmcw/validation.py",
+      "bytes": 2107,
+      "sha256": "7c1f7e77e01206fb3f01f416176a8cdc8e5fee5787db584c04b2adec3e3d87d1"
+    },
+    {
+      "path": "tests/test_ber.py",
+      "bytes": 1116,
+      "sha256": "1d3a9349722239c35548f060f29415d789826502c6751db8f24d1ae790754ebb"
+    },
+    {
+      "path": "tests/test_complexity.py",
+      "bytes": 980,
+      "sha256": "fcc98951a73ff34d64d670b9133c16d6ce350189194acc7ef32daebd177b5550"
+    },
+    {
+      "path": "tests/test_config.py",
+      "bytes": 876,
+      "sha256": "489edf8cfc4ae667e96f32acf80ab2fb80ebbd69919ef4e255342449a2bc7263"
+    },
+    {
+      "path": "tests/test_data_and_predictors.py",
+      "bytes": 3851,
+      "sha256": "880b822fce57ae69193c2e41b9b5d3cff40c27409c84e04742b487e219ce7d03"
+    },
+    {
+      "path": "tests/test_forecast_and_manifest.py",
+      "bytes": 2634,
+      "sha256": "625a17a8bc875044a17d0dc0f5df5ba316263aaeefd5721f34a676090b93fa7f"
+    },
+    {
+      "path": "tests/test_geometry.py",
+      "bytes": 748,
+      "sha256": "2bf04bce536463c3a0b19027120af7361747ff53f29eb3ae1a18ee155f17cd3e"
+    },
+    {
+      "path": "tests/test_link.py",
+      "bytes": 4113,
+      "sha256": "19faa6674a482d5fa567365740bc0a80f7828a41f27d92aa309ac65da9de7306"
+    },
+    {
+      "path": "tests/test_loss.py",
+      "bytes": 1896,
+      "sha256": "178bd451b67fedbab0313dd2f74a23f6eaeaace327a2bdfaddf6a8763c28b659"
+    },
+    {
+      "path": "tests/test_matrix.py",
+      "bytes": 1386,
+      "sha256": "f2557b5a7d79981cd4617f127d69fd43ab4cc796b29ae72bd3ef08e4e26b1434"
+    },
+    {
+      "path": "tests/test_metrics_and_slices.py",
+      "bytes": 2204,
+      "sha256": "636dfd48560a58c4736ffe63009ee2321ac150510c5c380f4f14d762eb853af2"
+    },
+    {
+      "path": "tests/test_probabilistic.py",
+      "bytes": 2701,
+      "sha256": "b7eeb6f42af6bb5a3bd5f460c1af5d603253981391fbc77355abc52edcf65f9f"
+    },
+    {
+      "path": "tests/test_sensing.py",
+      "bytes": 1540,
+      "sha256": "8a698f9c4913188cdeedef1512d73a5affdd063af90eb5d1d9f94700a0bf181c"
+    },
+    {
+      "path": "tests/test_simulation.py",
+      "bytes": 3042,
+      "sha256": "15c024fc6a523caaf2a188665a33864f561f3cdec272042f49899bd2667da79b"
+    },
+    {
+      "path": "tests/test_staged_experiments.py",
+      "bytes": 1051,
+      "sha256": "929ba8aa8b45f437efca07e33fdced019f076ea7c7bc6249504bb317454facf9"
+    },
+    {
+      "path": "tests/test_traffic_and_schedulers.py",
+      "bytes": 6572,
+      "sha256": "e927b724bb23872cbf86fd651292c8fda7dd6705d940e51ab0a9a9bbc687739e"
+    },
+    {
+      "path": "tests/test_training_ablation.py",
+      "bytes": 974,
+      "sha256": "70f62cd8bc4ef2468815a28884014aef1864ab07b8fe15907259309d1af1b8d2"
+    },
+    {
+      "path": "tests/test_validation.py",
+      "bytes": 368,
+      "sha256": "3525ba6c028e4bdb63a1902b82506276e6356acaa347d17939a0e6988f3faae1"
+    },
+    {
+      "path": "tests/test_womd_official.py",
+      "bytes": 1456,
+      "sha256": "02924c20379fa9ce807f7de106b4ada95f3a13060274bdffb20ce7c22a88eac9"
+    },
+    {
+      "path": "scripts/00_freeze_paper_manifest.py",
+      "bytes": 1784,
+      "sha256": "26a260836e9bc65cae50d707185ede3326f3a387253eba2be32ec8ab65f16b64"
+    },
+    {
+      "path": "scripts/01_build_comm_samples.py",
+      "bytes": 655,
+      "sha256": "cb015885291c1875690495550cf6818e6c8c1ebcb6e665c14bb9f209d43b0d52"
+    },
+    {
+      "path": "scripts/01_build_official_womd_samples.py",
+      "bytes": 1024,
+      "sha256": "564e651e35a867b7b4e9e4ce5417f908449b8430bbde02a51154684c3b5528fc"
+    },
+    {
+      "path": "scripts/02_build_part_a_link_lut.py",
+      "bytes": 1272,
+      "sha256": "ad31cd611e86a0c23709bd7d775a4d52d3d986a494a3ad00e8f007c141e11564"
+    },
+    {
+      "path": "scripts/03_eval_motion_baselines.py",
+      "bytes": 796,
+      "sha256": "403ef8a1e5451bac8ac095cf726da4376864611184d63214471753b6f49a6c64"
+    },
+    {
+      "path": "scripts/04_run_training_ablation.py",
+      "bytes": 1762,
+      "sha256": "24791f1afe7329659e0a584ea7dbf91e30cd0b579becd1d7acf90c3bee95b69b"
+    },
+    {
+      "path": "scripts/04_train_comm_aware_predictor.py",
+      "bytes": 1267,
+      "sha256": "a87c10a7552807d707cdaaf49f86bcbd6c5f754eb19553270b066f8858451df2"
+    },
+    {
+      "path": "scripts/04_train_simple_predictor.py",
+      "bytes": 713,
+      "sha256": "b99adbf2826727a2dcb5042972392a95409cf5d56306623553bbf9ced2f6d050"
+    },
+    {
+      "path": "scripts/05_run_link_lifetime_scheduler.py",
+      "bytes": 422,
+      "sha256": "fdb956ae79fb4c21f0f67901afd694eb0fdeb30b52733e1972b45df11eed6af4"
+    },
+    {
+      "path": "scripts/05_run_predictive_scheduler.py",
+      "bytes": 456,
+      "sha256": "4bf45dcbcbc1917ac779c54cf675c446b955cb2213e58798a329e93bde213ce1"
+    },
+    {
+      "path": "scripts/05_run_reactive_schedulers.py",
+      "bytes": 415,
+      "sha256": "3a248196f9ec3cb922d0ceb8ec16d63fa4b75490cacbb99b72a6122d62ce5771"
+    },
+    {
+      "path": "scripts/06_evaluate_communications.py",
+      "bytes": 333,
+      "sha256": "2ea035f6e9f25af0c8fe3ee787e4aa16a23b60d27731921405f5bfcf6f5ba230"
+    },
+    {
+      "path": "scripts/07_evaluate_probabilistic_baselines.py",
+      "bytes": 1825,
+      "sha256": "92112369436ed9dfad6f7945807d86c3158a6b06e8c57517c1a7bf241a744e17"
+    },
+    {
+      "path": "scripts/07_make_corrected_figures.py",
+      "bytes": 1585,
+      "sha256": "7796aa43584c255c8a54ac6e76e35212cb33145d78e73aa09869152c56fa3a55"
+    },
+    {
+      "path": "scripts/07_make_paper_figures.py",
+      "bytes": 836,
+      "sha256": "5bcd5d36ab94fe00075b1179d30ebede3119a6ee68b680237a39382b27af8a0d"
+    },
+    {
+      "path": "scripts/07_make_paper_tables.py",
+      "bytes": 621,
+      "sha256": "af9d6e12fc093e74523923171d0d9124f0962715dbd7422cfbc15186a4c8adc2"
+    },
+    {
+      "path": "scripts/07_measure_complexity.py",
+      "bytes": 792,
+      "sha256": "012a41804ded5a35733f8c00be75811b70ad504d18debde885e6332c03ec7941"
+    },
+    {
+      "path": "scripts/07_run_ablation_matrix.py",
+      "bytes": 657,
+      "sha256": "e14e2a6132be05bfe1a4876d230155db1193467ab6a0140892f99c290c0abede"
+    },
+    {
+      "path": "scripts/07_run_staged_experiments.py",
+      "bytes": 1053,
+      "sha256": "2b18001d75fd9f18f10b256ca05603a719e2928b0ec229722c3002abaf06ae1d"
+    },
+    {
+      "path": "scripts/build_paper_pdf.py",
+      "bytes": 8151,
+      "sha256": "ce7eebdbdcd399ae7603854070b48816f3d246f1f77b259f96ecfa768a0fc0d4"
+    },
+    {
+      "path": "scripts/build_reproducibility_manifest.py",
+      "bytes": 3681,
+      "sha256": "a222f6f04c797e4a00ce29918f2186727a0131695f2e9c09c5f3413b3de429f8"
+    },
+    {
+      "path": "scripts/run_corrected_pipeline.py",
+      "bytes": 9338,
+      "sha256": "36958dbde3cce9880ff04bde10fb5202f3fd56b875236fbaf7cbe34dacb9b61d"
+    },
+    {
+      "path": "scripts/run_full_pipeline.py",
+      "bytes": 776,
+      "sha256": "e2b301748c7eca73092dd7a20d3e846b6052583fc32d5298439cddd4346f8987"
+    },
+    {
+      "path": "scripts/run_paper_pipeline.py",
+      "bytes": 3423,
+      "sha256": "503ebdd885d8317525b2bdeb7f05adec3cd8058527cc5942ebe14261463dc5ef"
+    },
+    {
+      "path": "configs/default.json",
+      "bytes": 2103,
+      "sha256": "a6bd9e74d8c83d0ba97752a98f5081acab06c0cddebb9791117b04570ae60596"
+    },
+    {
+      "path": "configs/experiment_matrix.json",
+      "bytes": 221,
+      "sha256": "4fe1766f7d290ad15bc79f6b0bd94f0a49b5b40eda7d17b322423c4d2904b74b"
+    },
+    {
+      "path": "configs/paper_experiment_matrix.json",
+      "bytes": 245,
+      "sha256": "de4b4d15ea75242ab0d6b0d1e8f42c1ec583b463bb25096f835eefb15ebf6a0b"
+    },
+    {
+      "path": "configs/part_a_physical_layer.json",
+      "bytes": 1118,
+      "sha256": "289e213eddcd5b0126dd4ea2acc6be53c64b9dc03e0a52463077f3387533e8d8"
+    },
+    {
+      "path": "configs/staged_experiments.json",
+      "bytes": 1153,
+      "sha256": "8aa8d102344669d6698c2dda19e719b8dd59302f2b724909c05977041b9098da"
+    },
+    {
+      "path": "docs/ASSIGNMENT1_MAPPING.md",
+      "bytes": 970,
+      "sha256": "275e03f754bb733ba3b56bfd3c6ec17f42b3b7c54712bd33a3aa66f76686de40"
+    },
+    {
+      "path": "docs/DATA_PROVENANCE.md",
+      "bytes": 2806,
+      "sha256": "7461641edf532ac39551fbf52e143f8d6115f8cda0aee7f9d49a5cc95af6133d"
+    },
+    {
+      "path": "docs/EXPERIMENTS.md",
+      "bytes": 3825,
+      "sha256": "ac0b9fd02864aacf09aa08f282ee261777d1951cf14843e1a2ecf1f24b1e78b2"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_STATUS.md",
+      "bytes": 3171,
+      "sha256": "b8498ac3c25b8c118bdb66e2287f9474229434f5bbf9e4d53782bec52841cff5"
+    },
+    {
+      "path": "docs/METHODOLOGY.md",
+      "bytes": 7247,
+      "sha256": "8d1697378618671b3bdc122518afbf39782b34871d9921a9d80ed931cacb583e"
+    },
+    {
+      "path": "docs/PAPER_READINESS.md",
+      "bytes": 2744,
+      "sha256": "931e9e782d5eee3d68252daf536812513652ac40795c768a0045c294c52fef4c"
+    },
+    {
+      "path": "docs/PDF_REQUIREMENTS_TRACEABILITY.md",
+      "bytes": 6574,
+      "sha256": "e3e97f0db24d4ba4c612a93d93bc653396282375b1745db8ee68d508d16f547d"
+    },
+    {
+      "path": "docs/RESULTS.md",
+      "bytes": 5778,
+      "sha256": "34aedb8933b25944332e427c08ede7a0bbfe5b6351f290bd8260ca146266f0c5"
+    },
+    {
+      "path": "docs/SCIENTIFIC_AUDIT_AND_PLAN.md",
+      "bytes": 37756,
+      "sha256": "d78c2a930ffe7db54046d1572f16e3a71aee4c19bed005f22d97daf7dfbef9ea"
+    },
+    {
+      "path": "docs/assets/readme-hero.webp",
+      "bytes": 52664,
+      "sha256": "8cbffa6bb94adcb320a27ba9d102adcf542e9d52aa21d659b5e1d883f8668b9d"
+    },
+    {
+      "path": "docs/assets/readme-predictive-scheduler.webp",
+      "bytes": 59882,
+      "sha256": "ee7498ea3044a151e1d2c8b9fc747bdbce76768a119a2a2bebd2fb8aa83543dc"
+    },
+    {
+      "path": "paper/PAPER_DRAFT.md",
+      "bytes": 19529,
+      "sha256": "33ef02a12e7be964673d3b44dcf24aa29098ee87ce1524521b74601f73331d22"
+    },
+    {
+      "path": "data/example/womd_trajectories.json",
+      "bytes": 47427,
+      "sha256": "b56950c0cfb81563da55f8d358d3ce167a97b73920b406a182431e70e6d11484"
+    },
+    {
+      "path": "reference/part_b_stage4/README.md",
+      "bytes": 947,
+      "sha256": "5a50776c08139589d03d99bf55e1ab2a508664f92bc9b270c91bc14f4952329e"
+    },
+    {
+      "path": "reference/part_b_stage4/selection_config.json",
+      "bytes": 936,
+      "sha256": "8b10cc70833ec7843d11cc0bb0446265ef05c5db056fd5c00af641ec0652a747"
+    },
+    {
+      "path": "reference/part_b_stage4/stage4_final_real_results.json",
+      "bytes": 7694,
+      "sha256": "306a64de6907690840db0e77dca4c0b9a3f667a20e8ebe0ccef01698646c2166"
+    },
+    {
+      "path": "reference/part_b_stage4/stage4_prediction_artifact.json",
+      "bytes": 90437,
+      "sha256": "e6c88272fe2e1e0205e9a15fff3d06b8eb6c150ecb308e824b42d7a3224a0bc4"
+    },
+    {
+      "path": "reference/part_b_stage4/stage4_reproducibility_manifest.json",
+      "bytes": 1695,
+      "sha256": "7ed995821f4325f307fbeaa0139a29bb72dc5c4abb2f51564348b8079ccf0b6a"
+    },
+    {
+      "path": "reference/part_b_stage4/stage4_selected_models.json",
+      "bytes": 2737,
+      "sha256": "d43fc9c3fbda0505d354769c79b1d04922d5e316a336b692bfb7b687d6bb9aa4"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 1854,
+      "sha256": "f46a49fbf6e2dbd58d7197e876af35bf6e3e99701d6b4cb38a931a4b1c0c26a2"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "bytes": 451,
+      "sha256": "6c4cbc9943dbff60bd372c7ff697e3935354d9b761643c0b9fc5954c2ed0ea29"
+    },
+    {
+      "path": "README.md",
+      "bytes": 11978,
+      "sha256": "32d55078f70dce07dc756a9bdd6c243344457bd597c646ba2819cdaae24e0b86"
+    },
+    {
+      "path": "README_GR.md",
+      "bytes": 14394,
+      "sha256": "3333f9e4eaffc7b774a47e60ada996ad7c0f5f7d37707861def89ed49a33dcf7"
+    },
+    {
+      "path": "Makefile",
+      "bytes": 2207,
+      "sha256": "9a53764aaaab9c5ec0984c4f3d939dd648461ac53bad84fa40d82050047721c0"
+    },
+    {
+      "path": "pyproject.toml",
+      "bytes": 776,
+      "sha256": "b01db08389f7c4abc00f499d8e45385b8ff82670327eb469978c93c97f62276c"
+    },
+    {
+      "path": "requirements.txt",
+      "bytes": 41,
+      "sha256": "fd996bbf7cfc95a2f4c61e342f15b0e1c6fbde95ca8ca311434bf33c75a9fed7"
+    },
+    {
+      "path": "requirements.lock",
+      "bytes": 63,
+      "sha256": "b2b28a60abf582592346ef1879eecc6e76774a5552e287c8772dc94a2bf24443"
+    }
+  ]
+}

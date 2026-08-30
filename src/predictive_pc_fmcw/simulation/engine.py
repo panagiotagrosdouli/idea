@@ -174,6 +174,7 @@ def run_simulation(
     delivered_by_vehicle = np.zeros(vehicles, dtype=np.int64)
     delivered_by_slot_vehicle = np.zeros((slots, vehicles), dtype=np.int64)
     delivered_bits = np.zeros(vehicles, dtype=np.float64)
+    delivered_by_class = {"urgent": 0, "bulk": 0, "best_effort": 0}
     failed_attempts = 0
     scheduled_outages = 0
     scheduled_slots = 0
@@ -188,7 +189,11 @@ def run_simulation(
 
     for relative_slot in range(slots):
         time_index = scenario.start_index + relative_slot
-        queues.add_arrivals(relative_slot, traffic.deadlines[relative_slot])
+        queues.add_arrivals(
+            relative_slot,
+            traffic.deadlines[relative_slot],
+            traffic.classes[relative_slot],
+        )
         queues.expire(relative_slot)
         current_heading = _current_heading(scenario.ego_positions_xy[: time_index + 1])
         distance, bearing = range_and_bearing(
@@ -259,6 +264,8 @@ def run_simulation(
         ]
         failed_attempts += len(failed)
         delivered_by_vehicle[vehicle] += len(successful)
+        for packet in successful:
+            delivered_by_class[packet.traffic_class] += 1
         delivered_by_slot_vehicle[relative_slot, vehicle] = len(successful)
         delivered_bits[vehicle] += len(successful) * config.link.packet_bits
         latencies.extend(
@@ -289,6 +296,16 @@ def run_simulation(
         )
         if disconnect < slots:
             undelivered_at_disconnect += int(queue_series[disconnect, vehicle])
+    urgent_generated = int(queues.class_generated["urgent"].sum())
+    urgent_dropped = int(
+        queues.class_deadline_dropped["urgent"].sum()
+        + queues.class_overflow_dropped["urgent"].sum()
+    )
+    bulk_generated = int(queues.class_generated["bulk"].sum())
+    bulk_dropped = int(
+        queues.class_deadline_dropped["bulk"].sum()
+        + queues.class_overflow_dropped["bulk"].sum()
+    )
     metrics = SimulationMetrics(
         scheduler=scheduler_name,
         scenario_id=scenario.scenario_id,
@@ -325,6 +342,18 @@ def run_simulation(
         delivered_before_expiry_ratio=delivered_before_expiry
         / max(1, eligible_before_expiry),
         undelivered_packets_at_disconnect=undelivered_at_disconnect,
+        urgent_generated_packets=urgent_generated,
+        urgent_delivered_packets=delivered_by_class["urgent"],
+        urgent_packet_delivery_ratio=(
+            delivered_by_class["urgent"] / max(1, urgent_generated)
+        ),
+        urgent_deadline_miss_ratio=urgent_dropped / max(1, urgent_generated),
+        bulk_generated_packets=bulk_generated,
+        bulk_delivered_packets=delivered_by_class["bulk"],
+        bulk_packet_delivery_ratio=(
+            delivered_by_class["bulk"] / max(1, bulk_generated)
+        ),
+        bulk_deadline_miss_ratio=bulk_dropped / max(1, bulk_generated),
         jain_fairness=jains_fairness(delivered_by_vehicle),
         demand_normalized_jain_fairness=jains_fairness(demand_service_ratio),
         mean_scheduled_snr_db=scheduled_snr_sum / max(1, scheduled_slots),

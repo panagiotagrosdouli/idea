@@ -21,7 +21,7 @@ Joint Beam/ADB project: εδώ η απόφαση είναι μόνο **ποιο 
 |---|---|
 | Trajectory → geometry → link → packets → scheduler | Υλοποιημένο |
 | Classical predictors και 10 schedulers | Υλοποιημένα |
-| Tests και scientific sanity gates | 45/45 PASS και 5/5 PASS |
+| Tests και scientific sanity gates | 51/51 PASS και 5/5 PASS |
 | Corrected synthetic benchmark | Εκτελεσμένο, 12 ανεξάρτητα episodes |
 | Compact WOMD proxy benchmark | Εκτελεσμένο, μόνο 3 scenes |
 | Official WOMD true-SDC adapter | Υλοποιημένος, αλλά λείπουν τα TFRecord shards |
@@ -68,7 +68,7 @@ flowchart TD
 | Official WOMD loader | True `sdc_track_index` και validity masks | Έτοιμος όταν δοθούν τα shards |
 | PC-FMCW constants | Supplied Part-A notebook/report | Frozen physical assumptions |
 | Optical power/SNR/channel | Reference-SNR model | Model-based, όχι measurement |
-| BER | Analytical DBPSK ή adaptive Monte Carlo LUT | Reproducible simulation |
+| BER | Analytical DBPSK ή LUT από τον Part-A FFT/DPSK receiver | Reproducible simulation |
 | Packet delivery | PER και common random numbers | Controlled paired comparison |
 
 Η τιμή `received_power_w` είναι normalized reference quantity και συνοδεύεται
@@ -84,6 +84,12 @@ Trajectory predictors:
 - optional versioned GRU checkpoint,
 - perfect-future information reference.
 
+Η uncertainty αξιολόγηση περιλαμβάνει επίσης scenario-safe Gaussian residual
+wrappers για CV και CA. Έξι controlled scenarios χρησιμοποιούνται για
+calibration της per-horizon variance και έξι διαφορετικά για NLL και
+50/90/95% empirical coverage. Είναι classical probabilistic baseline, όχι
+υποκατάστατο του trained Gaussian/GMM checkpoint που λείπει.
+
 Schedulers:
 
 - Random, Round Robin, Reactive Greedy και Proportional Fair,
@@ -97,7 +103,7 @@ Schedulers:
 
 ## Corrected αποτελέσματα
 
-Τα παρακάτω προέρχονται αποκλειστικά από `artifacts/corrected_v1/`, μετά τις
+Τα παρακάτω προέρχονται αποκλειστικά από `artifacts/corrected_v2/`, μετά τις
 διορθώσεις frame, heading, horizon, physical deadlines, outage semantics και
 clustered inference.
 
@@ -122,16 +128,20 @@ benchmark. Αντίθετα, το P95 latency χειροτερεύει κατά 
 | Link Lifetime | 1.056 | 0.299 | 400.0 |
 | Oracle-information | 1.056 | 0.299 | 400.0 |
 
-Το αποτέλεσμα είναι αρνητικό και παραμένει στο repository. Το two-seed staged
-diagnostic βρίσκει επίσης αλλαγές προσήμου ανά load, deadline, horizon, channel
-και sensing assumption. Η σωστή υπόθεση του paper δεν είναι «prediction always
-wins», αλλά «πότε και υπό ποιες συνθήκες βοηθά η prediction;».
+Το αποτέλεσμα είναι αρνητικό και παραμένει στο repository. Το πλήρες staged
+run έχει **1.125 policy episodes** (45 settings × 5 seeds × 5 policies) και
+βρίσκει αλλαγές προσήμου ανά load, deadline, horizon, channel, sensing και
+traffic class. Για παράδειγμα, το Link Lifetime − Reactive είναι +0,139 Mbps
+σε deadline 0,5 s, αλλά −0,232 Mbps σε 0,05–0,1 s και −0,136 Mbps σε
+urgent/bulk traffic. Καμία οικογένεια συγκρίσεων δεν περνά Holm correction με
+μόνο πέντε seeds. Η σωστή υπόθεση δεν είναι «prediction always wins», αλλά
+«πότε και υπό ποιες συνθήκες βοηθά η prediction;».
 
-![Corrected benchmark](artifacts/corrected_v1/figures/corrected_benchmark_tradeoff.png)
+![Corrected benchmark](artifacts/corrected_v2/figures/corrected_benchmark_tradeoff.png)
 
 ## Έγγραφα για διάβασμα
 
-- [`output/pdf/predictive_pc_fmcw_corrected_research_draft.pdf`](output/pdf/predictive_pc_fmcw_corrected_research_draft.pdf): το εξασελίδο corrected research draft.
+- [`output/pdf/predictive_pc_fmcw_corrected_research_draft.pdf`](output/pdf/predictive_pc_fmcw_corrected_research_draft.pdf): το corrected research draft.
 - [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md): το μοντέλο, οι εξισώσεις και το experimental protocol.
 - [`docs/RESULTS.md`](docs/RESULTS.md): αποτελέσματα, paired statistics και αρνητικά ευρήματα.
 - [`docs/PDF_REQUIREMENTS_TRACEABILITY.md`](docs/PDF_REQUIREMENTS_TRACEABILITY.md): απαίτηση-προς-κώδικα/τεστ/artifact αντιστοίχιση.
@@ -168,7 +178,7 @@ make lint
 make validate
 ```
 
-Αναμενόμενο αποτέλεσμα: 45 tests και όλα τα scientific gates σε `PASS`.
+Αναμενόμενο αποτέλεσμα: 51 tests και όλα τα scientific gates σε `PASS`.
 
 ## Αναπαραγωγή των corrected artifacts
 
@@ -180,15 +190,18 @@ make corrected-quick
 
 Δημιουργεί νέο, ανεξάρτητο run directory με:
 
-- adaptive DBPSK BER LUT από −5 έως 25 dB,
+- DBPSK BER LUT από −5 έως 25 dB με τον supplied Part-A
+  FFT-carrier/DPSK receiver και confidence bounds,
 - controlled και compact-WOMD proxy benchmarks,
 - motion/link forecast metrics,
 - traffic/channel/noise ablations,
-- 430-row two-seed staged diagnostic,
+- urgent/bulk deadline-traffic study,
+- 1.125-row five-seed staged experiment στο full run,
 - mobility/FoV scenario slices,
 - CSV, JSON, LaTeX, figures και run manifest.
 
-Για πέντε staged seeds και όλα τα ablation episodes:
+Το repository περιέχει ήδη το ολοκληρωμένο five-seed run στο
+`artifacts/corrected_v2/`. Για αναπαραγωγή:
 
 ```bash
 make corrected-full
@@ -249,7 +262,7 @@ src/predictive_pc_fmcw/       core library
 configs/                      frozen assumptions και experiment designs
 scripts/                      numbered and one-command runners
 tests/                        deterministic scientific regressions
-artifacts/corrected_v1/       post-audit reproduced evidence
+artifacts/corrected_v2/       full post-audit reproduced evidence
 paper/                        current manuscript source
 docs/                         methods, provenance, results και traceability
 reference/                    supplied Part-A και Stage-4 provenance
@@ -266,7 +279,7 @@ reference/                    supplied Part-A και Stage-4 provenance
 - Τα no-outage horizons και τα packets που μένουν στην ουρά καταγράφονται ως
   censoring, δεν εξαφανίζονται.
 - Το sensing noise δηλώνεται ως synthetic assumption, όχι sensor measurement.
-- Τα παλιά pre-fix artifacts δεν αναμειγνύονται με τα `corrected_v1` results.
+- Τα παλιά/quick artifacts δεν αναμειγνύονται με τα `corrected_v2` results.
 
 ## Τεκμηρίωση
 

@@ -38,6 +38,9 @@ class ForecastMetricRow:
     outage_auroc: float
     link_lifetime_error_steps: float
     link_lifetime_error_s: float
+    predicted_link_lifetime_s: float
+    actual_link_lifetime_s: float
+    actual_link_lifetime_censored: bool
     outage_positive_steps: int
 
 
@@ -175,6 +178,15 @@ def _rows_for_forecast(
                 link_lifetime_error_s=float(
                     abs(predicted_lifetime[vehicle] - actual_lifetime[vehicle])
                     * scenario.dt_s
+                ),
+                predicted_link_lifetime_s=float(
+                    predicted_lifetime[vehicle] * scenario.dt_s
+                ),
+                actual_link_lifetime_s=float(
+                    actual_lifetime[vehicle] * scenario.dt_s
+                ),
+                actual_link_lifetime_censored=bool(
+                    actual_lifetime[vehicle] >= predicted.shape[1]
                 ),
                 outage_positive_steps=int(np.count_nonzero(true_outage)),
             )

@@ -8,6 +8,7 @@
     "slot_duration_s": [0.05, 0.1, 0.2],
     "vehicles": [3, 5, 10],
     "traffic_model": ["poisson", "periodic", "markov_modulated", "saturated"],
+    "traffic_class_mode": ["single", "urgent_bulk"],
     "packet_bits": [2400, 9600, 12000],
     "deadline_s": [0.05, 0.1, 0.25, 0.5, 1.0],
     "reference_snr_offset_db": [-6, -3, 0, 3, 6],

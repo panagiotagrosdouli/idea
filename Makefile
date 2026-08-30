@@ -59,17 +59,17 @@ staged:
 
 corrected-quick:
 	PYTHONPATH=src python scripts/run_corrected_pipeline.py --quick \
-		--output artifacts/corrected_v1
+		--output artifacts/corrected_v2_quick
 
 corrected-full:
 	PYTHONPATH=src python scripts/run_corrected_pipeline.py \
-		--output artifacts/corrected_v1_full
+		--output artifacts/corrected_v2
 
 paper-draft:
 	PYTHONPATH=src python scripts/build_paper_pdf.py
 
 reproducibility:
 	PYTHONPATH=src python scripts/build_reproducibility_manifest.py \
-		--output artifacts/corrected_v1/reproducibility_manifest.json
+		--output artifacts/corrected_v2/reproducibility_manifest.json
 
 reproduce: test lint corrected-quick paper-draft reproducibility

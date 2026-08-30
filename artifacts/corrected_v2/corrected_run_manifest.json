@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "config": "configs/default.json",
+  "output": "artifacts/corrected_v2",
+  "quick_diagnostic": false,
+  "official_womd_used": false,
+  "learned_checkpoint_used": false,
+  "classical_gaussian_calibration_used": true,
+  "measured_optical_channel_used": false,
+  "part_a_notebook_receiver_lut_used": true,
+  "notes": [
+    "Compact WOMD uses proxy ego and model-based communication.",
+    "Staged controlled studies use five independent seeds.",
+    "Existing artifacts outside this directory are not mixed into this run."
+  ]
+}

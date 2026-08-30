@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "distance_monotonic": true,
+  "pointing_monotonic": true,
+  "ber_monotonic": true,
+  "causal_forecast_invariant": true,
+  "oracle_forecast_sensitive": true
+}

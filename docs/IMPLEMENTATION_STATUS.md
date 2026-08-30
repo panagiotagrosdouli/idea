@@ -1,57 +1,55 @@
 # Exact implementation status
 
-## What was changed in corrected-v1
+## Implemented and executed in `corrected_v2`
 
-| Area | Concrete change | Verification |
+| Area | Concrete implementation | Verification |
 |---|---|---|
-| Coordinate frame | Explicit ego heading in link-aware loss | Rotation-invariance test |
-| Heading | Last valid direction persists while stationary | Regression test |
-| Horizon | All forecasts truncate at record end | Tail-horizon test |
-| Time units | Duration, deadlines and horizon represented in seconds | Slot-invariance tests |
-| Power | Relative power separated from calibration flag | Link tests |
-| Outage | BER/PER/goodput modes stored and selectable | Semantic tests |
-| BER LUT | −5…25 dB adaptive bits and upper confidence bound | Theory tracking test |
-| Traffic | Saturated mode and physical deadlines | Reproducibility tests |
-| PF baseline | Normalized current rate / past service | Policy integration tests |
-| Lifetime utility | Dimensionless horizon normalization | Scale-invariance test |
-| Metrics | P50/P99, censoring, scheduled link state, demand fairness | End-to-end tests |
-| Statistics | Cluster aggregation, metric direction and Holm | Exact stats tests |
-| Slices | Motion/FoV regime classifier | Actor-coverage test |
-| Sensing | Cartesian and range/bearing AR(1) assumptions | Reproducibility test |
-| Official WOMD | True-SDC, vehicle and valid-state adapter | Schema fixture test |
-| GRU | Four objectives, smooth FoV, frame-correct loss, dropout | Loss tests |
-| Checkpoint | Feature schema and dataset hash enforcement | Invalid schema rejected by design |
-| Experiments | One-axis staged design and corrected run isolation | 430 rows generated |
-| Documentation | Beginner README, methods, results, traceability, paper | Files regenerated |
+| Causality | history-only predictor API and forecast/evaluation separation | future-mutation + H=0 tests |
+| Coordinate frame | ego heading in geometry and link-aware loss | rotation/heading tests |
+| Physical time | seconds for duration, horizon and deadlines | slot-invariance tests |
+| Part-A receiver | chirp generation, FFT-carrier extraction, refinement, phase compensation and differential DPSK decisions | notebook-receiver BER tests |
+| BER confidence | adaptive Monte Carlo, Wilson upper bound, conservative monotone LUT | BER monotonicity tests |
+| Channel semantics | normalized power and explicit calibration flag | link tests and manifest |
+| Outage | BER/PER/goodput modes | semantic tests and staged study |
+| Traffic | Poisson, periodic, bursty, saturated, urgent/bulk deadlines | reproducibility and class tests |
+| Schedulers | Random, RR, Reactive, PF, CV, Kalman, IMM, Utility, Lifetime, Oracle | policy tests and benchmarks |
+| Metrics | goodput/PDR, P50/P95/P99, class misses, censoring, fairness, scheduled link state | end-to-end tests |
+| Statistics | paired clusters, bootstrap, direction-aware tests and Holm | exact statistical tests |
+| Sensing | perfect, Cartesian and range/bearing AR(1) assumptions | deterministic tests |
+| Official WOMD | true SDC, vehicle filtering and validity masks | fixture tests |
+| Learning | GRU plus trajectory/link/outage/full losses and checkpoint schema | loss/schema tests |
+| Probabilistic baseline | per-horizon residual Gaussian CV/CA calibration on disjoint scenarios | NLL/coverage tests and figure |
+| Artifacts | tables, architecture, traces, distributions, calibration, failures and complexity | regenerated figures/CSV/JSON/PDF |
 
-## Executed now
+## Executed evidence
 
-- 45/45 automated tests;
-- lint and compile checks;
-- five scientific validation gates;
-- 31-point adaptive DBPSK LUT;
-- 120 controlled policy episodes across 12 scenarios and 10 policies;
-- synthetic and compact-proxy forecast evaluation;
-- 42 quick ablation episodes;
-- 430 staged diagnostic policy episodes;
-- exact CSV/JSON/LaTeX and ten corrected result figures.
+- 51/51 tests, lint, compilation and 5/5 scientific gates;
+- 31-point Part-A receiver BER LUT from -5 to 25 dB;
+- 120 controlled policy episodes (12 scenarios × 10 policies);
+- synthetic and compact-proxy motion/link evaluation;
+- full paper ablations;
+- 1,125 staged rows (45 settings × 5 seeds × 5 policies);
+- 12 study axes including urgent/bulk traffic;
+- CPU complexity diagnostics for five predictors and ten schedulers;
+- analytical GRU parameter count: 169,620 parameters.
 
-## Implemented but not executable with supplied inputs
+## Implemented but not executed with the supplied inputs
 
 - official-WOMD TFRecord export and true-SDC training samples;
-- 4 objectives × 3+ seeds GRU training;
-- learned checkpoint evaluation in the scheduler.
+- four GRU objectives over three or more training seeds;
+- compatible learned-checkpoint evaluation in the packet scheduler.
 
-These require external WOMD shards and PyTorch. The supplied Stage-4 JSON files
-are reports only and cannot replace the missing checkpoint.
+The Stage-4 artifact contains 70 causal predicted trajectories but no model
+weights and no paired future ground truth. It cannot substitute for a trained
+checkpoint or a held-out dataset.
 
-## Not done because evidence does not exist
+## Not completed because the evidence does not exist
 
-- measured PC-FMCW vehicular channel validation;
-- calibrated absolute received power;
 - official full-WOMD held-out results;
-- successful communication-aware learned result;
-- exact offline scheduling upper bound;
-- final venue-formatted, author-complete submission.
+- probabilistic learned calibration results;
+- measured optical-channel validation or calibrated absolute received power;
+- learned GRU runtime on this machine;
+- final author/venue-formatted submission.
 
-No item in this final section is claimed elsewhere in the repository.
+These are reported as blockers and are not silently replaced by synthetic
+claims.

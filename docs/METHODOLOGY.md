@@ -86,9 +86,15 @@ PER=1-(1-P_b)^L,\qquad
 G=R_b(1-PER).
 ```
 
-The alternative Monte Carlo LUT uses differential encoding/detection, adaptive
-bit counts, an error target and Wilson 95% upper bounds for zero-error points.
-The generated grid covers −5 to 25 dB.
+The primary Monte Carlo LUT follows the supplied Part-A implementation: it
+constructs the PC-FMCW chirp, detects the carrier using the receiver FFT,
+applies parabolic sub-bin refinement and rotation compensation, and then makes
+differential phase decisions. Its horizontal axis is explicitly
+waveform-sample SNR rather than silently relabeled `Eb/N0`. Adaptive bit counts,
+an error target and one-sided Wilson 95% upper bounds handle zero-error points;
+a conservative monotone envelope is used by the packet model. The generated
+grid covers −5 to 25 dB. The analytical DBPSK path remains an explicit
+ablation.
 
 Outage is explicitly selectable as BER-, PER- or goodput-based. All three flags
 are stored, even when only one drives the scheduler.
@@ -96,9 +102,11 @@ are stored, even when only one drives the scheduler.
 ## 5. Traffic and packet simulation
 
 The simulator supports Poisson, periodic, Markov-modulated and saturated
-traffic. Every packet has a physical deadline in seconds; deadline slots are
-derived after the slot duration is selected. Physical episode duration is also
-fixed in seconds, preventing slot-size sweeps from changing the simulated time.
+traffic. It can use one best-effort class or an urgent/bulk mixture with
+separate physical deadlines and class-level PDR/miss metrics. Deadline slots
+are derived only after the slot duration is selected. Physical episode duration
+is also fixed in seconds, preventing slot-size sweeps from changing the
+simulated time.
 
 All policies in a paired episode share arrivals, deadlines and packet-success
 uniform random values. Failed transmissions return packets to the FIFO queue.
@@ -176,5 +184,6 @@ SNR/BER/PER/relative power and switching count.
 
 Policy comparisons are paired and direction-aware. Resampling and tests operate
 at independent scenario/seed-cluster level, not at every correlated Cartesian
-row. Wilcoxon families receive Holm correction. Two-seed outputs are labelled
-diagnostic and cannot support final inference.
+row. Wilcoxon families receive Holm correction. The completed staged study uses
+five seeds and 1,125 policy episodes; its rank tests still have limited
+resolution and are not substituted for official-WOMD held-out inference.
