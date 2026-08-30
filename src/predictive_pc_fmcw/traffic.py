@@ -15,12 +15,14 @@ class Packet:
     vehicle: int
     arrival_slot: int
     deadline_slot: int
+    traffic_class: str = "best_effort"
 
 
 @dataclass(frozen=True)
 class TrafficTrace:
     arrivals: NDArray[np.int64]
     deadlines: tuple[tuple[tuple[int, ...], ...], ...]
+    classes: tuple[tuple[tuple[str, ...], ...], ...]
     success_uniforms: NDArray[np.float64]
 
 
@@ -72,24 +74,41 @@ def generate_traffic_trace(
         base_deadline_slots = config.deadline_slots
         jitter_slots = config.deadline_jitter_slots
     deadline_rows: list[tuple[tuple[int, ...], ...]] = []
+    class_rows: list[tuple[tuple[str, ...], ...]] = []
     for slot in range(slots):
         vehicle_rows: list[tuple[int, ...]] = []
+        vehicle_classes: list[tuple[str, ...]] = []
         for vehicle in range(vehicles):
             count = int(arrivals[slot, vehicle])
-            jitter = rng.integers(
-                -jitter_slots,
-                jitter_slots + 1,
-                size=count,
-            )
-            deadlines = slot + np.maximum(1, base_deadline_slots + jitter)
+            if config.traffic_class_mode == "urgent_bulk":
+                urgent = rng.random(count) < config.urgent_fraction
+                classes = np.where(urgent, "urgent", "bulk")
+                urgent_slots = max(
+                    1, int(round(config.urgent_deadline_s / slot_duration_s))
+                )
+                bulk_slots = max(
+                    1, int(round(config.bulk_deadline_s / slot_duration_s))
+                )
+                deadlines = slot + np.where(urgent, urgent_slots, bulk_slots)
+            else:
+                jitter = rng.integers(
+                    -jitter_slots,
+                    jitter_slots + 1,
+                    size=count,
+                )
+                deadlines = slot + np.maximum(1, base_deadline_slots + jitter)
+                classes = np.full(count, "best_effort")
             vehicle_rows.append(tuple(int(value) for value in deadlines))
+            vehicle_classes.append(tuple(str(value) for value in classes))
         deadline_rows.append(tuple(vehicle_rows))
+        class_rows.append(tuple(vehicle_classes))
     success_uniforms = rng.random(
         (slots, vehicles, max(1, nominal_capacity_packets)), dtype=np.float64
     )
     return TrafficTrace(
         arrivals=arrivals.astype(np.int64),
         deadlines=tuple(deadline_rows),
+        classes=tuple(class_rows),
         success_uniforms=success_uniforms,
     )
 
@@ -138,21 +157,53 @@ class PacketQueues:
         self.generated = np.zeros(vehicles, dtype=np.int64)
         self.overflow_dropped = np.zeros(vehicles, dtype=np.int64)
         self.deadline_dropped = np.zeros(vehicles, dtype=np.int64)
+        self.class_generated = {
+            name: np.zeros(vehicles, dtype=np.int64)
+            for name in ("urgent", "bulk", "best_effort")
+        }
+        self.class_overflow_dropped = {
+            name: np.zeros(vehicles, dtype=np.int64)
+            for name in self.class_generated
+        }
+        self.class_deadline_dropped = {
+            name: np.zeros(vehicles, dtype=np.int64)
+            for name in self.class_generated
+        }
         self._next_packet_id = 0
 
-    def add_arrivals(self, slot: int, deadlines: tuple[tuple[int, ...], ...]) -> None:
-        for vehicle, vehicle_deadlines in enumerate(deadlines):
+    def add_arrivals(
+        self,
+        slot: int,
+        deadlines: tuple[tuple[int, ...], ...],
+        classes: tuple[tuple[str, ...], ...] | None = None,
+    ) -> None:
+        class_rows = classes or tuple(
+            tuple("best_effort" for _ in row) for row in deadlines
+        )
+        for vehicle, (vehicle_deadlines, vehicle_classes) in enumerate(
+            zip(deadlines, class_rows, strict=True)
+        ):
+            if len(vehicle_deadlines) != len(vehicle_classes):
+                raise ValueError("Traffic classes must align with packet deadlines.")
             self.generated[vehicle] += len(vehicle_deadlines)
+            for traffic_class in vehicle_classes:
+                self.class_generated[traffic_class][vehicle] += 1
             available = max(0, self.max_packets - len(self.queues[vehicle]))
             accepted = vehicle_deadlines[:available]
+            accepted_classes = vehicle_classes[:available]
             self.overflow_dropped[vehicle] += len(vehicle_deadlines) - len(accepted)
-            for deadline in accepted:
+            for traffic_class in vehicle_classes[available:]:
+                self.class_overflow_dropped[traffic_class][vehicle] += 1
+            for deadline, traffic_class in zip(
+                accepted, accepted_classes, strict=True
+            ):
                 self.queues[vehicle].append(
                     Packet(
                         packet_id=self._next_packet_id,
                         vehicle=vehicle,
                         arrival_slot=slot,
                         deadline_slot=int(deadline),
+                        traffic_class=traffic_class,
                     )
                 )
                 self._next_packet_id += 1
@@ -164,6 +215,7 @@ class PacketQueues:
                 packet = queue.popleft()
                 if packet.deadline_slot < slot:
                     self.deadline_dropped[vehicle] += 1
+                    self.class_deadline_dropped[packet.traffic_class][vehicle] += 1
                 else:
                     kept.append(packet)
             self.queues[vehicle] = kept

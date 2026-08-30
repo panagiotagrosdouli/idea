@@ -1,0 +1,69 @@
+\begin{table}[t]
+\centering
+\caption{Communication scheduling results.}
+\begin{tabular}{lrrrrrr}
+\toprule
+Policy & Goodput & PDR & P95 latency & Before expiry & Undelivered & Jain \\
+\midrule
+cv\_predictive & 2.305 & 0.647 & 948.7 & 0.802 & 57.7 & 0.563 \\
+imm\_predictive & 2.307 & 0.648 & 948.7 & 0.803 & 57.2 & 0.563 \\
+kalman\_predictive & 2.305 & 0.647 & 933.3 & 0.802 & 57.2 & 0.563 \\
+link\_lifetime & 2.307 & 0.648 & 968.3 & 0.803 & 54.2 & 0.566 \\
+oracle & 2.308 & 0.648 & 968.3 & 0.803 & 54.2 & 0.566 \\
+predictive\_utility & 2.306 & 0.648 & 965.4 & 0.802 & 57.7 & 0.564 \\
+proportional\_fair & 1.094 & 0.307 & 1214.6 & 0.387 & 49.8 & 0.569 \\
+random & 1.808 & 0.508 & 1291.7 & 0.635 & 48.9 & 0.614 \\
+reactive\_greedy & 2.293 & 0.644 & 699.6 & 0.801 & 49.8 & 0.536 \\
+round\_robin & 1.991 & 0.560 & 1183.3 & 0.699 & 48.4 & 0.605 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Motion and derived-link forecast errors.}
+\begin{tabular}{lrrrrrrr}
+\toprule
+Predictor & ADE & FDE & Range MAE & SNR MAE & F1 & AUROC & Lifetime MAE \\
+\midrule
+constant\_acceleration & 0.028 & 0.078 & 0.006 & 0.002 & 1.000 & 1.000 & 0.000 \\
+constant\_velocity & 0.087 & 0.216 & 0.042 & 0.031 & 0.999 & 0.992 & 0.003 \\
+imm & 0.176 & 0.288 & 0.095 & 0.053 & 0.998 & 0.983 & 0.006 \\
+kalman\_cv & 0.352 & 0.586 & 0.185 & 0.083 & 0.998 & 0.983 & 0.010 \\
+last\_position & 1.711 & 3.108 & 1.629 & 0.698 & 0.979 & 0.500 & 0.099 \\
+oracle & 0.000 & 0.000 & 0.000 & 0.000 & 1.000 & 1.000 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Paper ablation summary.}
+\begin{tabular}{lrrrrr}
+\toprule
+Ablation & Goodput & PDR & Deadline miss & Before expiry & Undelivered \\
+\midrule
+cv\_predictor & 2.305 & 0.647 & 0.298 & 0.802 & 57.7 \\
+forecast\_error\_0\_5m & 2.306 & 0.648 & 0.298 & 0.802 & 55.0 \\
+forecast\_error\_1m & 2.302 & 0.646 & 0.300 & 0.802 & 53.4 \\
+forecast\_error\_2m & 2.271 & 0.638 & 0.305 & 0.790 & 51.6 \\
+full\_channel & 2.307 & 0.648 & 0.297 & 0.803 & 54.2 \\
+history\_noise\_0\_5m & 2.310 & 0.648 & 0.296 & 0.809 & 48.8 \\
+history\_noise\_1m & 2.290 & 0.643 & 0.303 & 0.802 & 52.3 \\
+history\_noise\_2m & 2.280 & 0.640 & 0.306 & 0.799 & 49.3 \\
+imm\_predictor & 2.307 & 0.648 & 0.298 & 0.803 & 57.2 \\
+kalman\_predictor & 2.305 & 0.647 & 0.298 & 0.802 & 57.2 \\
+link\_lifetime & 2.307 & 0.648 & 0.297 & 0.803 & 54.2 \\
+markov\_traffic & 2.164 & 0.613 & 0.320 & 0.778 & 72.8 \\
+no\_fairness\_term & 2.320 & 0.651 & 0.300 & 0.807 & 58.8 \\
+no\_link\_lifetime\_urgency & 2.306 & 0.648 & 0.298 & 0.802 & 57.7 \\
+no\_prediction & 2.293 & 0.644 & 0.308 & 0.801 & 49.8 \\
+part\_a\_ber\_lut & 1.681 & 0.473 & 0.462 & 0.743 & 97.9 \\
+perfect\_future & 2.308 & 0.648 & 0.298 & 0.803 & 54.2 \\
+periodic\_traffic & 2.352 & 0.664 & 0.299 & 0.826 & 77.6 \\
+range\_only\_channel & 2.737 & 0.769 & 0.186 & 0.857 & 34.0 \\
+range\_pointing\_channel & 2.654 & 0.746 & 0.206 & 0.850 & 39.7 \\
+trajectory\_predictive & 2.306 & 0.648 & 0.298 & 0.802 & 57.7 \\
+\bottomrule
+\end{tabular}
+\end{table}

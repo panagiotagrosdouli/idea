@@ -1,0 +1,22 @@
+\begin{tabular}{llrrr}
+\toprule
+Component & Kind & Parameters & Median $\mu$s & P95 $\mu$s \\
+\midrule
+last\_position & trajectory\_predictor & 0 & 1.82 & 4.88 \\
+constant\_velocity & trajectory\_predictor & 0 & 6.40 & 11.60 \\
+constant\_acceleration & trajectory\_predictor & 0 & 17.53 & 33.58 \\
+kalman\_cv & trajectory\_predictor & 0 & 976.42 & 2919.68 \\
+imm & trajectory\_predictor & 0 & 1028.68 & 3435.22 \\
+random & scheduler & 0 & 5.31 & 5.71 \\
+round\_robin & scheduler & 0 & 2.01 & 2.10 \\
+reactive\_greedy & scheduler & 0 & 9.71 & 16.92 \\
+proportional\_fair & scheduler & 0 & 13.29 & 14.56 \\
+cv\_predictive & scheduler & 0 & 29.25 & 61.37 \\
+kalman\_predictive & scheduler & 0 & 29.06 & 43.50 \\
+imm\_predictive & scheduler & 0 & 29.55 & 65.74 \\
+predictive\_utility & scheduler & 0 & 29.46 & 63.77 \\
+link\_lifetime & scheduler & 0 & 37.79 & 53.02 \\
+oracle & scheduler & 0 & 37.99 & 71.41 \\
+gru\_128x2\_analytical\_count & learned\_predictor\_unexecuted & 169620 & nan & nan \\
+\bottomrule
+\end{tabular}

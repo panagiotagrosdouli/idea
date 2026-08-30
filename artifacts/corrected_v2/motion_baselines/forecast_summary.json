@@ -1,0 +1,74 @@
+{
+  "constant_acceleration": {
+    "samples": 1440,
+    "ade_m": 0.02781269322099959,
+    "fde_m": 0.07792716951722761,
+    "range_mae_m": 0.006126817093877236,
+    "bearing_mae_deg": 0.019760625841724798,
+    "snr_mae_db": 0.0021198122257794394,
+    "outage_f1": 1.0,
+    "outage_auroc": 1.0,
+    "link_lifetime_error_steps": 0.0,
+    "link_lifetime_error_s": 0.0
+  },
+  "constant_velocity": {
+    "samples": 1440,
+    "ade_m": 0.0874436409475181,
+    "fde_m": 0.21558121004399033,
+    "range_mae_m": 0.042486761442841664,
+    "bearing_mae_deg": 0.05161426182678083,
+    "snr_mae_db": 0.03067658069823092,
+    "outage_f1": 0.9993518518518518,
+    "outage_auroc": 0.9920977011494254,
+    "link_lifetime_error_steps": 0.002777777777777778,
+    "link_lifetime_error_s": 0.0002777777777777768
+  },
+  "imm": {
+    "samples": 1440,
+    "ade_m": 0.17564398151046884,
+    "fde_m": 0.287732211546536,
+    "range_mae_m": 0.09478657940557211,
+    "bearing_mae_deg": 0.10318025634167734,
+    "snr_mae_db": 0.05287372275301226,
+    "outage_f1": 0.9984276217609551,
+    "outage_auroc": 0.9834770114942529,
+    "link_lifetime_error_steps": 0.005555555555555556,
+    "link_lifetime_error_s": 0.0005555555555555536
+  },
+  "kalman_cv": {
+    "samples": 1440,
+    "ade_m": 0.3520600839023829,
+    "fde_m": 0.5859964526651623,
+    "range_mae_m": 0.18455312337858787,
+    "bearing_mae_deg": 0.21100424728312758,
+    "snr_mae_db": 0.08268918402422623,
+    "outage_f1": 0.9975149125374875,
+    "outage_auroc": 0.9834770114942529,
+    "link_lifetime_error_steps": 0.010416666666666666,
+    "link_lifetime_error_s": 0.001041666666666663
+  },
+  "last_position": {
+    "samples": 1440,
+    "ade_m": 1.7109467492390833,
+    "fde_m": 3.108074921753547,
+    "range_mae_m": 1.6285590799833896,
+    "bearing_mae_deg": 0.600920245849389,
+    "snr_mae_db": 0.697728211826582,
+    "outage_f1": 0.9792481123895597,
+    "outage_auroc": 0.5,
+    "link_lifetime_error_steps": 0.09930555555555555,
+    "link_lifetime_error_s": 0.00993055555555552
+  },
+  "oracle": {
+    "samples": 1440,
+    "ade_m": 0.0,
+    "fde_m": 0.0,
+    "range_mae_m": 0.0,
+    "bearing_mae_deg": 0.0,
+    "snr_mae_db": 0.0,
+    "outage_f1": 1.0,
+    "outage_auroc": 1.0,
+    "link_lifetime_error_steps": 0.0,
+    "link_lifetime_error_s": 0.0
+  }
+}

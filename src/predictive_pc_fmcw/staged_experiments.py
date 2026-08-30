@@ -90,6 +90,19 @@ def _staged_settings(
                 replace(base, traffic=replace(base.traffic, model=model)),
             )
         )
+    for class_mode in ("single", "urgent_bulk"):
+        settings.append(
+            (
+                "traffic_class",
+                f"classes={class_mode}",
+                replace(
+                    base,
+                    traffic=replace(
+                        base.traffic, traffic_class_mode=class_mode
+                    ),
+                ),
+            )
+        )
     for packet_bits in (2_400, 9_600, 12_000):
         settings.append(
             (
@@ -197,6 +210,9 @@ def run_staged_experiments(
                         "slot_duration_s": current.slot_duration_s,
                         "offered_load": current.traffic.offered_load,
                         "traffic_model": current.traffic.model,
+                        "traffic_class_mode": (
+                            current.traffic.traffic_class_mode
+                        ),
                         "packet_bits": current.link.packet_bits,
                         "deadline_s": current.traffic.deadline_s,
                         "reference_snr_db": current.link.reference_snr_db,

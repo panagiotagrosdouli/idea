@@ -1,0 +1,17 @@
+component,kind,parameters,median_runtime_us,p95_runtime_us,repeats,entities,horizon_steps
+last_position,trajectory_predictor,0,1.823,4.879949999999999,200,6,10
+constant_velocity,trajectory_predictor,0,6.4,11.59855,200,6,10
+constant_acceleration,trajectory_predictor,0,17.5315,33.57614999999996,200,6,10
+kalman_cv,trajectory_predictor,0,976.4175,2919.680049999994,200,6,10
+imm,trajectory_predictor,0,1028.681,3435.2241,200,6,10
+random,scheduler,0,5.308,5.709999999999999,200,5,10
+round_robin,scheduler,0,2.013,2.103,200,5,10
+reactive_greedy,scheduler,0,9.714,16.920049999999996,200,5,10
+proportional_fair,scheduler,0,13.295,14.558549999999995,200,5,10
+cv_predictive,scheduler,0,29.254,61.36755,200,5,10
+kalman_predictive,scheduler,0,29.064,43.49744999999999,200,5,10
+imm_predictive,scheduler,0,29.555,65.74104999999999,200,5,10
+predictive_utility,scheduler,0,29.4645,63.774849999999915,200,5,10
+link_lifetime,scheduler,0,37.786500000000004,53.016049999999986,200,5,10
+oracle,scheduler,0,37.9925,71.41499999999999,200,5,10
+gru_128x2_analytical_count,learned_predictor_unexecuted,169620,nan,nan,0,6,10

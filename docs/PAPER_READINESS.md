@@ -2,53 +2,58 @@
 
 ## Verdict
 
-The repository is now a tested, reproducible research prototype and an honest
-draft-paper package. It is **not yet a submission-ready empirical paper**.
+The repository is a reproducible, paper-oriented research prototype with a
+complete controlled experiment. It is **not yet a submission-ready empirical
+paper** because the official data and learned-model evidence requested by the
+plans are unavailable.
 
-## Completed
+## Completed and executed
 
-- 44 deterministic tests and five scientific gates;
-- corrected frame, heading, horizon and physical-time handling;
-- explicit BER/PER/goodput outage semantics and normalized-power labeling;
-- packet censoring, expanded KPIs and clustered direction-aware statistics;
-- classical predictors, ten schedulers and true-SDC official-WOMD adapter;
-- adaptive BER LUT with confidence handling;
-- scenario slices and staged load/horizon/traffic/channel/sensing design;
-- communication-aware four-objective multi-seed training infrastructure;
-- corrected synthetic, compact proxy, ablation and 430-row diagnostic artifacts;
-- beginner README, figures, tables, provenance and manuscript source.
+- 51 deterministic tests and five scientific gates;
+- a notebook-derived Part-A FFT-carrier/DPSK BER receiver and confidence-aware
+  LUT;
+- causal motion → geometry → link → packet → scheduler execution;
+- classical predictors, ten schedulers, urgent/bulk traffic, censoring and
+  boundary-sensitive link metrics;
+- a controlled 12-episode benchmark and compact three-scene proxy integration;
+- scenario-safe classical Gaussian CV/CA calibration on disjoint controlled
+  scenarios;
+- 12 one-axis studies, five independent seeds and 1,125 policy episodes;
+- clustered paired statistics, bootstrap intervals and Holm correction;
+- architecture, timeline, BER, ECDF, Pareto, lifetime, failure-case and
+  complexity artifacts;
+- English/Greek README, methods/results docs, traceability and paper PDF.
 
-## Empirical blockers
+## Remaining blockers
 
-| Blocker | Why it matters |
+| Blocker | Consequence |
 |---|---|
-| Official WOMD v1.3.0 shards absent | No true-SDC large held-out evaluation |
-| Compatible checkpoint absent | No learned or communication-aware result |
-| PyTorch absent in executed runtime | Training path not smoke-run here |
-| Measured/calibrated optical link absent | No absolute power or real-channel claim |
-| Only two staged quick seeds executed | Operating-region results are diagnostic |
-| Author/venue metadata absent | Manuscript cannot be submitted as-is |
+| Official WOMD shards absent | no true-SDC, large held-out evaluation |
+| Compatible learned checkpoint absent | no learned/communication-aware comparison |
+| Supplied Stage-4 JSON lacks paired ground truth | no honest ADE/FDE or probabilistic calibration from those 70 forecasts |
+| Measured/calibrated optical link absent | no absolute-power or real-channel claim |
+| Authors/venue metadata absent | draft cannot be submitted as-is |
 
-## Current evidence verdict
+PyTorch is optional for the executed classical experiment, but it is required
+to train the GRU ablation once the official samples are present.
 
-The corrected 12-episode benchmark shows a small, uncertain goodput difference
-and a clear tail-latency penalty. The explicit lifetime-weight ablation is null
-at the default operating point. The compact proxy result is negative. These are
-valid outcomes and replace the earlier stronger provisional story.
+## Evidence verdict
+
+The default 12-episode benchmark gives a small uncertain goodput difference
+(+0.014 Mbps, bootstrap 95% interval -0.0319 to +0.0593 Mbps) and a clear
+269 ms P95 latency penalty. The compact proxy result is negative. The full
+five-seed staged study exposes conditional positive and negative regions, but
+none of the cited families survives Holm correction with only five pairs.
+
+The strongest defensible claim is therefore:
+
+> Causal future motion changes packet-scheduling trade-offs, but the value of
+> link-lifetime urgency is conditional on deadline, load, channel and traffic
+> class; a universal communication gain is not supported.
 
 ## Submission gate
 
-Before submission:
-
-1. attach/fetch and hash official WOMD shards;
-2. build frozen scenario-safe train/development/test samples with true SDC;
-3. install PyTorch and run four objectives for at least three seeds;
-4. evaluate motion, boundary-sensitive link and scheduler metrics on held-out
-   scenes;
-5. execute the five-seed staged design and inspect corrected families;
-6. freeze a real repository commit and clean CI run;
-7. update the manuscript from those immutable artifacts;
-8. add authors, affiliations, venue formatting and a complete bibliography.
-
-The defensible label today is **paper-oriented research code with corrected
-controlled and proxy evidence**.
+Before submission, add and hash official WOMD shards, build true-SDC
+scenario-safe splits, run the four learned objectives for at least three seeds,
+freeze a compatible checkpoint, repeat held-out motion/link/scheduler
+evaluation, then add authors, venue formatting and the final bibliography.

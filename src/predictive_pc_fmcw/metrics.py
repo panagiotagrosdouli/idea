@@ -43,6 +43,14 @@ class SimulationMetrics:
     deadline_or_censored_ratio: float
     delivered_before_expiry_ratio: float
     undelivered_packets_at_disconnect: int
+    urgent_generated_packets: int
+    urgent_delivered_packets: int
+    urgent_packet_delivery_ratio: float
+    urgent_deadline_miss_ratio: float
+    bulk_generated_packets: int
+    bulk_delivered_packets: int
+    bulk_packet_delivery_ratio: float
+    bulk_deadline_miss_ratio: float
     jain_fairness: float
     demand_normalized_jain_fairness: float
     mean_scheduled_snr_db: float

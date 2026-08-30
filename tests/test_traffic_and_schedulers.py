@@ -39,6 +39,34 @@ class TrafficAndSchedulerTest(unittest.TestCase):
         self.assertAlmostEqual(fast_deadline, 1.2)
         self.assertTrue(np.all(slow.arrivals > 0))
 
+    def test_urgent_and_bulk_classes_have_distinct_deadlines(self):
+        config = TrafficConfig(
+            model="saturated",
+            traffic_class_mode="urgent_bulk",
+            urgent_fraction=0.5,
+            urgent_deadline_s=0.1,
+            bulk_deadline_s=1.0,
+        )
+        trace = generate_traffic_trace(
+            18, 4, 2, 100, config, slot_duration_s=0.1
+        )
+        observed = {
+            traffic_class
+            for row in trace.classes
+            for vehicle in row
+            for traffic_class in vehicle
+        }
+        self.assertEqual(observed, {"urgent", "bulk"})
+        for slot, (deadline_row, class_row) in enumerate(
+            zip(trace.deadlines, trace.classes, strict=True)
+        ):
+            for deadlines, classes in zip(deadline_row, class_row, strict=True):
+                for deadline, traffic_class in zip(
+                    deadlines, classes, strict=True
+                ):
+                    expected = 1 if traffic_class == "urgent" else 10
+                    self.assertEqual(deadline - slot, expected)
+
     def test_all_policies_choose_at_most_one_eligible_vehicle(self):
         context = SchedulerContext(
             slot=0,
@@ -92,6 +120,35 @@ class TrafficAndSchedulerTest(unittest.TestCase):
         short = scheduler._score(context(4, [2, 4]))
         long = scheduler._score(context(8, [4, 8]))
         np.testing.assert_allclose(short, long)
+
+    def test_reactive_is_horizon_zero_equivalent(self):
+        """Future arrays cannot change the current-link (H=0) decision."""
+
+        def context(predicted_goodput, predicted_outage):
+            return SchedulerContext(
+                slot=2,
+                queue_lengths=np.asarray([4, 4]),
+                time_to_deadline=np.asarray([3.0, 3.0]),
+                current_goodput_bps=np.asarray([7e8, 9e8]),
+                current_outage=np.asarray([False, False]),
+                predicted_goodput_bps=np.asarray(predicted_goodput),
+                predicted_outage=np.asarray(predicted_outage),
+                predicted_lifetime_steps=np.asarray([1, 1]),
+                delivered_bits=np.asarray([0.0, 0.0]),
+                previous_vehicle=None,
+                data_rate_bps=1e9,
+                discount=0.9,
+            )
+
+        scheduler = build_scheduler("reactive_greedy", SchedulerConfig(), 5)
+        favorable_first = scheduler.select(
+            context([[1e9], [0.0]], [[False], [True]])
+        )
+        favorable_second = scheduler.select(
+            context([[0.0], [1e9]], [[True], [False]])
+        )
+        self.assertEqual(favorable_first.vehicle, 1)
+        self.assertEqual(favorable_second.vehicle, 1)
 
 
 if __name__ == "__main__":

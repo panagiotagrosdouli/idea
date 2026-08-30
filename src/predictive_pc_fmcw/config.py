@@ -80,6 +80,10 @@ class TrafficConfig:
     markov_high_rate_scale: float = 2.5
     markov_low_to_high: float = 0.08
     markov_high_to_low: float = 0.20
+    traffic_class_mode: str = "single"
+    urgent_fraction: float = 0.35
+    urgent_deadline_s: float = 0.1
+    bulk_deadline_s: float = 1.0
 
     def __post_init__(self) -> None:
         if not 0 <= self.offered_load <= 2:
@@ -104,6 +108,14 @@ class TrafficConfig:
             raise ValueError("Markov transition probabilities must be in [0, 1].")
         if self.markov_low_rate_scale < 0 or self.markov_high_rate_scale < 0:
             raise ValueError("Markov traffic-rate scales must be non-negative.")
+        if self.traffic_class_mode not in {"single", "urgent_bulk"}:
+            raise ValueError(
+                "traffic_class_mode must be single or urgent_bulk."
+            )
+        if not 0 <= self.urgent_fraction <= 1:
+            raise ValueError("urgent_fraction must be in [0, 1].")
+        if self.urgent_deadline_s <= 0 or self.bulk_deadline_s <= 0:
+            raise ValueError("Class-specific deadlines must be positive.")
 
 
 @dataclass(frozen=True)

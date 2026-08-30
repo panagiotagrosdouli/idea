@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "scope": "scenario-safe classical Gaussian residual calibration",
+  "learned_gaussian_or_gmm_checkpoint_used": false,
+  "calibrations": [
+    {
+      "predictor": "constant_velocity",
+      "horizon_steps": 10,
+      "variance_floor_m2": 0.0001,
+      "isotropic_variance_m2": [
+        0.0001,
+        0.00013898674960066015,
+        0.0005518774468483787,
+        0.001518418694887649,
+        0.003376648530642982,
+        0.0067611720281207585,
+        0.011829243896155464,
+        0.019206202600098806,
+        0.029419377564342986,
+        0.04300563694495243
+      ],
+      "calibration_scenario_ids": [
+        "synthetic-20260827-v5-slots120-dt0.100000",
+        "synthetic-20260828-v5-slots120-dt0.100000",
+        "synthetic-20260829-v5-slots120-dt0.100000",
+        "synthetic-20260830-v5-slots120-dt0.100000",
+        "synthetic-20260831-v5-slots120-dt0.100000",
+        "synthetic-20260832-v5-slots120-dt0.100000"
+      ]
+    },
+    {
+      "predictor": "constant_acceleration",
+      "horizon_steps": 10,
+      "variance_floor_m2": 0.0001,
+      "isotropic_variance_m2": [
+        0.0001,
+        0.0001,
+        0.0001,
+        0.00014741411387327616,
+        0.00036651372417343807,
+        0.0008744149490094455,
+        0.0018413550904513604,
+        0.003589040711123012,
+        0.0065369545749696745,
+        0.011230638298133734
+      ],
+      "calibration_scenario_ids": [
+        "synthetic-20260827-v5-slots120-dt0.100000",
+        "synthetic-20260828-v5-slots120-dt0.100000",
+        "synthetic-20260829-v5-slots120-dt0.100000",
+        "synthetic-20260830-v5-slots120-dt0.100000",
+        "synthetic-20260831-v5-slots120-dt0.100000",
+        "synthetic-20260832-v5-slots120-dt0.100000"
+      ]
+    }
+  ],
+  "metrics": [
+    {
+      "predictor": "constant_velocity",
+      "calibration_scenarios": 6,
+      "evaluation_scenarios": 6,
+      "calibration_evaluation_overlap": 0,
+      "samples": 7050,
+      "rmse_m": 0.16734105227931403,
+      "mean_nll": -2.859348051330509,
+      "mean_sigma_m": 0.08387860304142251,
+      "coverage_50": 0.750354609929078,
+      "coverage_90": 0.8621276595744681,
+      "coverage_95": 0.8845390070921986,
+      "calibration_error": 0.11789598108747042
+    },
+    {
+      "predictor": "constant_acceleration",
+      "calibration_scenarios": 6,
+      "evaluation_scenarios": 6,
+      "calibration_evaluation_overlap": 0,
+      "samples": 7050,
+      "rmse_m": 0.07754534554271378,
+      "mean_nll": -4.52173594520811,
+      "mean_sigma_m": 0.037501435676935174,
+      "coverage_50": 0.8287943262411348,
+      "coverage_90": 0.9056737588652483,
+      "coverage_95": 0.9224113475177305,
+      "calibration_error": 0.12068557919621752
+    }
+  ]
+}

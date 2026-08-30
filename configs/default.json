@@ -31,7 +31,11 @@
     "deadline_jitter_slots": 4,
     "deadline_s": 1.2,
     "deadline_jitter_s": 0.4,
-    "max_queue_packets": 2000
+    "max_queue_packets": 2000,
+    "traffic_class_mode": "single",
+    "urgent_fraction": 0.35,
+    "urgent_deadline_s": 0.1,
+    "bulk_deadline_s": 1.0
   },
   "sensing": {
     "model": "perfect",

@@ -1,0 +1,212 @@
+{
+  "cv_predictor": {
+    "samples": 12,
+    "goodput_mbps": 2.30525,
+    "packet_delivery_ratio": 0.6473250629645196,
+    "deadline_miss_ratio": 0.29807586811109904,
+    "p95_latency_ms": 948.7499999999992,
+    "jain_fairness": 0.5632901467013309,
+    "delivered_before_expiry_ratio": 0.8019059508719238,
+    "undelivered_packets_at_disconnect": 57.666666666666664
+  },
+  "forecast_error_0_5m": {
+    "samples": 12,
+    "goodput_mbps": 2.3060833333333335,
+    "packet_delivery_ratio": 0.6475384138608522,
+    "deadline_miss_ratio": 0.2983413027961617,
+    "p95_latency_ms": 950.0,
+    "jain_fairness": 0.5634786446194981,
+    "delivered_before_expiry_ratio": 0.802311021274492,
+    "undelivered_packets_at_disconnect": 55.0
+  },
+  "forecast_error_1m": {
+    "samples": 12,
+    "goodput_mbps": 2.3023333333333333,
+    "packet_delivery_ratio": 0.6464861599808641,
+    "deadline_miss_ratio": 0.2999703272776979,
+    "p95_latency_ms": 966.6666666666666,
+    "jain_fairness": 0.5635146669970635,
+    "delivered_before_expiry_ratio": 0.8015897447150393,
+    "undelivered_packets_at_disconnect": 53.416666666666664
+  },
+  "forecast_error_2m": {
+    "samples": 12,
+    "goodput_mbps": 2.271333333333333,
+    "packet_delivery_ratio": 0.6376883030898074,
+    "deadline_miss_ratio": 0.30545930059006854,
+    "p95_latency_ms": 983.3333333333334,
+    "jain_fairness": 0.5679815164845771,
+    "delivered_before_expiry_ratio": 0.7896876360030932,
+    "undelivered_packets_at_disconnect": 51.583333333333336
+  },
+  "full_channel": {
+    "samples": 12,
+    "goodput_mbps": 2.307,
+    "packet_delivery_ratio": 0.6478107623464653,
+    "deadline_miss_ratio": 0.29739717619322653,
+    "p95_latency_ms": 968.3333333333318,
+    "jain_fairness": 0.5658151786535671,
+    "delivered_before_expiry_ratio": 0.8026373137631307,
+    "undelivered_packets_at_disconnect": 54.25
+  },
+  "history_noise_0_5m": {
+    "samples": 12,
+    "goodput_mbps": 2.3104999999999998,
+    "packet_delivery_ratio": 0.6484767506257447,
+    "deadline_miss_ratio": 0.29600744907205023,
+    "p95_latency_ms": 958.3333333333334,
+    "jain_fairness": 0.5675090865339634,
+    "delivered_before_expiry_ratio": 0.809031996500453,
+    "undelivered_packets_at_disconnect": 48.833333333333336
+  },
+  "history_noise_1m": {
+    "samples": 12,
+    "goodput_mbps": 2.29025,
+    "packet_delivery_ratio": 0.6427005739818784,
+    "deadline_miss_ratio": 0.3026580980595289,
+    "p95_latency_ms": 966.6666666666666,
+    "jain_fairness": 0.5698306033490702,
+    "delivered_before_expiry_ratio": 0.8024749619086813,
+    "undelivered_packets_at_disconnect": 52.333333333333336
+  },
+  "history_noise_2m": {
+    "samples": 12,
+    "goodput_mbps": 2.27975,
+    "packet_delivery_ratio": 0.6396898211789793,
+    "deadline_miss_ratio": 0.30557090590239205,
+    "p95_latency_ms": 958.3333333333334,
+    "jain_fairness": 0.5592869645861824,
+    "delivered_before_expiry_ratio": 0.7988340734043992,
+    "undelivered_packets_at_disconnect": 49.333333333333336
+  },
+  "imm_predictor": {
+    "samples": 12,
+    "goodput_mbps": 2.30725,
+    "packet_delivery_ratio": 0.6478964580407333,
+    "deadline_miss_ratio": 0.2978597437680585,
+    "p95_latency_ms": 948.7499999999992,
+    "jain_fairness": 0.5629110169835673,
+    "delivered_before_expiry_ratio": 0.8027279903489816,
+    "undelivered_packets_at_disconnect": 57.25
+  },
+  "kalman_predictor": {
+    "samples": 12,
+    "goodput_mbps": 2.3046666666666664,
+    "packet_delivery_ratio": 0.6471594035251357,
+    "deadline_miss_ratio": 0.297888426615532,
+    "p95_latency_ms": 933.3333333333334,
+    "jain_fairness": 0.5632945074546192,
+    "delivered_before_expiry_ratio": 0.8023139410350275,
+    "undelivered_packets_at_disconnect": 57.25
+  },
+  "link_lifetime": {
+    "samples": 12,
+    "goodput_mbps": 2.307,
+    "packet_delivery_ratio": 0.6478107623464653,
+    "deadline_miss_ratio": 0.29739717619322653,
+    "p95_latency_ms": 968.3333333333318,
+    "jain_fairness": 0.5658151786535671,
+    "delivered_before_expiry_ratio": 0.8026373137631307,
+    "undelivered_packets_at_disconnect": 54.25
+  },
+  "markov_traffic": {
+    "samples": 12,
+    "goodput_mbps": 2.1635833333333334,
+    "packet_delivery_ratio": 0.6130463316385545,
+    "deadline_miss_ratio": 0.32005416858949326,
+    "p95_latency_ms": 1046.2499999999998,
+    "jain_fairness": 0.5371394416621633,
+    "delivered_before_expiry_ratio": 0.7781705527594541,
+    "undelivered_packets_at_disconnect": 72.83333333333333
+  },
+  "no_fairness_term": {
+    "samples": 12,
+    "goodput_mbps": 2.32025,
+    "packet_delivery_ratio": 0.651498074454239,
+    "deadline_miss_ratio": 0.2996238229719373,
+    "p95_latency_ms": 783.3333333333334,
+    "jain_fairness": 0.5478059792165991,
+    "delivered_before_expiry_ratio": 0.8071079556008826,
+    "undelivered_packets_at_disconnect": 58.75
+  },
+  "no_link_lifetime_urgency": {
+    "samples": 12,
+    "goodput_mbps": 2.3063333333333333,
+    "packet_delivery_ratio": 0.6476280524582659,
+    "deadline_miss_ratio": 0.29765889712895727,
+    "p95_latency_ms": 965.416666666666,
+    "jain_fairness": 0.5638354184193948,
+    "delivered_before_expiry_ratio": 0.8024301038547765,
+    "undelivered_packets_at_disconnect": 57.666666666666664
+  },
+  "no_prediction": {
+    "samples": 12,
+    "goodput_mbps": 2.2929999999999997,
+    "packet_delivery_ratio": 0.6438811308521737,
+    "deadline_miss_ratio": 0.30798936846342906,
+    "p95_latency_ms": 699.5833333333318,
+    "jain_fairness": 0.535508660720175,
+    "delivered_before_expiry_ratio": 0.8009604134395324,
+    "undelivered_packets_at_disconnect": 49.75
+  },
+  "part_a_ber_lut": {
+    "samples": 12,
+    "goodput_mbps": 1.6812500000000001,
+    "packet_delivery_ratio": 0.47268587815499646,
+    "deadline_miss_ratio": 0.4623930039024209,
+    "p95_latency_ms": 1017.083333333333,
+    "jain_fairness": 0.45834007649188974,
+    "delivered_before_expiry_ratio": 0.7425336375639492,
+    "undelivered_packets_at_disconnect": 97.91666666666667
+  },
+  "perfect_future": {
+    "samples": 12,
+    "goodput_mbps": 2.30775,
+    "packet_delivery_ratio": 0.6480246813424722,
+    "deadline_miss_ratio": 0.29768240152123565,
+    "p95_latency_ms": 968.3333333333318,
+    "jain_fairness": 0.5657007772977828,
+    "delivered_before_expiry_ratio": 0.8028586179826646,
+    "undelivered_packets_at_disconnect": 54.25
+  },
+  "periodic_traffic": {
+    "samples": 12,
+    "goodput_mbps": 2.3520833333333333,
+    "packet_delivery_ratio": 0.6635283662118819,
+    "deadline_miss_ratio": 0.2985247938844095,
+    "p95_latency_ms": 891.6666666666666,
+    "jain_fairness": 0.565715049678356,
+    "delivered_before_expiry_ratio": 0.8263776994282407,
+    "undelivered_packets_at_disconnect": 77.58333333333333
+  },
+  "range_only_channel": {
+    "samples": 12,
+    "goodput_mbps": 2.736916666666667,
+    "packet_delivery_ratio": 0.7689416100979543,
+    "deadline_miss_ratio": 0.18597081414297692,
+    "p95_latency_ms": 875.0,
+    "jain_fairness": 0.6326660344829201,
+    "delivered_before_expiry_ratio": 0.856668278562917,
+    "undelivered_packets_at_disconnect": 34.0
+  },
+  "range_pointing_channel": {
+    "samples": 12,
+    "goodput_mbps": 2.653583333333333,
+    "packet_delivery_ratio": 0.7455566490182616,
+    "deadline_miss_ratio": 0.205516045704728,
+    "p95_latency_ms": 875.0,
+    "jain_fairness": 0.6170138831306882,
+    "delivered_before_expiry_ratio": 0.8497135812188871,
+    "undelivered_packets_at_disconnect": 39.666666666666664
+  },
+  "trajectory_predictive": {
+    "samples": 12,
+    "goodput_mbps": 2.3063333333333333,
+    "packet_delivery_ratio": 0.6476280524582659,
+    "deadline_miss_ratio": 0.29765889712895727,
+    "p95_latency_ms": 965.416666666666,
+    "jain_fairness": 0.5638354184193948,
+    "delivered_before_expiry_ratio": 0.8024301038547765,
+    "undelivered_packets_at_disconnect": 57.666666666666664
+  }
+}

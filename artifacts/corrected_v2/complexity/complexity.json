@@ -1,0 +1,167 @@
+{
+  "measurement_scope": "single-process CPU wall-clock diagnostic",
+  "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+  "python": "3.12.13",
+  "rows": [
+    {
+      "component": "last_position",
+      "kind": "trajectory_predictor",
+      "parameters": 0,
+      "median_runtime_us": 1.823,
+      "p95_runtime_us": 4.879949999999999,
+      "repeats": 200,
+      "entities": 6,
+      "horizon_steps": 10
+    },
+    {
+      "component": "constant_velocity",
+      "kind": "trajectory_predictor",
+      "parameters": 0,
+      "median_runtime_us": 6.4,
+      "p95_runtime_us": 11.59855,
+      "repeats": 200,
+      "entities": 6,
+      "horizon_steps": 10
+    },
+    {
+      "component": "constant_acceleration",
+      "kind": "trajectory_predictor",
+      "parameters": 0,
+      "median_runtime_us": 17.5315,
+      "p95_runtime_us": 33.57614999999996,
+      "repeats": 200,
+      "entities": 6,
+      "horizon_steps": 10
+    },
+    {
+      "component": "kalman_cv",
+      "kind": "trajectory_predictor",
+      "parameters": 0,
+      "median_runtime_us": 976.4175,
+      "p95_runtime_us": 2919.680049999994,
+      "repeats": 200,
+      "entities": 6,
+      "horizon_steps": 10
+    },
+    {
+      "component": "imm",
+      "kind": "trajectory_predictor",
+      "parameters": 0,
+      "median_runtime_us": 1028.681,
+      "p95_runtime_us": 3435.2241,
+      "repeats": 200,
+      "entities": 6,
+      "horizon_steps": 10
+    },
+    {
+      "component": "random",
+      "kind": "scheduler",
+      "parameters": 0,
+      "median_runtime_us": 5.308,
+      "p95_runtime_us": 5.709999999999999,
+      "repeats": 200,
+      "entities": 5,
+      "horizon_steps": 10
+    },
+    {
+      "component": "round_robin",
+      "kind": "scheduler",
+      "parameters": 0,
+      "median_runtime_us": 2.013,
+      "p95_runtime_us": 2.103,
+      "repeats": 200,
+      "entities": 5,
+      "horizon_steps": 10
+    },
+    {
+      "component": "reactive_greedy",
+      "kind": "scheduler",
+      "parameters": 0,
+      "median_runtime_us": 9.714,
+      "p95_runtime_us": 16.920049999999996,
+      "repeats": 200,
+      "entities": 5,
+      "horizon_steps": 10
+    },
+    {
+      "component": "proportional_fair",
+      "kind": "scheduler",
+      "parameters": 0,
+      "median_runtime_us": 13.295,
+      "p95_runtime_us": 14.558549999999995,
+      "repeats": 200,
+      "entities": 5,
+      "horizon_steps": 10
+    },
+    {
+      "component": "cv_predictive",
+      "kind": "scheduler",
+      "parameters": 0,
+      "median_runtime_us": 29.254,
+      "p95_runtime_us": 61.36755,
+      "repeats": 200,
+      "entities": 5,
+      "horizon_steps": 10
+    },
+    {
+      "component": "kalman_predictive",
+      "kind": "scheduler",
+      "parameters": 0,
+      "median_runtime_us": 29.064,
+      "p95_runtime_us": 43.49744999999999,
+      "repeats": 200,
+      "entities": 5,
+      "horizon_steps": 10
+    },
+    {
+      "component": "imm_predictive",
+      "kind": "scheduler",
+      "parameters": 0,
+      "median_runtime_us": 29.555,
+      "p95_runtime_us": 65.74104999999999,
+      "repeats": 200,
+      "entities": 5,
+      "horizon_steps": 10
+    },
+    {
+      "component": "predictive_utility",
+      "kind": "scheduler",
+      "parameters": 0,
+      "median_runtime_us": 29.4645,
+      "p95_runtime_us": 63.774849999999915,
+      "repeats": 200,
+      "entities": 5,
+      "horizon_steps": 10
+    },
+    {
+      "component": "link_lifetime",
+      "kind": "scheduler",
+      "parameters": 0,
+      "median_runtime_us": 37.786500000000004,
+      "p95_runtime_us": 53.016049999999986,
+      "repeats": 200,
+      "entities": 5,
+      "horizon_steps": 10
+    },
+    {
+      "component": "oracle",
+      "kind": "scheduler",
+      "parameters": 0,
+      "median_runtime_us": 37.9925,
+      "p95_runtime_us": 71.41499999999999,
+      "repeats": 200,
+      "entities": 5,
+      "horizon_steps": 10
+    },
+    {
+      "component": "gru_128x2_analytical_count",
+      "kind": "learned_predictor_unexecuted",
+      "parameters": 169620,
+      "median_runtime_us": NaN,
+      "p95_runtime_us": NaN,
+      "repeats": 0,
+      "entities": 6,
+      "horizon_steps": 10
+    }
+  ]
+}

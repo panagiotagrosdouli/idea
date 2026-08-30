@@ -17,6 +17,7 @@ from .benchmark import (
 from .ber import (
     simulate_dbpsk_ber,
     simulate_dbpsk_ber_adaptive,
+    simulate_part_a_notebook_receiver_ber,
     write_ber_lut,
 )
 from .config import load_config
@@ -102,6 +103,15 @@ def build_parser() -> argparse.ArgumentParser:
     ber.add_argument("--snr-min", type=float, default=-5.0)
     ber.add_argument("--snr-max", type=float, default=25.0)
     ber.add_argument("--snr-step", type=float, default=1.0)
+    ber.add_argument(
+        "--receiver",
+        choices=("symbol", "part-a-notebook"),
+        default="symbol",
+        help=(
+            "Use the generic symbol-level DBPSK model or the supplied Part-A "
+            "notebook FFT-carrier/DPSK receiver."
+        ),
+    )
 
     benchmark = subparsers.add_parser("benchmark", help="Run scheduler benchmark")
     benchmark.add_argument("--config", default="configs/default.json")
@@ -204,17 +214,22 @@ def main(argv: list[str] | None = None) -> int:
             args.snr_max + 0.5 * args.snr_step,
             args.snr_step,
         )
-        points = (
-            simulate_dbpsk_ber(grid, bits=args.bits, seed=args.seed)
-            if args.fixed_bits
-            else simulate_dbpsk_ber_adaptive(
-                grid,
-                min_bits=args.bits,
-                max_bits=args.max_bits,
-                target_errors=args.target_errors,
-                seed=args.seed,
+        if args.receiver == "part-a-notebook":
+            points = simulate_part_a_notebook_receiver_ber(
+                grid, bits=args.bits, seed=args.seed
             )
-        )
+        else:
+            points = (
+                simulate_dbpsk_ber(grid, bits=args.bits, seed=args.seed)
+                if args.fixed_bits
+                else simulate_dbpsk_ber_adaptive(
+                    grid,
+                    min_bits=args.bits,
+                    max_bits=args.max_bits,
+                    target_errors=args.target_errors,
+                    seed=args.seed,
+                )
+            )
         path = write_ber_lut(points, args.output)
         print(path)
         return 0
