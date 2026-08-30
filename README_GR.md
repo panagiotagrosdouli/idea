@@ -212,7 +212,18 @@ proxy dataset σε official WOMD evidence.
 
 ## Official WOMD και learned ablation
 
-Όταν υπάρχουν official WOMD v1.3.0 TFRecord shards και το Waymo proto package:
+Τα μεγάλα WOMD shards δεν χρειάζεται να ανέβουν στο repository. Το GPU-enabled
+Colab workflow
+[`notebooks/WOMD_PAPER_TRAINING_COLAB.ipynb`](notebooks/WOMD_PAPER_TRAINING_COLAB.ipynb)
+συνδέεται στο Google Cloud, κατεβάζει ελεγχόμενο υποσύνολο Scenario TFRecords
+v1.3.1 στο προσωρινό Colab runtime, εκτελεί την προκαθορισμένη ablation τεσσάρων
+objectives και τριών seeds και αποθηκεύει στο Google Drive μόνο checkpoints και
+metrics. Πρώτα εκτελείται με `SMOKE = True` και αλλάζει σε `False` μόνο αφού
+περάσουν οι έλεγχοι loader και GPU. Τα official validation shards παραμένουν
+απομονωμένα για το τελικό held-out evaluation και δεν χρησιμοποιούνται στο
+training.
+
+Όταν υπάρχουν official WOMD v1.3.1 TFRecord shards και το Waymo proto package:
 
 ```bash
 python scripts/01_build_official_womd_samples.py \
