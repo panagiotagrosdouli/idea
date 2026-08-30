@@ -69,17 +69,22 @@ def run_training_ablation(
     for objective in OBJECTIVES:
         for seed in seeds:
             run_dir = destination / objective / f"seed_{seed}"
-            result = train_from_npz(
-                dataset_path,
-                run_dir,
-                epochs=epochs,
-                batch_size=batch_size,
-                lambda_link=lambda_link,
-                lambda_outage=lambda_outage,
-                objective=objective,
-                link_config=link_config,
-                seed=seed,
-            )
+            completed_result = run_dir / "training_result.json"
+            if completed_result.is_file():
+                payload = json.loads(completed_result.read_text(encoding="utf-8"))
+                result = TrainingResult(**payload)
+            else:
+                result = train_from_npz(
+                    dataset_path,
+                    run_dir,
+                    epochs=epochs,
+                    batch_size=batch_size,
+                    lambda_link=lambda_link,
+                    lambda_outage=lambda_outage,
+                    objective=objective,
+                    link_config=link_config,
+                    seed=seed,
+                )
             results.append(result)
             (destination / "ablation_results.json").write_text(
                 json.dumps([asdict(item) for item in results], indent=2),
