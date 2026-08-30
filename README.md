@@ -214,7 +214,17 @@ compact proxy dataset into official-WOMD evidence.
 
 ## Official WOMD and learned ablation
 
-When official WOMD v1.3.0 TFRecord shards and the Waymo proto package are
+Large WOMD shards do not need to be uploaded to this repository. The
+GPU-enabled Colab workflow in
+[`notebooks/WOMD_PAPER_TRAINING_COLAB.ipynb`](notebooks/WOMD_PAPER_TRAINING_COLAB.ipynb)
+authenticates to Google Cloud, downloads a controlled v1.3.1 Scenario-TFRecord
+subset into the temporary Colab runtime, runs the preregistered four-objective
+three-seed ablation, and writes only checkpoints and metrics to Google Drive.
+Run it first with `SMOKE = True`; change to `False` only after the loader and
+GPU checks pass. The official validation shards remain isolated for the final
+held-out evaluation and must not be used for model fitting.
+
+When official WOMD v1.3.1 TFRecord shards and the Waymo proto package are
 available:
 
 ```bash
