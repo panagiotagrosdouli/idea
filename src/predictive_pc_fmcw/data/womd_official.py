@@ -41,14 +41,16 @@ def iter_official_womd_protos(
 
     try:
         from waymo_open_dataset.protos import scenario_pb2
-    except ImportError as exc:  # pragma: no cover - optional data dependency
-        raise ImportError(
-            "Official WOMD loading requires the Waymo Open Dataset proto package."
-        ) from exc
+
+        scenario_class = scenario_pb2.Scenario
+    except ImportError:  # Python 3.13/Colab has no compatible Waymo TF wheel.
+        from .womd_minimal_proto import scenario_message_class
+
+        scenario_class = scenario_message_class()
     produced = 0
     for path in paths:
         for payload in iter_tfrecord_payloads(path):
-            scenario = scenario_pb2.Scenario()
+            scenario = scenario_class()
             scenario.ParseFromString(payload)
             yield scenario
             produced += 1
