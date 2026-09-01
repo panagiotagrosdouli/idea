@@ -36,7 +36,7 @@ class OfficialWOMDTest(unittest.TestCase):
         self.assertIsNotNone(scenario)
         self.assertEqual(scenario.actor_ids, ("valid-car",))
         self.assertEqual(scenario.start_index, 3)
-        self.assertEqual(scenario.source, "real_WOMD_v1.3.0_true_SDC_model_based_link")
+        self.assertEqual(scenario.source, "real_WOMD_v1.3.1_true_SDC_model_based_link")
         self.assertAlmostEqual(scenario.ego_positions_xy[2, 0], 2.0)
 
 
