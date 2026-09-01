@@ -28,6 +28,7 @@ def build_training_npz_from_scenarios(
     output_path: str | Path,
     *,
     source: str,
+    fixed_split: str | None = None,
 ) -> Path:
     histories: list[np.ndarray] = []
     futures: list[np.ndarray] = []
@@ -50,25 +51,30 @@ def build_training_npz_from_scenarios(
     if not histories:
         raise ValueError("No training samples were produced.")
     unique_scenarios = sorted(set(scenario_ids))
-    split_by_scenario = {
-        scenario_id: deterministic_development_split(scenario_id)
-        for scenario_id in unique_scenarios
-    }
-    if len(unique_scenarios) > 1:
-        if "development" not in split_by_scenario.values():
-            split_by_scenario[unique_scenarios[-1]] = "development"
-        if "training" not in split_by_scenario.values():
-            split_by_scenario[unique_scenarios[0]] = "training"
-    splits = [split_by_scenario[scenario_id] for scenario_id in scenario_ids]
+    if fixed_split is None:
+        split_by_scenario = {
+            scenario_id: deterministic_development_split(scenario_id)
+            for scenario_id in unique_scenarios
+        }
+        if len(unique_scenarios) > 1:
+            if "development" not in split_by_scenario.values():
+                split_by_scenario[unique_scenarios[-1]] = "development"
+            if "training" not in split_by_scenario.values():
+                split_by_scenario[unique_scenarios[0]] = "training"
+        splits = [split_by_scenario[scenario_id] for scenario_id in scenario_ids]
+    else:
+        if not fixed_split.strip():
+            raise ValueError("fixed_split must be a non-empty label.")
+        splits = [fixed_split] * len(scenario_ids)
     destination = Path(output_path)
     destination.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(
         destination,
-        history_xy=np.stack(histories),
-        future_xy=np.stack(futures),
+        history_xy=np.stack(histories).astype(np.float32),
+        future_xy=np.stack(futures).astype(np.float32),
         scenario_id=np.asarray(scenario_ids),
         actor_id=np.asarray(actor_ids),
-        future_ego_heading_rad=np.stack(future_ego_headings),
+        future_ego_heading_rad=np.stack(future_ego_headings).astype(np.float32),
         split=np.asarray(splits),
         source=np.asarray(source),
         coordinate_frame=np.asarray("world_xy_with_explicit_ego_heading"),
