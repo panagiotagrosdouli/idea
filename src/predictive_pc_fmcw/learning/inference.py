@@ -45,7 +45,7 @@ class TorchCheckpointPredictor:
         self, history_xy: ArrayLike, horizon_steps: int, dt_s: float
     ) -> NDArray[np.float64]:
         del dt_s
-        if horizon_steps != self.horizon_steps:
+        if horizon_steps > self.horizon_steps:
             message = (
                 f"Checkpoint horizon is {self.horizon_steps}, "
                 f"requested {horizon_steps}."
@@ -65,5 +65,5 @@ class TorchCheckpointPredictor:
         normalized = (history - self.center) / self.scale
         with self._torch.no_grad():
             tensor = self._torch.from_numpy(normalized).to(self.device)
-            output = self.model(tensor).cpu().numpy()
+            output = self.model(tensor).cpu().numpy()[:, :horizon_steps]
         return (output * self.scale + self.center).astype(np.float64)
