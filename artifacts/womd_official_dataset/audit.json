@@ -1,0 +1,28 @@
+{
+  "all_numeric_values_finite": true,
+  "coordinate_dimensions": 2,
+  "coordinate_frame": "world_xy_with_explicit_ego_heading",
+  "file_size_bytes": 278168355,
+  "future_displacement_m": {
+    "mean": 20.151533057433113,
+    "median": 12.732079911568563,
+    "p95": 67.90056672413968
+  },
+  "future_steps": 80,
+  "history_step_displacement_m": {
+    "mean": 0.2709854831706099,
+    "median": 0.13975427719784,
+    "p95": 0.9715941802693714
+  },
+  "history_steps": 11,
+  "path": "/workspace/scratch/1385c5ec521c/upload/womd_training_paper.npz",
+  "sample_count": 249137,
+  "sha256": "b47faf427487a7405531e4944c5bfff9ca56d4fcb9ce3f8495df3cce534347ee",
+  "source": "real_WOMD_v1.3.0_true_SDC_geometry",
+  "splits": {
+    "development": 25351,
+    "training": 223786
+  },
+  "unique_actor_ids": 5390,
+  "unique_scenarios": 24182
+}
