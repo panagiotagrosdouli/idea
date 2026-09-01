@@ -25,7 +25,7 @@ def main() -> None:
     output = build_training_npz_from_scenarios(
         scenarios,
         args.output,
-        source="real_WOMD_v1.3.0_true_SDC_geometry",
+        source="real_WOMD_v1.3.1_true_SDC_geometry",
     )
     print(output)
 
