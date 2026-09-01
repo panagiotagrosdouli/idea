@@ -76,6 +76,7 @@ as proof of zero BER.
 | Three or more training seeds | three-seed immutable plan and 12-run smoke result | Executed as smoke test; paper-scale evidence pending |
 | Communication-loss weight sweep | resumable one-axis link/outage lambda sweep over five settings and three seeds | Implemented; GPU execution pending |
 | Official held-out learned evaluation | validation-only split label plus per-scenario ADE/FDE/link/outage/goodput/lifetime evaluator | Implemented; official-validation NPZ and checkpoints pending |
+| Learned objective analysis | objective tables, paired scenario-cluster statistics, ADE-vs-link-fidelity figure, explicit scheduler-utility scope warning | Implemented; execution pending held-out rows |
 | Horizon/load/channel/traffic/sensing/FoV sweeps | 12 one-axis studies | Executed |
 | Five independent staged seeds | 1,125 policy rows in `corrected_v2` | Executed |
 | PDR, goodput, P50/P95/P99, miss/censoring, fairness | machine-readable episode metrics | Executed |
@@ -84,7 +85,7 @@ as proof of zero BER.
 | BER, ECDF, outage-latency, Pareto and lifetime calibration | publication figures | Executed |
 | Failure-case analysis | uncensored optical-boundary error figure | Executed |
 | Runtime/complexity | CPU median/P95 for classical code; analytical GRU parameters | Partial: GRU runtime blocked |
-| Causality, conservation, monotonicity, perfect prediction, H=0 and reproducibility tests | 54 deterministic tests + 5 scientific gates | Executed |
+| Causality, conservation, monotonicity, perfect prediction, H=0 and reproducibility tests | 55 deterministic tests + 5 scientific gates | Executed |
 | Full manuscript and supplement | Markdown manuscript, generated PDF, traceability and manifests | Partial: evidence/metadata blockers remain |
 
 ## Exact publication blockers
