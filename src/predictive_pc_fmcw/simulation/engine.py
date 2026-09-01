@@ -114,6 +114,15 @@ def _link_forecast(
             combined[: time_index + 1, 1:]
             - combined[: time_index + 1, :1]
         ).transpose(1, 0, 2)
+        feature_schema = getattr(learned_predictor, "feature_schema", {})
+        expected_history = int(
+            feature_schema.get("history_steps", relative_history.shape[1])
+        )
+        if relative_history.shape[1] < expected_history:
+            raise ValueError(
+                "Learned checkpoint requires more causal history than is available."
+            )
+        relative_history = relative_history[:, -expected_history:]
         relative_prediction = learned_predictor.predict(
             relative_history, horizon, scenario.dt_s
         )[:, :effective_horizon]
