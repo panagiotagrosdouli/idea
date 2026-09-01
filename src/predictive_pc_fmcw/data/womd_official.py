@@ -122,7 +122,7 @@ def scenario_proto_to_motion_scenario(
             str(scenario.tracks[index].id) for _, index, _ in candidates
         ),
         start_index=start_index,
-        source="real_WOMD_v1.3.0_true_SDC_model_based_link",
+        source="real_WOMD_v1.3.1_true_SDC_model_based_link",
     )
 
 
