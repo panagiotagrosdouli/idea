@@ -23,7 +23,7 @@
 
 ## Executed evidence
 
-- 54/54 tests, compilation and 5/5 scientific gates;
+- 55/55 tests, compilation and 5/5 scientific gates;
 - 31-point Part-A receiver BER LUT from -5 to 25 dB;
 - 120 controlled policy episodes (12 scenarios × 10 policies);
 - synthetic and compact-proxy motion/link evaluation;
@@ -39,6 +39,7 @@
 - paper-scale four-objective GRU training over three seeds;
 - one-axis communication-loss lambda sweep;
 - per-scenario learned-checkpoint evaluation on official validation;
+- paired objective statistics and ADE-vs-link-fidelity paper artifacts;
 - compatible learned-checkpoint evaluation in the packet scheduler.
 
 The official training NPZ is no longer a blocker: it contains 249,137 samples
