@@ -20,11 +20,11 @@ Status meanings:
 | PDF requirement | Evidence | Status |
 |---|---|---|
 | Strictly causal history through time `t` | predictor API; future-mutation validation gate | Executed |
-| Scenario-safe split and provenance hashes | manifest/split/checkpoint schema modules | Implemented; official data blocked |
-| Official WOMD true SDC | `data/womd_official.py`, true `sdc_track_index`, validity masks | Implemented; shards blocked |
+| Scenario-safe split and provenance hashes | manifest/split/checkpoint schema modules; audited paper NPZ SHA-256 | Executed on official training corpus |
+| Official WOMD true SDC | `data/womd_official.py`, true `sdc_track_index`, validity masks; 249,137 samples from 24,182 scenarios | Executed on official training corpus; held-out validation pending |
 | Compact supplied WOMD export | proxy dataset manifest, motion/link evaluation | Executed on 3 scene IDs |
 | Last/CV/CA/Kalman/IMM baselines | predictor library and forecast artifacts | Executed |
-| Existing/GRU model | versioned GRU inference and training code | Implemented; compatible checkpoint absent |
+| Existing/GRU model | versioned GRU inference/training code; 12 smoke checkpoints reported by Colab | Partial; paper-scale checkpoints pending |
 | Classical probabilistic baseline and calibration | residual Gaussian CV/CA; six calibration and six disjoint evaluation scenarios | Executed, controlled |
 | Learned Gaussian/GMM predictor and calibration | no compatible distributional checkpoint or ground truth paired with the supplied 70 predictions | Blocked |
 | Transformer/SOTA comparator | not implemented | Optional, not done |
@@ -72,8 +72,10 @@ as proof of zero BER.
 
 | PDF requirement | Evidence | Status |
 |---|---|---|
-| Trajectory/link/outage/full communication-aware losses | GRU four-objective runner | Implemented; not trained |
-| Three or more training seeds | plan validator supports it | Blocked by WOMD/checkpoint/PyTorch evidence |
+| Trajectory/link/outage/full communication-aware losses | resumable GRU four-objective runner | Executed as smoke test; paper-scale training pending GPU quota |
+| Three or more training seeds | three-seed immutable plan and 12-run smoke result | Executed as smoke test; paper-scale evidence pending |
+| Communication-loss weight sweep | resumable one-axis link/outage lambda sweep over five settings and three seeds | Implemented; GPU execution pending |
+| Official held-out learned evaluation | validation-only split label plus per-scenario ADE/FDE/link/outage/goodput/lifetime evaluator | Implemented; official-validation NPZ and checkpoints pending |
 | Horizon/load/channel/traffic/sensing/FoV sweeps | 12 one-axis studies | Executed |
 | Five independent staged seeds | 1,125 policy rows in `corrected_v2` | Executed |
 | PDR, goodput, P50/P95/P99, miss/censoring, fairness | machine-readable episode metrics | Executed |
@@ -82,15 +84,16 @@ as proof of zero BER.
 | BER, ECDF, outage-latency, Pareto and lifetime calibration | publication figures | Executed |
 | Failure-case analysis | uncensored optical-boundary error figure | Executed |
 | Runtime/complexity | CPU median/P95 for classical code; analytical GRU parameters | Partial: GRU runtime blocked |
-| Causality, conservation, monotonicity, perfect prediction, H=0 and reproducibility tests | 51 deterministic tests + 5 scientific gates | Executed |
+| Causality, conservation, monotonicity, perfect prediction, H=0 and reproducibility tests | 54 deterministic tests + 5 scientific gates | Executed |
 | Full manuscript and supplement | Markdown manuscript, generated PDF, traceability and manifests | Partial: evidence/metadata blockers remain |
 
 ## Exact publication blockers
 
-1. Official WOMD v1.3.0 TFRecord shards and the Waymo proto runtime were not
-   supplied, so there is no large true-SDC held-out experiment.
-2. No compatible learned checkpoint was supplied; the upstream Stage-4 files
-   do not contain model weights or paired targets.
+1. A large official WOMD v1.3.1 training corpus now exists and has been audited,
+   but a separately converted official-validation NPZ has not yet been supplied,
+   so there is no large true-SDC held-out result.
+2. Twelve smoke checkpoints were reported by Colab, but the paper-scale archive
+   has not yet been supplied because the free GPU quota stopped training.
 3. No optical measurement/calibration dataset was supplied, so absolute-power
    and real-channel claims are prohibited.
 4. Authors, affiliations and target-venue template are still placeholders.
