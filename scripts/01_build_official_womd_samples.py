@@ -16,6 +16,10 @@ def main() -> None:
     parser.add_argument("--output", default="data/processed/womd_official_samples.npz")
     parser.add_argument("--max-scenarios", type=int)
     parser.add_argument("--max-vehicles", type=int, default=16)
+    parser.add_argument(
+        "--fixed-split",
+        help="Label every sample identically, e.g. official_validation.",
+    )
     args = parser.parse_args()
     scenarios = load_official_womd_tfrecords(
         args.tfrecords,
@@ -26,6 +30,7 @@ def main() -> None:
         scenarios,
         args.output,
         source="real_WOMD_v1.3.1_true_SDC_geometry",
+        fixed_split=args.fixed_split,
     )
     print(output)
 
