@@ -23,7 +23,7 @@
 
 ## Executed evidence
 
-- 55/55 tests, compilation and 5/5 scientific gates;
+- 57/57 tests, compilation and 5/5 scientific gates;
 - 31-point Part-A receiver BER LUT from -5 to 25 dB;
 - 120 controlled policy episodes (12 scenarios × 10 policies);
 - synthetic and compact-proxy motion/link evaluation;
@@ -40,6 +40,8 @@
 - one-axis communication-loss lambda sweep;
 - per-scenario learned-checkpoint evaluation on official validation;
 - paired objective statistics and ADE-vs-link-fidelity paper artifacts;
+- official-WOMD learned/reactive/oracle packet evaluation and the joined
+  ADE-vs-realized-goodput analysis;
 - compatible learned-checkpoint evaluation in the packet scheduler.
 
 The official training NPZ is no longer a blocker: it contains 249,137 samples
