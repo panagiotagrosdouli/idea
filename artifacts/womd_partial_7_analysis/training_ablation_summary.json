@@ -1,0 +1,145 @@
+{
+  "completed_runs": 7,
+  "dataset_sha256": "b47faf427487a7405531e4944c5bfff9ca56d4fcb9ce3f8495df3cce534347ee",
+  "expected_runs": 12,
+  "objectives": {
+    "trajectory_link": {
+      "runs": 3,
+      "seeds": [
+        20260827,
+        20260828,
+        20260829
+      ],
+      "validation_ade_m": {
+        "mean": 3.94333815574646,
+        "std": 0.010355236572406923
+      },
+      "validation_fde_m": {
+        "mean": 11.261137326558432,
+        "std": 0.03591851959516122
+      },
+      "validation_link_loss": {
+        "mean": 2.6479899046815913,
+        "std": 0.016433860869349462
+      },
+      "validation_outage_loss": {
+        "mean": 0.6779081357180083,
+        "std": 0.01619721483473301
+      },
+      "validation_trajectory_loss": {
+        "mean": 2.101918836384636,
+        "std": 0.007214347172579052
+      }
+    },
+    "trajectory_only": {
+      "runs": 3,
+      "seeds": [
+        20260827,
+        20260828,
+        20260829
+      ],
+      "validation_ade_m": {
+        "mean": 3.9405673344930015,
+        "std": 0.010272508073961076
+      },
+      "validation_fde_m": {
+        "mean": 11.293014526367188,
+        "std": 0.028344563278801742
+      },
+      "validation_link_loss": {
+        "mean": 2.662951235807212,
+        "std": 0.0045642895502169675
+      },
+      "validation_outage_loss": {
+        "mean": 0.6776961564476579,
+        "std": 0.009880305557214248
+      },
+      "validation_trajectory_loss": {
+        "mean": 2.0966679976579026,
+        "std": 0.005253158575067685
+      }
+    },
+    "trajectory_outage": {
+      "runs": 1,
+      "seeds": [
+        20260827
+      ],
+      "validation_ade_m": {
+        "mean": 3.94882869720459,
+        "std": null
+      },
+      "validation_fde_m": {
+        "mean": 11.275043487548828,
+        "std": null
+      },
+      "validation_link_loss": {
+        "mean": 2.666884042529075,
+        "std": null
+      },
+      "validation_outage_loss": {
+        "mean": 0.6642503717008706,
+        "std": null
+      },
+      "validation_trajectory_loss": {
+        "mean": 2.095975179966511,
+        "std": null
+      }
+    }
+  },
+  "paired_vs_trajectory_only": {
+    "trajectory_link": {
+      "validation_ade_m": {
+        "mean_difference_vs_trajectory_only": 0.0027708212534586587,
+        "paired_seeds": [
+          20260827,
+          20260828,
+          20260829
+        ],
+        "paired_t_p_value": 0.786392154876344,
+        "wilcoxon_p_value": 1.0
+      },
+      "validation_fde_m": {
+        "mean_difference_vs_trajectory_only": -0.03187719980875651,
+        "paired_seeds": [
+          20260827,
+          20260828,
+          20260829
+        ],
+        "paired_t_p_value": 0.25061481326707497,
+        "wilcoxon_p_value": 0.5
+      },
+      "validation_link_loss": {
+        "mean_difference_vs_trajectory_only": -0.014961331125621,
+        "paired_seeds": [
+          20260827,
+          20260828,
+          20260829
+        ],
+        "paired_t_p_value": 0.16483048689984708,
+        "wilcoxon_p_value": 0.25
+      },
+      "validation_outage_loss": {
+        "mean_difference_vs_trajectory_only": 0.0002119792703504745,
+        "paired_seeds": [
+          20260827,
+          20260828,
+          20260829
+        ],
+        "paired_t_p_value": 0.9885276339901959,
+        "wilcoxon_p_value": 1.0
+      },
+      "validation_trajectory_loss": {
+        "mean_difference_vs_trajectory_only": 0.005250838726733893,
+        "paired_seeds": [
+          20260827,
+          20260828,
+          20260829
+        ],
+        "paired_t_p_value": 0.3703717446385968,
+        "wilcoxon_p_value": 0.25
+      }
+    }
+  },
+  "scope_warning": "Internal development metrics are training diagnostics, not official WOMD held-out or packet-scheduler evidence.",
+  "status": "partial"
+}
