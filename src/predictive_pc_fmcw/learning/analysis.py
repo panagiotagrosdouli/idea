@@ -8,7 +8,7 @@ from typing import Any
 
 import numpy as np
 
-from ..metrics import paired_metric_statistics
+from ..metrics import holm_adjusted_pvalues, paired_metric_statistics
 
 METRICS = (
     "ade_m",
@@ -65,6 +65,21 @@ def summarize_objectives(rows: list[dict[str, Any]]) -> dict[str, Any]:
     return summary
 
 
+def _apply_holm_family(results: dict[str, dict[str, Any]]) -> None:
+    names = list(results)
+    t_adjusted = holm_adjusted_pvalues(
+        results[name]["paired_t_test_p_value"] for name in names
+    )
+    wilcoxon_adjusted = holm_adjusted_pvalues(
+        results[name]["wilcoxon_p_value"] for name in names
+    )
+    for name, t_value, wilcoxon_value in zip(
+        names, t_adjusted, wilcoxon_adjusted, strict=True
+    ):
+        results[name]["paired_t_test_holm_p_value"] = t_value
+        results[name]["wilcoxon_holm_p_value"] = wilcoxon_value
+
+
 def paired_full_vs_trajectory(rows: list[dict[str, Any]]) -> dict[str, Any]:
     indexed = {
         (str(row["objective"]), int(row["seed"]), str(row["scenario_id"])): row
@@ -91,6 +106,7 @@ def paired_full_vs_trajectory(rows: list[dict[str, Any]]) -> dict[str, Any]:
             higher_is_better=metric in {"outage_f1", "outage_auroc"},
             clusters=[scenario for _, scenario in keys],
         )
+    _apply_holm_family(results)
     return {"pairs": len(keys), "metrics": results}
 
 

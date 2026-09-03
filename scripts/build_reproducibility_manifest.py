@@ -27,6 +27,19 @@ INCLUDED_ROOTS = (
     "data/example",
     "reference/part_b_stage4",
 )
+EVIDENCE_ROOTS = tuple(
+    f"artifacts/paper_final/{index:02d}_{name}"
+    for index, name in (
+        (0, "freeze"),
+        (1, "data"),
+        (2, "link"),
+        (3, "baselines"),
+        (4, "learning"),
+        (5, "heldout"),
+        (6, "scheduling"),
+        (7, "analysis"),
+    )
+)
 INCLUDED_FILES = (
     ".gitignore",
     ".github/workflows/ci.yml",
@@ -47,22 +60,12 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Hash the executable research package and record its environment."
-    )
-    parser.add_argument(
-        "--output",
-        default=str(OUTPUT.relative_to(ROOT)),
-        help="Manifest path, relative to the repository unless absolute.",
-    )
-    args = parser.parse_args()
-    output = Path(args.output)
-    if not output.is_absolute():
-        output = ROOT / output
+def _inventory_roots(roots: tuple[str, ...]) -> list[dict[str, object]]:
     files = []
-    for relative_root in INCLUDED_ROOTS:
+    for relative_root in roots:
         root = ROOT / relative_root
+        if not root.exists():
+            continue
         for path in sorted(item for item in root.rglob("*") if item.is_file()):
             if (
                 "__pycache__" in path.parts
@@ -77,8 +80,28 @@ def main() -> None:
                     "sha256": sha256(path),
                 }
             )
+    return files
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Hash the executable research package and canonical evidence."
+    )
+    parser.add_argument(
+        "--output",
+        default=str(OUTPUT.relative_to(ROOT)),
+        help="Manifest path, relative to the repository unless absolute.",
+    )
+    args = parser.parse_args()
+    output = Path(args.output)
+    if not output.is_absolute():
+        output = ROOT / output
+
+    files = _inventory_roots(INCLUDED_ROOTS)
     for relative_path in INCLUDED_FILES:
         path = ROOT / relative_path
+        if not path.is_file():
+            continue
         files.append(
             {
                 "path": relative_path,
@@ -86,6 +109,7 @@ def main() -> None:
                 "sha256": sha256(path),
             }
         )
+    evidence = _inventory_roots(EVIDENCE_ROOTS)
     git_result = subprocess.run(
         ["git", "rev-parse", "HEAD"],
         cwd=ROOT,
@@ -112,19 +136,18 @@ def main() -> None:
             "pytorch_available": importlib.util.find_spec("torch") is not None,
         },
         "scientific_scope": {
-            "mobility": (
-                "official WOMD trajectories when stage inputs are supplied; "
-                "controlled data otherwise"
-            ),
+            "mobility": "official WOMD required for final empirical claims",
             "communication": "model-based PC-FMCW/DPSK simulation",
             "measured_optical_channel": False,
             "official_validation_required_for_final_claims": True,
         },
-        "file_count": len(files),
-        "files": files,
+        "source_file_count": len(files),
+        "source_files": files,
+        "evidence_file_count": len(evidence),
+        "evidence_files": evidence,
     }
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(output)
 
 

@@ -1,0 +1,96 @@
+{
+  "repository": {
+    "full_name": "panagiotagrosdouli/predictive-pc-fmcw-vehicular-communications.",
+    "default_branch": "main",
+    "language": "Python",
+    "package": "predictive-pc-fmcw",
+    "version": "0.1.0",
+    "python_requires": ">=3.10"
+  },
+  "environment": {
+    "ci_os": "ubuntu-24.04",
+    "ci_python": "3.11.16",
+    "ci_install": "pip install -e .[dev]"
+  },
+  "branches": {
+    "audited_branch": "feature/rl-scheduling",
+    "audit_baseline_sha": "7bed967e6ea7ce3a104f82fac0856c38c52fb1ed",
+    "verified_code_sha": "3cdb108ec5c3b50b96b2c61ffbfa579297f1dd8b",
+    "observed_main_sha": "35e0f24615e01f0c1c0f93ce013f7734918ccb56"
+  },
+  "entry_points": [
+    "pcfmcw = predictive_pc_fmcw.cli:main",
+    "Makefile",
+    "stages/*/run.py",
+    "scripts/*.py"
+  ],
+  "configs": ["configs/"],
+  "tests": [{"path": "tests/", "verified_passed": 71}],
+  "stages": [
+    "stage0",
+    "stage1",
+    "stage2",
+    "stage3",
+    "stage4",
+    "stage5",
+    "stage6",
+    "stage7",
+    "stage8"
+  ],
+  "datasets": [
+    {
+      "name": "official WOMD training processed corpus",
+      "status": "documented as executed",
+      "final_claim_use": "requires manifest-backed verification"
+    },
+    {
+      "name": "untouched official validation processed corpus",
+      "status": "missing final artifact"
+    }
+  ],
+  "checkpoints": [
+    {
+      "name": "canonical learned archive",
+      "required": 20,
+      "status": "missing/incomplete"
+    }
+  ],
+  "artifacts": [
+    "artifacts/corrected_v1/",
+    "artifacts/corrected_v2/",
+    "artifacts/paper_final/ where present",
+    "artifacts/audit/"
+  ],
+  "paper_files": ["paper/"],
+  "ci_workflows": [".github/workflows/ci.yml"],
+  "verification": {
+    "ci_run_id": 33731714105,
+    "ruff": "PASS",
+    "pytest": "PASS: 71",
+    "scientific_validation": "PASS"
+  },
+  "rl": {
+    "state": "implemented_unit_verified",
+    "reward": "implemented_unit_verified",
+    "environment": "implemented_unit_verified_end_to_end_pending",
+    "transition_backend": "implemented_end_to_end_pending",
+    "oracle_guard": "implemented_unit_verified",
+    "action_mask": "implemented_unit_verified",
+    "dqn": "missing",
+    "ppo": "missing",
+    "equivalence_gate": "missing"
+  },
+  "known_gaps": [
+    "untouched official-validation artifact",
+    "cross-corpus zero-overlap final evidence",
+    "development-only frozen lambda selection",
+    "20 verified GRU checkpoints",
+    "learned probabilistic calibration evidence",
+    "official learned scheduler matrix",
+    "final official statistical analysis",
+    "RL environment equivalence tests",
+    "DQN/PPO agents",
+    "final venue-formatted manuscript and release manifest"
+  ],
+  "gate0_status": "PASS"
+}

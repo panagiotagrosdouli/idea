@@ -1,12 +1,44 @@
 {
   "id": "stage7",
-  "title": "Operating regions, clustered statistics and paper artifacts",
+  "title": "Held-out statistics and evidence-backed paper artifacts",
   "depends_on": ["stage6"],
-  "required_inputs": ["artifacts/paper_final/06_scheduling/completed_runs.json"],
-  "outputs": ["artifacts/paper_final/07_analysis/learned/learned_heldout_analysis.json", "artifacts/paper_final/07_analysis/statistics/scheduler_utility_summary.json"],
-  "acceptance": ["scenario-cluster bootstrap", "paired Wilcoxon and t-test", "Holm families", "horizon/N/load/slice results", "ADE-to-goodput join"],
+  "required_inputs": [
+    "artifacts/paper_final/05_heldout/heldout_metrics_by_scenario.csv",
+    "artifacts/paper_final/05_heldout/heldout_provenance.json",
+    "artifacts/paper_final/06_scheduling/completed_runs.json",
+    "artifacts/paper_final/06_scheduling/evaluation_manifest.json"
+  ],
+  "outputs": [
+    "artifacts/paper_final/07_analysis/learned/learned_heldout_analysis.json",
+    "artifacts/paper_final/07_analysis/learned/learned_heldout_table.tex",
+    "artifacts/paper_final/07_analysis/learned/ade_vs_link_fidelity.pdf",
+    "artifacts/paper_final/07_analysis/statistics/scheduler_utility_summary.json",
+    "artifacts/paper_final/07_analysis/statistics/ade_vs_scheduler_utility.csv",
+    "artifacts/paper_final/07_analysis/statistics/ade_vs_realized_goodput.pdf"
+  ],
+  "acceptance": [
+    "scenario-cluster bootstrap",
+    "paired Wilcoxon and t-test",
+    "Holm correction within declared metric families",
+    "held-out trajectory-to-link fidelity analysis",
+    "ADE-to-realized-goodput join",
+    "no synthetic operating-region study presented as official WOMD evidence"
+  ],
   "commands": [
-    ["python", "scripts/07_analyze_learned_results.py", "artifacts/paper_final/05_heldout/heldout_metrics_by_scenario.csv", "--output", "artifacts/paper_final/07_analysis/learned"],
-    ["python", "scripts/07_analyze_scheduler_utility.py", "artifacts/paper_final/05_heldout/heldout_metrics_by_scenario.csv", "artifacts/paper_final/06_scheduling", "--output", "artifacts/paper_final/07_analysis/statistics"]
+    [
+      "python",
+      "scripts/07_analyze_learned_results.py",
+      "artifacts/paper_final/05_heldout/heldout_metrics_by_scenario.csv",
+      "--output",
+      "artifacts/paper_final/07_analysis/learned"
+    ],
+    [
+      "python",
+      "scripts/07_analyze_scheduler_utility.py",
+      "artifacts/paper_final/05_heldout/heldout_metrics_by_scenario.csv",
+      "artifacts/paper_final/06_scheduling",
+      "--output",
+      "artifacts/paper_final/07_analysis/statistics"
+    ]
   ]
 }

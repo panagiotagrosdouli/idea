@@ -47,9 +47,8 @@ class UtilityAnalysisTest(unittest.TestCase):
                 "deadline_miss_ratio",
                 "jain_fairness",
             ]
-            with (run / "episode_metrics.csv").open(
-                "w", newline="", encoding="utf-8"
-            ) as handle:
+            metrics_path = run / "episode_metrics.csv"
+            with metrics_path.open("w", newline="", encoding="utf-8") as handle:
                 writer = csv.DictWriter(handle, fieldnames=fields)
                 writer.writeheader()
                 base = {

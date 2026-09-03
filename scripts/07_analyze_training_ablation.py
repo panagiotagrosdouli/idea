@@ -13,6 +13,7 @@ from scipy import stats
 
 matplotlib.use("Agg")
 
+
 METRICS = (
     "validation_ade_m",
     "validation_fde_m",
@@ -103,9 +104,12 @@ def main() -> None:
         (axes[0], "validation_ade_m", "Internal development ADE (m)"),
         (axes[1], "validation_link_loss", "Internal development link loss"),
     ):
-        means = [summary["objectives"][name][metric]["mean"] for name in objectives]
+        means = [
+            summary["objectives"][name][metric]["mean"] for name in objectives
+        ]
         errors = [
-            summary["objectives"][name][metric]["std"] or 0 for name in objectives
+            summary["objectives"][name][metric]["std"] or 0
+            for name in objectives
         ]
         axis.bar(objectives, means, yerr=errors, capsize=4, color="#2563eb")
         axis.set_ylabel(label)

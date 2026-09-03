@@ -6,9 +6,9 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from scipy.stats import spearmanr
+from scipy import stats
 
-from ..metrics import paired_metric_statistics
+from ..metrics import holm_adjusted_pvalues, paired_metric_statistics
 
 UTILITY_METRICS = (
     "goodput_mbps",
@@ -34,15 +34,12 @@ def join_accuracy_and_scheduler_utility(
         for row in heldout
     }
     joined = []
-    for metrics_path in sorted(
-        Path(scheduler_root).glob("*/seed_*/episode_metrics.csv")
-    ):
+    pattern = "*/seed_*/episode_metrics.csv"
+    for metrics_path in sorted(Path(scheduler_root).glob(pattern)):
         objective = metrics_path.parent.parent.name
         seed = int(metrics_path.parent.name.removeprefix("seed_"))
         rows = _read_csv(metrics_path)
-        indexed = {
-            (row["scheduler"], row["scenario_id"]): row for row in rows
-        }
+        indexed = {(row["scheduler"], row["scenario_id"]): row for row in rows}
         scenarios = sorted(
             scenario
             for scheduler, scenario in indexed
@@ -71,6 +68,21 @@ def join_accuracy_and_scheduler_utility(
     return joined
 
 
+def _apply_holm_family(metrics: dict[str, dict[str, Any]]) -> None:
+    names = list(metrics)
+    t_adjusted = holm_adjusted_pvalues(
+        metrics[name]["paired_t_test_p_value"] for name in names
+    )
+    wilcoxon_adjusted = holm_adjusted_pvalues(
+        metrics[name]["wilcoxon_p_value"] for name in names
+    )
+    for name, t_value, wilcoxon_value in zip(
+        names, t_adjusted, wilcoxon_adjusted, strict=True
+    ):
+        metrics[name]["paired_t_test_holm_p_value"] = t_value
+        metrics[name]["wilcoxon_holm_p_value"] = wilcoxon_value
+
+
 def summarize_utility(rows: list[dict[str, Any]]) -> dict[str, Any]:
     summary = {}
     for objective in sorted({row["objective"] for row in rows}):
@@ -86,13 +98,15 @@ def summarize_utility(rows: list[dict[str, Any]]) -> dict[str, Any]:
             metrics[metric] = paired_metric_statistics(
                 proposed,
                 baseline,
-                higher_is_better=metric not in {
+                higher_is_better=metric
+                not in {
                     "scheduled_outage_fraction",
                     "p95_latency_ms",
                     "deadline_miss_ratio",
                 },
                 clusters=[row["scenario_id"] for row in selected],
             )
+        _apply_holm_family(metrics)
         summary[objective] = {
             "scenario_seed_rows": len(selected),
             "independent_scenarios": len(
@@ -103,7 +117,7 @@ def summarize_utility(rows: list[dict[str, Any]]) -> dict[str, Any]:
     if rows:
         ade = np.asarray([row["ade_m"] for row in rows], dtype=float)
         gain = np.asarray([row["delta_goodput_mbps"] for row in rows], dtype=float)
-        correlation = spearmanr(ade, gain)
+        correlation = stats.spearmanr(ade, gain)
         summary["ade_vs_realized_goodput_gain"] = {
             "spearman_rho": float(correlation.statistic),
             "p_value": float(correlation.pvalue),

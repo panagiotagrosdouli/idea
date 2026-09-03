@@ -2,10 +2,42 @@
   "id": "stage5",
   "title": "Untouched official-validation predictor evaluation",
   "depends_on": ["stage4"],
-  "required_inputs": ["${TRAIN_NPZ}", "${VALIDATION_NPZ}", "artifacts/paper_final/04_learning/learned_ablation/completion_manifest.json"],
-  "outputs": ["artifacts/paper_final/05_heldout/heldout_summary.json"],
-  "acceptance": ["ADE/FDE", "range/bearing/SNR/goodput/lifetime", "outage F1/AUROC", "development-fitted NLL and coverage"],
+  "required_inputs": [
+    "${TRAIN_NPZ}",
+    "${VALIDATION_NPZ}",
+    "${CHECKPOINT_GLOB}",
+    "artifacts/paper_final/04_learning/learned_ablation/completion_manifest.json",
+    "artifacts/paper_final/02_link/dbpsk_ber_lut.csv",
+    "artifacts/paper_final/02_link/link_verification.json"
+  ],
+  "outputs": [
+    "artifacts/paper_final/05_heldout/heldout_summary.json",
+    "artifacts/paper_final/05_heldout/heldout_metrics_by_scenario.csv",
+    "artifacts/paper_final/05_heldout/heldout_provenance.json"
+  ],
+  "acceptance": [
+    "exactly 20 frozen Stage-4 checkpoints verified against completion manifest",
+    "untouched split=official_validation only",
+    "verified frozen Part-A BER LUT used for link metrics",
+    "ADE/FDE",
+    "range/bearing/SNR/goodput/lifetime",
+    "outage F1/AUROC",
+    "development-fitted NLL and coverage"
+  ],
   "commands": [
-    ["python", "scripts/06_evaluate_learned_checkpoints.py", "${VALIDATION_NPZ}", "${CHECKPOINT_GLOB}", "--development-npz", "${TRAIN_NPZ}", "--output", "artifacts/paper_final/05_heldout"]
+    [
+      "python",
+      "scripts/06_evaluate_learned_checkpoints.py",
+      "${VALIDATION_NPZ}",
+      "${CHECKPOINT_GLOB}",
+      "--development-npz",
+      "${TRAIN_NPZ}",
+      "--completion-manifest",
+      "artifacts/paper_final/04_learning/learned_ablation/completion_manifest.json",
+      "--ber-lut",
+      "artifacts/paper_final/02_link/dbpsk_ber_lut.csv",
+      "--output",
+      "artifacts/paper_final/05_heldout"
+    ]
   ]
 }

@@ -3,16 +3,18 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 
 import numpy as np
 
 from predictive_pc_fmcw.config import load_config
 from predictive_pc_fmcw.learning.calibration import fit_residual_gaussian
+from predictive_pc_fmcw.learning.completion import verify_completion_manifest
 from predictive_pc_fmcw.learning.heldout import evaluate_checkpoint_arrays
 from predictive_pc_fmcw.learning.inference import TorchCheckpointPredictor
 from predictive_pc_fmcw.link import LinkModel
+from predictive_pc_fmcw.link_verification import verify_lut
 
 
 def _predict_in_batches(predictor, history, horizon, batch_size):
@@ -40,27 +42,76 @@ def main() -> None:
         "--development-npz",
         help="Development-only NPZ used to fit residual Gaussian uncertainty.",
     )
+    parser.add_argument(
+        "--completion-manifest",
+        help="Stage-4 manifest proving the frozen 20-checkpoint ablation is complete.",
+    )
+    parser.add_argument(
+        "--ber-lut",
+        help="Verified Stage-2 Part-A LUT used for held-out link metrics.",
+    )
     args = parser.parse_args()
     destination = Path(args.output)
     destination.mkdir(parents=True, exist_ok=True)
-    data = np.load(args.validation_npz, allow_pickle=False)
-    split_labels = set(np.asarray(data["split"]).astype(str).tolist())
-    if split_labels != {"official_validation"}:
-        raise ValueError(
-            "Held-out evaluation requires split=official_validation for every sample; "
-            f"received {sorted(split_labels)}."
+
+    with np.load(args.validation_npz, allow_pickle=False) as data:
+        split_labels = set(np.asarray(data["split"]).astype(str).tolist())
+        if split_labels != {"official_validation"}:
+            raise ValueError(
+                "Held-out evaluation requires split=official_validation for every "
+                f"sample; received {sorted(split_labels)}."
+            )
+        validation_arrays = {
+            "history_xy": np.asarray(data["history_xy"]),
+            "future_xy": np.asarray(data["future_xy"]),
+            "future_ego_heading_rad": np.asarray(data["future_ego_heading_rad"]),
+            "scenario_id": np.asarray(data["scenario_id"]),
+        }
+
+    completion_report = None
+    if args.completion_manifest:
+        if not args.development_npz:
+            raise ValueError(
+                "completion-manifest verification requires --development-npz."
+            )
+        completion_report = verify_completion_manifest(
+            args.completion_manifest,
+            training_npz=args.development_npz,
+            checkpoints=list(args.checkpoints),
         )
-    link_model = LinkModel(load_config(args.config).link)
+        if completion_report["status"] != "PASS":
+            raise ValueError("Stage-4 completion manifest verification failed.")
+
+    config = load_config(args.config)
+    link_config = config.link
+    lut_report = None
+    if args.ber_lut:
+        lut_report = verify_lut(args.ber_lut)
+        if lut_report["status"] != "PASS":
+            raise ValueError("The supplied BER LUT does not satisfy the Stage-2 gate.")
+        link_config = replace(
+            link_config,
+            ber_source="lut",
+            ber_lut_path=str(Path(args.ber_lut)),
+        )
+    link_model = LinkModel(link_config)
+
     all_rows = []
     development = None
+    development_mask = None
     if args.development_npz:
-        development = np.load(args.development_npz, allow_pickle=False)
-        development_labels = np.asarray(development["split"]).astype(str)
-        development_mask = development_labels == "development"
+        with np.load(args.development_npz, allow_pickle=False) as source:
+            development = {
+                "history_xy": np.asarray(source["history_xy"]),
+                "future_xy": np.asarray(source["future_xy"]),
+                "split": np.asarray(source["split"]).astype(str),
+            }
+        development_mask = development["split"] == "development"
         if not np.any(development_mask):
             raise ValueError(
                 "Uncertainty calibration requires at least one development sample."
             )
+
     for checkpoint in args.checkpoints:
         predictor = TorchCheckpointPredictor(checkpoint, device=args.device)
         payload = predictor._torch.load(
@@ -68,7 +119,7 @@ def main() -> None:
         )
         training = payload.get("training", {})
         calibration = None
-        if development is not None:
+        if development is not None and development_mask is not None:
             development_history = development["history_xy"][development_mask]
             development_future = development["future_xy"][development_mask]
             predicted_development = _predict_in_batches(
@@ -90,10 +141,12 @@ def main() -> None:
         all_rows.extend(
             evaluate_checkpoint_arrays(
                 predictor=predictor,
-                history_xy=data["history_xy"],
-                future_xy=data["future_xy"],
-                future_ego_heading_rad=data["future_ego_heading_rad"],
-                scenario_ids=data["scenario_id"],
+                history_xy=validation_arrays["history_xy"],
+                future_xy=validation_arrays["future_xy"],
+                future_ego_heading_rad=validation_arrays[
+                    "future_ego_heading_rad"
+                ],
+                scenario_ids=validation_arrays["scenario_id"],
                 link_model=link_model,
                 checkpoint=str(checkpoint),
                 objective=str(training.get("objective", "unknown")),
@@ -102,7 +155,10 @@ def main() -> None:
                 calibration=calibration,
             )
         )
+
     dictionaries = [asdict(row) for row in all_rows]
+    if not dictionaries:
+        raise ValueError("Held-out evaluation produced no scenario rows.")
     csv_path = destination / "heldout_metrics_by_scenario.csv"
     with csv_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=dictionaries[0].keys())
@@ -135,6 +191,20 @@ def main() -> None:
         }
     (destination / "heldout_summary.json").write_text(
         json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    provenance = {
+        "validation_npz": args.validation_npz,
+        "development_npz": args.development_npz,
+        "completion_verification": completion_report,
+        "ber_lut_verification": lut_report,
+        "link_model": {
+            "ber_source": link_config.ber_source,
+            "ber_lut_path": link_config.ber_lut_path,
+            "received_power_calibrated": link_config.received_power_calibrated,
+        },
+    }
+    (destination / "heldout_provenance.json").write_text(
+        json.dumps(provenance, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     print(json.dumps(summary, indent=2, sort_keys=True))
 
