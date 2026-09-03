@@ -6,8 +6,9 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from predictive_pc_fmcw.metrics import paired_metric_statistics
 from scipy.stats import spearmanr
+
+from predictive_pc_fmcw.metrics import paired_metric_statistics
 
 
 UTILITY_METRICS = (
