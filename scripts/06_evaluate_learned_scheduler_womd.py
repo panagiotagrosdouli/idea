@@ -82,9 +82,32 @@ def main() -> None:
         seed = int(training.get("seed", -1))
         run_dir = destination / objective / f"seed_{seed}"
         summary_path = run_dir / "summary.json"
+        run_manifest_path = run_dir / "run_manifest.json"
+        run_manifest = {
+            "checkpoint": str(checkpoint),
+            "objective": objective,
+            "model_seed": seed,
+            "traffic_seeds": args.traffic_seeds,
+            "schedulers": args.schedulers,
+            "scenario_ids": manifest["scenario_ids"],
+        }
         if summary_path.is_file():
-            completed.append(str(summary_path))
-            continue
+            existing_manifest = (
+                json.loads(run_manifest_path.read_text(encoding="utf-8"))
+                if run_manifest_path.is_file()
+                else None
+            )
+            if existing_manifest == run_manifest:
+                completed.append(str(summary_path))
+                continue
+            raise RuntimeError(
+                f"Existing run {run_dir} was produced by an incompatible plan. "
+                "Choose a new output directory or remove that run explicitly."
+            )
+        run_dir.mkdir(parents=True, exist_ok=True)
+        run_manifest_path.write_text(
+            json.dumps(run_manifest, indent=2) + "\n", encoding="utf-8"
+        )
         outputs = []
         for traffic_seed in args.traffic_seeds:
             outputs.extend(
