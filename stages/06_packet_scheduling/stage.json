@@ -2,10 +2,47 @@
   "id": "stage6",
   "title": "Paired official-WOMD packet scheduling",
   "depends_on": ["stage5"],
-  "required_inputs": ["${VALIDATION_TFRECORD}", "artifacts/paper_final/05_heldout/heldout_summary.json"],
-  "outputs": ["artifacts/paper_final/06_scheduling/completed_runs.json"],
-  "acceptance": ["eight scheduler families", "five paired traffic seeds", "ground-truth packet realization", "per-scenario raw metrics"],
+  "required_inputs": [
+    "${TRAIN_NPZ}",
+    "${VALIDATION_TFRECORD}",
+    "${CHECKPOINT_GLOB}",
+    "artifacts/paper_final/04_learning/learned_ablation/completion_manifest.json",
+    "artifacts/paper_final/05_heldout/heldout_summary.json",
+    "artifacts/paper_final/05_heldout/heldout_metrics_by_scenario.csv",
+    "artifacts/paper_final/05_heldout/heldout_provenance.json",
+    "artifacts/paper_final/02_link/dbpsk_ber_lut.csv",
+    "artifacts/paper_final/02_link/link_verification.json"
+  ],
+  "outputs": [
+    "artifacts/paper_final/06_scheduling/completed_runs.json",
+    "artifacts/paper_final/06_scheduling/evaluation_manifest.json"
+  ],
+  "acceptance": [
+    "exactly 20 frozen learned checkpoints verified",
+    "raw validation TFRecord scenario IDs match Stage-5 heldout scenario IDs",
+    "verified frozen Part-A BER LUT used",
+    "eight scheduler families",
+    "five paired traffic seeds",
+    "ground-truth future used only for realized packet outcomes/oracle",
+    "per-scenario raw metrics"
+  ],
   "commands": [
-    ["python", "scripts/06_evaluate_learned_scheduler_womd.py", "${VALIDATION_TFRECORD}", "--checkpoints", "${CHECKPOINT_GLOB}", "--output", "artifacts/paper_final/06_scheduling"]
+    [
+      "python",
+      "scripts/06_evaluate_learned_scheduler_womd.py",
+      "${VALIDATION_TFRECORD}",
+      "--checkpoints",
+      "${CHECKPOINT_GLOB}",
+      "--training-npz",
+      "${TRAIN_NPZ}",
+      "--completion-manifest",
+      "artifacts/paper_final/04_learning/learned_ablation/completion_manifest.json",
+      "--ber-lut",
+      "artifacts/paper_final/02_link/dbpsk_ber_lut.csv",
+      "--heldout-metrics",
+      "artifacts/paper_final/05_heldout/heldout_metrics_by_scenario.csv",
+      "--output",
+      "artifacts/paper_final/06_scheduling"
+    ]
   ]
 }
