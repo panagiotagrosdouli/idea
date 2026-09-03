@@ -9,7 +9,9 @@ from predictive_pc_fmcw.release import verify_release_readiness
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Block final-paper release while stale draft claims or evidence gaps remain."
+        description=(
+            "Block final-paper release while stale draft claims or evidence gaps remain."
+        )
     )
     parser.add_argument("--manuscript", default="paper/PAPER_DRAFT.md")
     parser.add_argument("--evidence", nargs="+", required=True)
