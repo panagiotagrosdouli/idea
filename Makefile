@@ -1,6 +1,6 @@
 .PHONY: install test lint validate benchmark womd ablation matrix paper-quick \
 	paper-full motion manifest paper-ablation staged corrected-quick \
-	corrected-full paper-draft reproducibility reproduce split-audit
+	corrected-full paper-draft reproducibility reproduce split-audit stages stage
 
 install:
 	python -m pip install -e ".[dev]"
@@ -43,6 +43,13 @@ split-audit:
 		(echo "Set TRAIN_NPZ and VALIDATION_NPZ"; exit 2)
 	PYTHONPATH=src python scripts/00_audit_womd_split_integrity.py \
 		training=$(TRAIN_NPZ) official_validation=$(VALIDATION_NPZ)
+
+stages:
+	PYTHONPATH=src python scripts/run_research_stage.py
+
+stage:
+	@test -n "$(STAGE)" || (echo "Set STAGE=stage0 ... stage8"; exit 2)
+	PYTHONPATH=src python scripts/run_research_stage.py --stage $(STAGE) $(EXECUTE)
 
 paper-ablation:
 	pcfmcw paper-ablation --config configs/default.json \
