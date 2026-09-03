@@ -7,7 +7,6 @@ import numpy as np
 
 from .dataset_audit import audit_training_npz
 
-
 OFFICIAL_SOURCE = "real_WOMD_v1.3.1_true_SDC_geometry"
 OFFICIAL_COORDINATE_FRAME = "world_xy_with_explicit_ego_heading"
 OFFICIAL_VALIDATION_SPLIT = "official_validation"
