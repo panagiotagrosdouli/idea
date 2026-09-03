@@ -3,7 +3,7 @@
 **English** | [Ελληνικά](README_GR.md)
 
 > **Structured paper workflow:** follow the [Stage 0-8 execution guide](docs/STAGED_EXECUTION_GR.md)
-> and its machine-readable [research protocol](configs/research_stages.json).
+> and the executable [`stages/`](stages) workspace.
 
 ![System overview](docs/assets/readme-hero.webp)
 
