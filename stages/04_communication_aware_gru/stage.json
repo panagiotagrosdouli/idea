@@ -3,10 +3,70 @@
   "title": "Communication-aware GRU selection and five-seed training",
   "depends_on": ["stage3"],
   "required_inputs": ["${TRAIN_NPZ}"],
-  "outputs": ["artifacts/paper_final/04_learning/learned_ablation/completion_manifest.json"],
-  "acceptance": ["lambda selected on development only", "four objectives times five seeds", "20 verified checkpoints", "dataset/config hashes embedded"],
+  "outputs": [
+    "artifacts/paper_final/04_learning/lambda_sweep/lambda_sweep_plan.json",
+    "artifacts/paper_final/04_learning/lambda_sweep/lambda_sweep_results.json",
+    "artifacts/paper_final/04_learning/lambda_selection.json",
+    "artifacts/paper_final/04_learning/learned_ablation/completion_manifest.json"
+  ],
+  "acceptance": [
+    "complete five-seed lambda sweep on development data",
+    "selected lambda pair is explicitly frozen from a swept setting",
+    "selection rationale recorded before held-out evaluation",
+    "four objectives times five frozen seeds",
+    "20 verified checkpoints",
+    "dataset/config hashes embedded"
+  ],
   "commands": [
-    ["python", "scripts/04_run_lambda_sweep.py", "${TRAIN_NPZ}", "--output", "artifacts/paper_final/04_learning/lambda_sweep", "--epochs", "80", "--batch-size", "32", "--seeds", "20260827", "20260828", "20260829", "20260830", "20260831"],
-    ["python", "scripts/04_run_training_ablation.py", "${TRAIN_NPZ}", "--output", "artifacts/paper_final/04_learning/learned_ablation", "--epochs", "80", "--batch-size", "32", "--seeds", "20260827", "20260828", "20260829", "20260830", "20260831", "--lambda-link", "${LAMBDA_LINK}", "--lambda-outage", "${LAMBDA_OUTAGE}"]
+    [
+      "python",
+      "scripts/04_run_lambda_sweep.py",
+      "${TRAIN_NPZ}",
+      "--output",
+      "artifacts/paper_final/04_learning/lambda_sweep",
+      "--epochs",
+      "80",
+      "--batch-size",
+      "32",
+      "--seeds",
+      "20260827",
+      "20260828",
+      "20260829",
+      "20260830",
+      "20260831"
+    ],
+    [
+      "python",
+      "scripts/04_freeze_lambda_selection.py",
+      "artifacts/paper_final/04_learning/lambda_sweep",
+      "${TRAIN_NPZ}",
+      "--lambda-link",
+      "${LAMBDA_LINK}",
+      "--lambda-outage",
+      "${LAMBDA_OUTAGE}",
+      "--rationale",
+      "${LAMBDA_SELECTION_RATIONALE}",
+      "--output",
+      "artifacts/paper_final/04_learning/lambda_selection.json"
+    ],
+    [
+      "python",
+      "scripts/04_run_training_ablation.py",
+      "${TRAIN_NPZ}",
+      "--output",
+      "artifacts/paper_final/04_learning/learned_ablation",
+      "--epochs",
+      "80",
+      "--batch-size",
+      "32",
+      "--seeds",
+      "20260827",
+      "20260828",
+      "20260829",
+      "20260830",
+      "20260831",
+      "--selection",
+      "artifacts/paper_final/04_learning/lambda_selection.json"
+    ]
   ]
 }
