@@ -34,13 +34,12 @@ def join_accuracy_and_scheduler_utility(
         for row in heldout
     }
     joined = []
-    for metrics_path in sorted(Path(scheduler_root).glob("*/seed_*/episode_metrics.csv")):
+    pattern = "*/seed_*/episode_metrics.csv"
+    for metrics_path in sorted(Path(scheduler_root).glob(pattern)):
         objective = metrics_path.parent.parent.name
         seed = int(metrics_path.parent.name.removeprefix("seed_"))
         rows = _read_csv(metrics_path)
-        indexed = {
-            (row["scheduler"], row["scenario_id"]): row for row in rows
-        }
+        indexed = {(row["scheduler"], row["scenario_id"]): row for row in rows}
         scenarios = sorted(
             scenario
             for scheduler, scenario in indexed
@@ -84,7 +83,8 @@ def summarize_utility(rows: list[dict[str, Any]]) -> dict[str, Any]:
             metrics[metric] = paired_metric_statistics(
                 proposed,
                 baseline,
-                higher_is_better=metric not in {
+                higher_is_better=metric
+                not in {
                     "scheduled_outage_fraction",
                     "p95_latency_ms",
                     "deadline_miss_ratio",
