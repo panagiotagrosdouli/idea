@@ -49,9 +49,14 @@ def main() -> None:
             validation_npz = Path(args.validation_npz).resolve()
             dataset_report["official_validation_npz"] = str(validation_npz)
             dataset_report["official_validation_sha256"] = sha256_file(validation_npz)
-            dataset_report["split_integrity"] = audit_scenario_overlap(
+            split_integrity = audit_scenario_overlap(
                 {"training_corpus": training_npz, "official_validation": validation_npz}
             )
+            if not split_integrity["passed"]:
+                raise ValueError(
+                    "Cannot freeze paper manifest: scenario leakage was detected."
+                )
+            dataset_report["split_integrity"] = split_integrity
         dataset_manifest.write_text(
             json.dumps(dataset_report, indent=2) + "\n", encoding="utf-8"
         )
