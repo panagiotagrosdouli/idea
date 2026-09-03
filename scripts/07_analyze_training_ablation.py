@@ -7,12 +7,11 @@ from collections import defaultdict
 from pathlib import Path
 
 import matplotlib
-
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
 
+matplotlib.use("Agg")
 
 METRICS = (
     "validation_ade_m",
@@ -105,7 +104,9 @@ def main() -> None:
         (axes[1], "validation_link_loss", "Internal development link loss"),
     ):
         means = [summary["objectives"][name][metric]["mean"] for name in objectives]
-        errors = [summary["objectives"][name][metric]["std"] or 0 for name in objectives]
+        errors = [
+            summary["objectives"][name][metric]["std"] or 0 for name in objectives
+        ]
         axis.bar(objectives, means, yerr=errors, capsize=4, color="#2563eb")
         axis.set_ylabel(label)
         axis.tick_params(axis="x", rotation=25)
