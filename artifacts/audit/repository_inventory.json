@@ -8,13 +8,14 @@
     "python_requires": ">=3.10"
   },
   "environment": {
-    "ci_os": "ubuntu-latest",
-    "ci_python": "3.11",
+    "ci_os": "ubuntu-24.04",
+    "ci_python": "3.11.16",
     "ci_install": "pip install -e .[dev]"
   },
   "branches": {
     "audited_branch": "feature/rl-scheduling",
     "audit_baseline_sha": "7bed967e6ea7ce3a104f82fac0856c38c52fb1ed",
+    "verified_code_sha": "3cdb108ec5c3b50b96b2c61ffbfa579297f1dd8b",
     "observed_main_sha": "35e0f24615e01f0c1c0f93ce013f7734918ccb56"
   },
   "entry_points": [
@@ -24,7 +25,7 @@
     "scripts/*.py"
   ],
   "configs": ["configs/"],
-  "tests": ["tests/"],
+  "tests": [{"path": "tests/", "verified_passed": 71}],
   "stages": [
     "stage0",
     "stage1",
@@ -57,17 +58,24 @@
   "artifacts": [
     "artifacts/corrected_v1/",
     "artifacts/corrected_v2/",
-    "artifacts/paper_final/ where present"
+    "artifacts/paper_final/ where present",
+    "artifacts/audit/"
   ],
   "paper_files": ["paper/"],
   "ci_workflows": [".github/workflows/ci.yml"],
+  "verification": {
+    "ci_run_id": 33731714105,
+    "ruff": "PASS",
+    "pytest": "PASS: 71",
+    "scientific_validation": "PASS"
+  },
   "rl": {
-    "state": "implemented",
-    "reward": "implemented",
-    "environment": "implemented_unverified_end_to_end",
-    "transition_backend": "implemented_unverified_end_to_end",
-    "oracle_guard": "implemented",
-    "action_mask": "implemented",
+    "state": "implemented_unit_verified",
+    "reward": "implemented_unit_verified",
+    "environment": "implemented_unit_verified_end_to_end_pending",
+    "transition_backend": "implemented_end_to_end_pending",
+    "oracle_guard": "implemented_unit_verified",
+    "action_mask": "implemented_unit_verified",
     "dqn": "missing",
     "ppo": "missing",
     "equivalence_gate": "missing"
@@ -84,5 +92,5 @@
     "DQN/PPO agents",
     "final venue-formatted manuscript and release manifest"
   ],
-  "gate0_status": "PARTIAL"
+  "gate0_status": "PASS"
 }
