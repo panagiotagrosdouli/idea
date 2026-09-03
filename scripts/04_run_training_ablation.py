@@ -49,8 +49,8 @@ def main() -> None:
         lambda_link, lambda_outage = args.lambda_link, args.lambda_outage
     else:
         raise ValueError(
-            "Provide --selection for canonical training, or both explicit lambda values "
-            "for non-canonical experiments."
+            "Provide --selection for canonical training, or both explicit "
+            "lambda values for non-canonical experiments."
         )
     results = run_training_ablation(
         args.dataset,
