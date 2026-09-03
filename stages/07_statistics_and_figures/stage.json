@@ -1,0 +1,12 @@
+{
+  "id": "stage7",
+  "title": "Operating regions, clustered statistics and paper artifacts",
+  "depends_on": ["stage6"],
+  "required_inputs": ["artifacts/paper_final/official_scheduler/completed_runs.json"],
+  "outputs": ["artifacts/paper_final/learned_analysis/learned_heldout_analysis.json", "artifacts/paper_final/statistics/scheduler_utility_summary.json"],
+  "acceptance": ["scenario-cluster bootstrap", "paired Wilcoxon and t-test", "Holm families", "horizon/N/load/slice results", "ADE-to-goodput join"],
+  "commands": [
+    ["python", "scripts/07_analyze_learned_results.py", "artifacts/paper_final/heldout_learned/heldout_metrics_by_scenario.csv", "--output", "artifacts/paper_final/learned_analysis"],
+    ["python", "scripts/07_analyze_scheduler_utility.py", "artifacts/paper_final/heldout_learned/heldout_metrics_by_scenario.csv", "artifacts/paper_final/official_scheduler", "--output", "artifacts/paper_final/statistics"]
+  ]
+}
