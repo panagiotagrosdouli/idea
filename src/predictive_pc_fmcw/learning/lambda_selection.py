@@ -62,5 +62,7 @@ def load_lambda_selection(
     if payload.get("selection_scope") != "development_only":
         raise ValueError("Lambda selection must be development-only.")
     if payload.get("dataset_sha256") != sha256_file(dataset_path):
-        raise ValueError("Lambda selection dataset hash does not match training corpus.")
+        raise ValueError(
+            "Lambda selection dataset hash does not match training corpus."
+        )
     return float(payload["lambda_link"]), float(payload["lambda_outage"])
