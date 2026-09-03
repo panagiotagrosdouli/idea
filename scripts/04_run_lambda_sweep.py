@@ -2,15 +2,18 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import asdict
+from dataclasses import asdict, replace
+from pathlib import Path
 
 from predictive_pc_fmcw.config import load_config
 from predictive_pc_fmcw.learning.lambda_sweep import (
     default_lambda_settings,
     run_lambda_sweep,
 )
+from predictive_pc_fmcw.link_verification import verify_lut
 
 CANONICAL_SEEDS = [20260827, 20260828, 20260829, 20260830, 20260831]
+CANONICAL_BER_LUT = "artifacts/paper_final/02_link/dbpsk_ber_lut.csv"
 
 
 def main() -> None:
@@ -18,8 +21,11 @@ def main() -> None:
         description="Run the pre-registered communication-loss lambda sweep."
     )
     parser.add_argument("dataset")
-    parser.add_argument("--output", default="artifacts/lambda_sweep")
+    parser.add_argument(
+        "--output", default="artifacts/paper_final/04_learning/lambda_sweep"
+    )
     parser.add_argument("--config", default="configs/default.json")
+    parser.add_argument("--ber-lut", default=CANONICAL_BER_LUT)
     parser.add_argument("--epochs", type=int, default=80)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--seeds", nargs="+", type=int, default=CANONICAL_SEEDS)
@@ -38,10 +44,18 @@ def main() -> None:
             )
         )
         return
+    verification = verify_lut(args.ber_lut)
+    if verification["status"] != "PASS":
+        raise ValueError("The supplied BER LUT does not satisfy the Stage-2 gate.")
+    link_config = replace(
+        load_config(args.config).link,
+        ber_source="lut",
+        ber_lut_path=str(Path(args.ber_lut)),
+    )
     results = run_lambda_sweep(
         args.dataset,
         args.output,
-        link_config=load_config(args.config).link,
+        link_config=link_config,
         seeds=tuple(args.seeds),
         epochs=args.epochs,
         batch_size=args.batch_size,

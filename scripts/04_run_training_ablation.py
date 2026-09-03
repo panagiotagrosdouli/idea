@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import asdict
+from dataclasses import asdict, replace
+from pathlib import Path
 
 from predictive_pc_fmcw.config import load_config
 from predictive_pc_fmcw.learning.ablation import (
@@ -10,8 +11,10 @@ from predictive_pc_fmcw.learning.ablation import (
     run_training_ablation,
 )
 from predictive_pc_fmcw.learning.lambda_selection import load_lambda_selection
+from predictive_pc_fmcw.link_verification import verify_lut
 
 CANONICAL_SEEDS = [20260827, 20260828, 20260829, 20260830, 20260831]
+CANONICAL_BER_LUT = "artifacts/paper_final/02_link/dbpsk_ber_lut.csv"
 
 
 def main() -> None:
@@ -19,8 +22,11 @@ def main() -> None:
         description="Run the pre-registered four-objective, five-seed GRU ablation."
     )
     parser.add_argument("dataset")
-    parser.add_argument("--output", default="artifacts/learned_ablation")
+    parser.add_argument(
+        "--output", default="artifacts/paper_final/04_learning/learned_ablation"
+    )
     parser.add_argument("--config", default="configs/default.json")
+    parser.add_argument("--ber-lut", default=CANONICAL_BER_LUT)
     parser.add_argument("--epochs", type=int, default=80)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--seeds", nargs="+", type=int, default=CANONICAL_SEEDS)
@@ -41,6 +47,9 @@ def main() -> None:
         plan = build_training_ablation_plan(args.dataset, seeds, args.epochs)
         print(json.dumps(asdict(plan), indent=2))
         return
+    verification = verify_lut(args.ber_lut)
+    if verification["status"] != "PASS":
+        raise ValueError("The supplied BER LUT does not satisfy the Stage-2 gate.")
     if args.selection:
         lambda_link, lambda_outage = load_lambda_selection(
             args.selection, args.dataset
@@ -52,10 +61,15 @@ def main() -> None:
             "Provide --selection for canonical training, or both explicit "
             "lambda values for non-canonical experiments."
         )
+    link_config = replace(
+        load_config(args.config).link,
+        ber_source="lut",
+        ber_lut_path=str(Path(args.ber_lut)),
+    )
     results = run_training_ablation(
         args.dataset,
         args.output,
-        link_config=load_config(args.config).link,
+        link_config=link_config,
         seeds=seeds,
         epochs=args.epochs,
         batch_size=args.batch_size,

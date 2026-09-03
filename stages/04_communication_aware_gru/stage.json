@@ -2,7 +2,11 @@
   "id": "stage4",
   "title": "Communication-aware GRU selection and five-seed training",
   "depends_on": ["stage3"],
-  "required_inputs": ["${TRAIN_NPZ}"],
+  "required_inputs": [
+    "${TRAIN_NPZ}",
+    "artifacts/paper_final/02_link/dbpsk_ber_lut.csv",
+    "artifacts/paper_final/02_link/link_verification.json"
+  ],
   "outputs": [
     "artifacts/paper_final/04_learning/lambda_sweep/lambda_sweep_plan.json",
     "artifacts/paper_final/04_learning/lambda_sweep/lambda_sweep_results.json",
@@ -13,6 +17,7 @@
     "complete five-seed lambda sweep on development data",
     "selected lambda pair is explicitly frozen from a swept setting",
     "selection rationale recorded before held-out evaluation",
+    "verified frozen Part-A BER LUT used for communication-aware losses",
     "four objectives times five frozen seeds",
     "20 verified checkpoints",
     "dataset/config hashes embedded"
@@ -22,6 +27,8 @@
       "python",
       "scripts/04_run_lambda_sweep.py",
       "${TRAIN_NPZ}",
+      "--ber-lut",
+      "artifacts/paper_final/02_link/dbpsk_ber_lut.csv",
       "--output",
       "artifacts/paper_final/04_learning/lambda_sweep",
       "--epochs",
@@ -53,6 +60,8 @@
       "python",
       "scripts/04_run_training_ablation.py",
       "${TRAIN_NPZ}",
+      "--ber-lut",
+      "artifacts/paper_final/02_link/dbpsk_ber_lut.csv",
       "--output",
       "artifacts/paper_final/04_learning/learned_ablation",
       "--epochs",
