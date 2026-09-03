@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from dataclasses import replace
 from pathlib import Path
 
 from predictive_pc_fmcw.benchmark import (
@@ -27,6 +28,26 @@ def main() -> None:
     parser.add_argument("--max-scenarios", type=int)
     parser.add_argument("--max-vehicles", type=int, default=16)
     parser.add_argument("--device")
+    parser.add_argument(
+        "--schedulers",
+        nargs="+",
+        default=[
+            "reactive_greedy",
+            "proportional_fair",
+            "cv_predictive",
+            "kalman_predictive",
+            "imm_predictive",
+            "link_lifetime",
+            "learned_predictive",
+            "oracle",
+        ],
+    )
+    parser.add_argument(
+        "--traffic-seeds",
+        nargs="+",
+        type=int,
+        default=[20260827, 20260828, 20260829, 20260830, 20260831],
+    )
     args = parser.parse_args()
     destination = Path(args.output)
     destination.mkdir(parents=True, exist_ok=True)
@@ -43,7 +64,9 @@ def main() -> None:
         "scenario_count": len(scenarios),
         "tfrecords": [str(path) for path in args.tfrecords],
         "checkpoints": args.checkpoints,
-        "paired_schedulers": ["reactive_greedy", "learned_predictive", "oracle"],
+        "paired_schedulers": args.schedulers,
+        "traffic_seeds": args.traffic_seeds,
+        "independent_statistical_unit": "scenario_id",
     }
     (destination / "evaluation_manifest.json").write_text(
         json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
@@ -62,12 +85,16 @@ def main() -> None:
         if summary_path.is_file():
             completed.append(str(summary_path))
             continue
-        outputs = run_scenario_benchmark(
-            scenarios,
-            config,
-            scheduler_names=("reactive_greedy", "learned_predictive", "oracle"),
-            learned_predictor=predictor,
-        )
+        outputs = []
+        for traffic_seed in args.traffic_seeds:
+            outputs.extend(
+                run_scenario_benchmark(
+                    scenarios,
+                    replace(config, seed=traffic_seed),
+                    scheduler_names=args.schedulers,
+                    learned_predictor=predictor,
+                )
+            )
         artifacts = write_benchmark_artifacts(outputs, config, run_dir)
         completed.append(str(artifacts["summary"]))
         (destination / "completed_runs.json").write_text(
