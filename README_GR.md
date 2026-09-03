@@ -3,7 +3,7 @@
 [English](README.md) | **Ελληνικά**
 
 > **Οργανωμένη εκτέλεση του paper:** ακολουθήστε τον [οδηγό Stage 0-8](docs/STAGED_EXECUTION_GR.md)
-> και το μηχανικά ελέγξιμο [πρωτόκολλο σταδίων](configs/research_stages.json).
+> και τον εκτελέσιμο χώρο εργασίας [`stages/`](stages).
 
 ![System overview](docs/assets/readme-hero.webp)
 
