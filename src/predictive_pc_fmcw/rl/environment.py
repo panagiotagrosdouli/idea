@@ -22,12 +22,7 @@ class EnvironmentStep:
 
 
 class SchedulingTransitionBackend(Protocol):
-    """Adapter implemented by the packet simulator, not by an RL algorithm.
-
-    Keeping the transition mechanics behind this protocol ensures that DQN,
-    PPO and heuristic schedulers can share the same link, queue, deadline,
-    retry and packet-success realization logic.
-    """
+    """Adapter implemented by the packet simulator, not by an RL algorithm."""
 
     @property
     def vehicle_count(self) -> int: ...
@@ -64,10 +59,9 @@ class ActionSpec:
 class RLSchedulingEnv:
     """Gym-style scheduling environment without a hard Gymnasium dependency.
 
-    The environment owns only observation/action/reward semantics. Physical
-    link evolution, packet queues and delivery realization remain in the
-    shared simulation backend. This separation is intentional for fair paired
-    comparisons against non-RL schedulers.
+    Observation/action/reward semantics live here. Physical link evolution,
+    packet queues and delivery realization remain in the shared simulation
+    backend so RL and heuristic policies can be compared on paired traces.
     """
 
     def __init__(
@@ -92,12 +86,7 @@ class RLSchedulingEnv:
         return self._context
 
     def action_mask(self) -> NDArray[np.bool_]:
-        """Return deployable actions for the current causal state.
-
-        A vehicle action is valid only when that vehicle has queued packets.
-        No-op is always valid when every queue is empty and can optionally be
-        allowed with backlog for ablation/control studies.
-        """
+        """Return valid actions for the current causal state."""
 
         eligible = self.context.queue_lengths > 0
         mask = np.zeros(self.action_spec.size, dtype=bool)
@@ -126,11 +115,12 @@ class RLSchedulingEnv:
         bool,
         dict[str, object],
     ]:
+        action = int(action)
         mask = self.action_mask()
-        if not mask[int(action)] if 0 <= int(action) < mask.size else True:
+        if not 0 <= action < mask.size or not bool(mask[action]):
             raise ValueError(f"masked or invalid RL action: {action}")
 
-        vehicle = self.action_spec.decode(int(action))
+        vehicle = self.action_spec.decode(action)
         transition = self.backend.step(vehicle)
         reward = compute_reward(transition.outcome, self.reward_config)
 
@@ -147,8 +137,6 @@ class RLSchedulingEnv:
         }
 
         if transition.terminated:
-            # Gym-style terminal observation. We keep the shape stable rather
-            # than fabricating a future context.
             terminal = np.zeros_like(
                 build_observation(self.context, self.observation_config)
             )
