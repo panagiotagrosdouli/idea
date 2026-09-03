@@ -4,7 +4,7 @@ from pathlib import Path
 
 import numpy as np
 
-from scripts import _01_verify_womd_corpora  # type: ignore[attr-defined]
+from predictive_pc_fmcw.data.corpus_audit import verify_corpora
 
 
 class WomdCorpusVerificationTest(unittest.TestCase):
@@ -29,7 +29,7 @@ class WomdCorpusVerificationTest(unittest.TestCase):
             validation = root / "validation.npz"
             self._write(training, ["a", "b"], "training")
             self._write(validation, ["c", "d"], "validation")
-            report = _01_verify_womd_corpora.verify_corpora(training, validation)
+            report = verify_corpora(training, validation)
             self.assertEqual(report["status"], "PASS")
             self.assertEqual(report["cross_corpus_overlap"]["count"], 0)
 
@@ -40,7 +40,7 @@ class WomdCorpusVerificationTest(unittest.TestCase):
             validation = root / "validation.npz"
             self._write(training, ["a", "shared"], "training")
             self._write(validation, ["shared", "z"], "validation")
-            report = _01_verify_womd_corpora.verify_corpora(training, validation)
+            report = verify_corpora(training, validation)
             self.assertEqual(report["status"], "FAIL")
             self.assertEqual(report["cross_corpus_overlap"]["scenario_ids"], ["shared"])
 
