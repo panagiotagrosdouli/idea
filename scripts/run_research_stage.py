@@ -18,7 +18,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Inspect or execute the gated paper workflow one stage at a time."
     )
-    parser.add_argument("--config", default="configs/research_stages.json")
+    parser.add_argument("--config", default="stages")
     parser.add_argument("--stage", help="Stage identifier, for example stage0.")
     parser.add_argument("--execute", action="store_true")
     parser.add_argument("--status-json")
