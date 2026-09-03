@@ -7,8 +7,8 @@ from typing import Any
 
 import numpy as np
 from scipy import stats
-from ..metrics import paired_metric_statistics
 
+from ..metrics import paired_metric_statistics
 
 UTILITY_METRICS = (
     "goodput_mbps",
