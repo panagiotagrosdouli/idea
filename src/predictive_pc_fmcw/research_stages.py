@@ -21,7 +21,17 @@ class ResearchStage:
 
 def load_research_stages(path: str | Path) -> tuple[ResearchStage, ...]:
     source = Path(path)
-    payload = json.loads(source.read_text(encoding="utf-8"))
+    if source.is_dir():
+        stage_files = sorted(source.glob("*/stage.json"))
+        if not stage_files:
+            raise ValueError(f"No */stage.json definitions found under {source}.")
+        items = [
+            json.loads(stage_file.read_text(encoding="utf-8"))
+            for stage_file in stage_files
+        ]
+    else:
+        payload = json.loads(source.read_text(encoding="utf-8"))
+        items = payload["stages"]
     stages = tuple(
         ResearchStage(
             stage_id=str(item["id"]),
@@ -32,7 +42,7 @@ def load_research_stages(path: str | Path) -> tuple[ResearchStage, ...]:
             acceptance=tuple(item.get("acceptance", [])),
             commands=tuple(tuple(command) for command in item.get("commands", [])),
         )
-        for item in payload["stages"]
+        for item in items
     )
     validate_stage_graph(stages)
     return stages
