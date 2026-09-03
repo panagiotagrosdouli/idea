@@ -26,7 +26,7 @@ Status meanings:
 | Last/CV/CA/Kalman/IMM baselines | predictor library and forecast artifacts | Executed |
 | Existing/GRU model | versioned GRU inference/training code; 12 smoke checkpoints reported by Colab | Partial; paper-scale checkpoints pending |
 | Classical probabilistic baseline and calibration | residual Gaussian CV/CA; six calibration and six disjoint evaluation scenarios | Executed, controlled |
-| Learned Gaussian/GMM predictor and calibration | no compatible distributional checkpoint or ground truth paired with the supplied 70 predictions | Blocked |
+| Learned Gaussian/GMM predictor and calibration | development-only residual Gaussian wrapper now reports held-out NLL and 50/90/95% coverage | Implemented; official execution pending |
 | Transformer/SOTA comparator | not implemented | Optional, not done |
 | ADE/FDE and range/bearing/SNR metrics | forecast evaluator, CSV/JSON summaries | Executed |
 | Outage F1/AUROC and link-lifetime error | forecast evaluator and boundary diagnostics | Executed |
@@ -75,9 +75,9 @@ as proof of zero BER.
 | Trajectory/link/outage/full communication-aware losses | resumable GRU four-objective runner | Executed as smoke test; paper-scale training pending GPU quota |
 | Three or more training seeds | three-seed immutable plan and 12-run smoke result | Executed as smoke test; paper-scale evidence pending |
 | Communication-loss weight sweep | resumable one-axis link/outage lambda sweep over five settings and three seeds | Implemented; GPU execution pending |
-| Official held-out learned evaluation | validation-only split label plus per-scenario ADE/FDE/link/outage/goodput/lifetime evaluator | Implemented; official-validation NPZ and checkpoints pending |
+| Official held-out learned evaluation | validation-only label gate plus per-scenario ADE/FDE/link/outage/goodput/lifetime/NLL/coverage evaluator | Implemented; official-validation NPZ and checkpoints pending |
 | Learned objective analysis | objective tables, paired scenario-cluster statistics, ADE-vs-link-fidelity figure, explicit scheduler-utility scope warning | Implemented; execution pending held-out rows |
-| ADE versus realized communication utility | official-WOMD learned/reactive/oracle packet benchmark joined by objective, seed and scenario; paired statistics and paper figure | Implemented; execution pending checkpoints and GPU |
+| ADE versus realized communication utility | official-WOMD eight-scheduler benchmark with five paired traffic seeds, joined by objective/model seed/scenario | Implemented; execution pending checkpoints and GPU |
 | Horizon/load/channel/traffic/sensing/FoV sweeps | 12 one-axis studies | Executed |
 | Five independent staged seeds | 1,125 policy rows in `corrected_v2` | Executed |
 | PDR, goodput, P50/P95/P99, miss/censoring, fairness | machine-readable episode metrics | Executed |
