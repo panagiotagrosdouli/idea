@@ -1,5 +1,6 @@
 {
   "audit_baseline_sha": "7bed967e6ea7ce3a104f82fac0856c38c52fb1ed",
+  "verified_code_sha": "3cdb108ec5c3b50b96b2c61ffbfa579297f1dd8b",
   "ci_workflow": ".github/workflows/ci.yml",
   "pre_fix_run": {
     "run_id": 33730169018,
@@ -24,12 +25,29 @@
     ]
   },
   "post_fix_verification": {
-    "status": "PENDING_CI_COMPLETION",
-    "required_steps": [
-      "ruff check src tests scripts stages",
-      "pytest",
-      "pcfmcw validate --config configs/default.json --output results/validation.json"
-    ]
+    "run_id": 33731714105,
+    "job_id": 100572919112,
+    "status": "completed",
+    "conclusion": "success",
+    "ruff": {
+      "command": "ruff check src tests scripts stages",
+      "status": "PASS"
+    },
+    "pytest": {
+      "command": "pytest",
+      "status": "PASS",
+      "passed": 71,
+      "duration_seconds": 4.97
+    },
+    "scientific_validation": {
+      "command": "pcfmcw validate --config configs/default.json --output results/validation.json",
+      "status": "PASS",
+      "distance_monotonic": true,
+      "pointing_monotonic": true,
+      "ber_monotonic": true,
+      "causal_forecast_invariant": true,
+      "oracle_forecast_sensitive": true
+    }
   },
-  "gate0_status": "PARTIAL"
+  "gate0_status": "PASS"
 }
