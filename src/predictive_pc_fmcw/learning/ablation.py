@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -14,6 +15,7 @@ OBJECTIVES = (
     "trajectory_outage",
     "full",
 )
+CANONICAL_SEEDS = (20260827, 20260828, 20260829, 20260830, 20260831)
 
 
 @dataclass(frozen=True)
@@ -26,6 +28,13 @@ class TrainingAblationPlan:
     planned_runs: int
 
 
+def _link_config_sha256(link_config: LinkConfig) -> str:
+    payload = json.dumps(
+        asdict(link_config), sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
 def build_training_ablation_plan(
     dataset_path: str | Path,
     seeds: tuple[int, ...],
@@ -34,8 +43,11 @@ def build_training_ablation_plan(
     source = Path(dataset_path)
     if not source.is_file():
         raise FileNotFoundError(f"Training dataset not found: {source}")
-    if len(seeds) < 3:
-        raise ValueError("Publication ablation requires at least three seeds.")
+    if seeds != CANONICAL_SEEDS:
+        raise ValueError(
+            "Publication ablation requires exactly the five frozen seeds: "
+            f"{CANONICAL_SEEDS}."
+        )
     if epochs < 1:
         raise ValueError("epochs must be positive.")
     return TrainingAblationPlan(
@@ -53,9 +65,9 @@ def run_training_ablation(
     output_dir: str | Path,
     *,
     link_config: LinkConfig,
-    seeds: tuple[int, ...] = (20260827, 20260828, 20260829),
+    seeds: tuple[int, ...] = CANONICAL_SEEDS,
     epochs: int = 80,
-    batch_size: int = 64,
+    batch_size: int = 32,
     lambda_link: float = 0.2,
     lambda_outage: float = 0.1,
 ) -> list[TrainingResult]:
@@ -98,8 +110,12 @@ def run_training_ablation(
             "completed_runs": len(results),
             "expected_runs": expected,
             "dataset_sha256": plan.dataset_sha256,
+            "link_config": asdict(link_config),
+            "link_config_sha256": _link_config_sha256(link_config),
             "objectives": list(OBJECTIVES),
             "seeds": list(seeds),
+            "epochs": epochs,
+            "batch_size": batch_size,
             "lambda_link": lambda_link,
             "lambda_outage": lambda_outage,
             "checkpoints": [str(path) for path in checkpoints],
