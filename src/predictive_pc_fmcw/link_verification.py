@@ -6,7 +6,6 @@ from pathlib import Path
 
 import numpy as np
 
-
 CANONICAL_MIN_BITS_PER_POINT = 250_000
 
 
