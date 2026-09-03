@@ -20,6 +20,8 @@ from predictive_pc_fmcw.predictors import (
     LastPositionPredictor,
 )
 
+CANONICAL_BER_LUT = "artifacts/paper_final/02_link/dbpsk_ber_lut.csv"
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(
@@ -30,11 +32,15 @@ def main() -> None:
     parser.add_argument("--config", default="configs/default.json")
     parser.add_argument(
         "--ber-lut",
-        help="Verified Stage-2 Part-A LUT. Required for canonical paper runs.",
+        default=CANONICAL_BER_LUT,
+        help="Verified Stage-2 Part-A LUT used for all link metrics.",
     )
-    parser.add_argument("--output", default="artifacts/motion_baselines_npz")
+    parser.add_argument("--output", default="artifacts/paper_final/03_baselines")
     parser.add_argument("--batch-size", type=int, default=1024)
     args = parser.parse_args()
+
+    if args.split != "development":
+        parser.error("Stage 3 is development-only; use --split development")
 
     with np.load(args.npz, allow_pickle=False) as archive:
         labels = np.asarray(archive["split"]).astype(str)
@@ -54,16 +60,14 @@ def main() -> None:
         InteractingMultipleModelPredictor(),
     )
     config = load_config(args.config)
-    link_config = config.link
-    if args.ber_lut:
-        verification = verify_lut(args.ber_lut)
-        if verification["status"] != "PASS":
-            raise ValueError("The supplied BER LUT does not satisfy the Stage-2 gate.")
-        link_config = replace(
-            link_config,
-            ber_source="lut",
-            ber_lut_path=str(Path(args.ber_lut)),
-        )
+    verification = verify_lut(args.ber_lut)
+    if verification["status"] != "PASS":
+        raise ValueError("The supplied BER LUT does not satisfy the Stage-2 gate.")
+    link_config = replace(
+        config.link,
+        ber_source="lut",
+        ber_lut_path=str(Path(args.ber_lut)),
+    )
     link_model = LinkModel(link_config)
 
     rows = []
