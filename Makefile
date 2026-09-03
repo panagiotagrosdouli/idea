@@ -1,6 +1,6 @@
 .PHONY: install test lint validate benchmark womd ablation matrix paper-quick \
 	paper-full motion manifest paper-ablation staged corrected-quick \
-	corrected-full paper-draft reproducibility reproduce
+	corrected-full paper-draft reproducibility reproduce split-audit
 
 install:
 	python -m pip install -e ".[dev]"
@@ -37,6 +37,12 @@ motion:
 
 manifest:
 	python scripts/00_freeze_paper_manifest.py
+
+split-audit:
+	@test -n "$(TRAIN_NPZ)" -a -n "$(VALIDATION_NPZ)" || \
+		(echo "Set TRAIN_NPZ and VALIDATION_NPZ"; exit 2)
+	PYTHONPATH=src python scripts/00_audit_womd_split_integrity.py \
+		training=$(TRAIN_NPZ) official_validation=$(VALIDATION_NPZ)
 
 paper-ablation:
 	pcfmcw paper-ablation --config configs/default.json \
