@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any
 
 from scipy.stats import spearmanr
-
 import numpy as np
 
 from ..metrics import paired_metric_statistics
