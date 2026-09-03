@@ -10,7 +10,7 @@ from .dataset_audit import audit_training_npz
 
 OFFICIAL_SOURCE = "real_WOMD_v1.3.1_true_SDC_geometry"
 OFFICIAL_COORDINATE_FRAME = "world_xy_with_explicit_ego_heading"
-VALIDATION_SPLIT_LABELS = {"validation", "official_validation"}
+OFFICIAL_VALIDATION_SPLIT = "official_validation"
 
 
 def _scenario_ids(path: str | Path) -> set[str]:
@@ -54,9 +54,8 @@ def verify_corpora(
         "training_has_training_and_development": (
             {"training", "development"}.issubset(training_splits)
         ),
-        "validation_is_untouched_role": bool(
-            validation_splits and validation_splits.issubset(VALIDATION_SPLIT_LABELS)
-        ),
+        "validation_is_untouched_role": validation_splits
+        == {OFFICIAL_VALIDATION_SPLIT},
     }
     integrity_checks = {
         "training_finite": bool(training["all_numeric_values_finite"]),
