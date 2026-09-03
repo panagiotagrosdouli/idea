@@ -4,12 +4,11 @@ import unittest
 from pathlib import Path
 
 from predictive_pc_fmcw.ber import BERPoint, write_ber_lut
+from predictive_pc_fmcw.link_verification import verify_lut
 
 
 class PartALinkVerificationTest(unittest.TestCase):
     def test_canonical_shape_and_monotonicity(self):
-        from scripts.stage2_link_verification import verify_lut
-
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "lut.csv"
             points = [
@@ -30,8 +29,6 @@ class PartALinkVerificationTest(unittest.TestCase):
             self.assertEqual(verify_lut(path)["status"], "PASS")
 
     def test_nonmonotone_lut_fails(self):
-        from scripts.stage2_link_verification import verify_lut
-
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "lut.csv"
             fieldnames = [
