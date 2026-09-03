@@ -1,0 +1,27 @@
+{
+  "checks": {
+    "finite_lut": true,
+    "lut_in_probability_range": true,
+    "minimum_bits_per_point_met": true,
+    "monotone_nonincreasing": true,
+    "part_a_receiver": true,
+    "required_columns": true,
+    "snr_grid_minus5_to_25": true,
+    "snr_points_31": true,
+    "waveform_sample_snr_semantics": true,
+    "zero_error_points_use_confidence_bound": true
+  },
+  "max_bits_per_point": 250000,
+  "min_bits_per_point": 250000,
+  "missing_columns": [],
+  "path": "artifacts/paper_final/02_link/dbpsk_ber_lut.csv",
+  "required_minimum_bits_per_point": 250000,
+  "rows": 31,
+  "scientific_disclosure": {
+    "absolute_received_power": "normalized/model-based, not measured watts",
+    "lut_axis": "waveform-sample SNR in dB; legacy column name ebn0_db",
+    "measured_optical_channel_claimed": false
+  },
+  "sha256": "786d324b96c1d069789af34c1324d48eb5a1caf63d0d31b6d38cd5c96c40a49a",
+  "status": "PASS"
+}
