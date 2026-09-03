@@ -20,8 +20,8 @@ def verify_completion_manifest(
     supplied = [Path(path) for path in checkpoints]
     declared = [Path(path) for path in payload.get("checkpoints", [])]
 
-    supplied_names = sorted(path.name for path in supplied)
-    declared_names = sorted(path.name for path in declared)
+    supplied_paths = sorted(str(path.resolve()) for path in supplied)
+    declared_paths = sorted(str(path.resolve()) for path in declared)
     checks = {
         "manifest_complete": payload.get("complete") is True,
         "expected_runs_20": payload.get("expected_runs") == expected_runs,
@@ -33,7 +33,7 @@ def verify_completion_manifest(
         ),
         "twenty_checkpoints_declared": len(declared) == expected_runs,
         "twenty_checkpoints_supplied": len(supplied) == expected_runs,
-        "checkpoint_names_match_manifest": supplied_names == declared_names,
+        "checkpoint_paths_match_manifest": supplied_paths == declared_paths,
         "supplied_checkpoints_exist": all(path.is_file() for path in supplied),
         "link_config_hash_recorded": bool(payload.get("link_config_sha256")),
     }
