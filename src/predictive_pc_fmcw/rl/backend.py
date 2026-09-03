@@ -11,8 +11,8 @@ from ..link import LinkModel
 from ..metrics import jains_fairness
 from ..predictors import TrajectoryPredictor
 from ..scheduling.base import SchedulerContext
-from ..traffic import PacketQueues, TrafficTrace
 from ..simulation.engine import _current_heading, _link_forecast
+from ..traffic import PacketQueues, TrafficTrace
 from .environment import EnvironmentStep
 from .reward import TransitionOutcome
 
@@ -80,7 +80,10 @@ class SimulationTransitionBackend:
     def reset(self, seed: int) -> SchedulerContext:
         self._seed = int(seed)
         self._slot = 0
-        self._queues = PacketQueues(self.vehicle_count, self.config.traffic.max_queue_packets)
+        self._queues = PacketQueues(
+            self.vehicle_count,
+            self.config.traffic.max_queue_packets,
+        )
         self._delivered_bits = np.zeros(self.vehicle_count, dtype=np.float64)
         self._delivered_packets = np.zeros(self.vehicle_count, dtype=np.int64)
         self._failed_attempts = 0
@@ -160,16 +163,30 @@ class SimulationTransitionBackend:
             self._previous = vehicle
             capacity = self.model.capacity_packets(self.config.slot_duration_s)
             attempted = self.queues.pop_attempts(vehicle, capacity)
-            uniforms = self.traffic.success_uniforms[self._slot, vehicle, : len(attempted)]
+            uniforms = self.traffic.success_uniforms[
+                self._slot,
+                vehicle,
+                : len(attempted),
+            ]
             success = uniforms >= float(self._current["per"][vehicle])
-            failed = [p for p, ok in zip(attempted, success, strict=True) if not ok]
-            successful = [p for p, ok in zip(attempted, success, strict=True) if ok]
+            failed = [
+                packet
+                for packet, ok in zip(attempted, success, strict=True)
+                if not ok
+            ]
+            successful = [
+                packet
+                for packet, ok in zip(attempted, success, strict=True)
+                if ok
+            ]
             self.queues.requeue_failed(vehicle, failed)
             failed_now = len(failed)
             delivered_now = len(successful)
             self._failed_attempts += failed_now
             self._delivered_packets[vehicle] += delivered_now
-            self._delivered_bits[vehicle] += delivered_now * self.config.link.packet_bits
+            self._delivered_bits[vehicle] += (
+                delivered_now * self.config.link.packet_bits
+            )
 
         fairness_after = jains_fairness(self._delivered_packets)
         self._slot += 1
