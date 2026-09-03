@@ -3,8 +3,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import numpy as np
+
 from predictive_pc_fmcw.config import LinkConfig
 from predictive_pc_fmcw.data.manifest import (
+    audit_scenario_overlap,
     build_compact_womd_manifest,
     deterministic_development_split,
 )
@@ -37,9 +40,7 @@ class ForecastAndManifestTest(unittest.TestCase):
         self.assertAlmostEqual(summary["fde_m"], 0.0, places=10)
         self.assertAlmostEqual(summary["range_mae_m"], 0.0, places=10)
         self.assertAlmostEqual(summary["snr_mae_db"], 0.0, places=10)
-        self.assertAlmostEqual(
-            summary["link_lifetime_error_steps"], 0.0, places=10
-        )
+        self.assertAlmostEqual(summary["link_lifetime_error_steps"], 0.0, places=10)
         self.assertAlmostEqual(summary["outage_f1"], 1.0, places=10)
 
     def test_manifest_hash_and_scenario_split_are_deterministic(self):
@@ -65,6 +66,23 @@ class ForecastAndManifestTest(unittest.TestCase):
             deterministic_development_split("scene-a"),
             deterministic_development_split("scene-a"),
         )
+
+    def test_npz_overlap_audit_passes_and_rejects_leakage(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            train = root / "train.npz"
+            heldout = root / "heldout.npz"
+            np.savez(train, scenario_id=np.asarray(["a", "a", "b"]))
+            np.savez(heldout, scenario_id=np.asarray(["c"]))
+            clean = audit_scenario_overlap({"train": train, "heldout": heldout})
+            self.assertTrue(clean["passed"])
+            np.savez(heldout, scenario_id=np.asarray(["b", "c"]))
+            leaked = audit_scenario_overlap({"train": train, "heldout": heldout})
+            self.assertFalse(leaked["passed"])
+            self.assertEqual(
+                leaked["pairwise_overlaps"]["heldout__train"]["scenario_ids"],
+                ["b"],
+            )
 
 
 if __name__ == "__main__":
