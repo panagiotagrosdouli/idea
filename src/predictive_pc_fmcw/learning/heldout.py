@@ -8,6 +8,7 @@ import numpy as np
 
 from ..geometry import wrap_angle_rad
 from ..link import LinkModel
+from .calibration import ResidualGaussianCalibration, gaussian_nll_and_coverage
 
 
 class BatchTrajectoryPredictor(Protocol):
@@ -32,6 +33,10 @@ class HeldoutScenarioMetrics:
     outage_f1: float
     outage_auroc: float
     link_lifetime_mae_s: float
+    gaussian_nll: float = float("nan")
+    coverage_50: float = float("nan")
+    coverage_90: float = float("nan")
+    coverage_95: float = float("nan")
 
 
 def _binary_f1(labels: np.ndarray, predictions: np.ndarray) -> float:
@@ -75,6 +80,7 @@ def evaluate_checkpoint_arrays(
     seed: int,
     batch_size: int = 1024,
     dt_s: float = 0.1,
+    calibration: ResidualGaussianCalibration | None = None,
 ) -> list[HeldoutScenarioMetrics]:
     history = np.asarray(history_xy, dtype=np.float32)
     future = np.asarray(future_xy, dtype=np.float32)
@@ -114,6 +120,11 @@ def evaluate_checkpoint_arrays(
     )
     target_lifetime = link_model.link_lifetime_seconds(
         target_range, target_bearing, dt_s
+    )
+    probabilistic = (
+        gaussian_nll_and_coverage(predicted, target, calibration)
+        if calibration is not None
+        else None
     )
 
     grouped: dict[str, list[int]] = defaultdict(list)
@@ -166,6 +177,26 @@ def evaluate_checkpoint_arrays(
                     np.abs(
                         predicted_lifetime[indices] - target_lifetime[indices]
                     ).mean()
+                ),
+                gaussian_nll=(
+                    float(probabilistic["nll"][indices].mean())
+                    if probabilistic is not None
+                    else float("nan")
+                ),
+                coverage_50=(
+                    float(probabilistic["coverage_50"][indices].mean())
+                    if probabilistic is not None
+                    else float("nan")
+                ),
+                coverage_90=(
+                    float(probabilistic["coverage_90"][indices].mean())
+                    if probabilistic is not None
+                    else float("nan")
+                ),
+                coverage_95=(
+                    float(probabilistic["coverage_95"][indices].mean())
+                    if probabilistic is not None
+                    else float("nan")
                 ),
             )
         )
