@@ -32,6 +32,10 @@ evidence: code being present does not mean that an official-WOMD result exists.
 | Optical measurements | Model-based channel with explicit uncalibrated-power flag | No measurement dataset; measured-channel claim prohibited |
 | Predictive RL | Proposed only as a P1 extension | Not implemented; not on the core-paper critical path |
 
+The repository now also exposes these gates as a dependency-checked Stage 0-8
+workflow in `configs/research_stages.json`, operated by
+`scripts/run_research_stage.py`.
+
 ## Canonical execution order
 
 1. Export official WOMD validation with
