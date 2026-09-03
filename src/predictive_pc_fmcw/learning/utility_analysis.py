@@ -8,7 +8,7 @@ from typing import Any
 import numpy as np
 from scipy.stats import spearmanr
 
-from ..metrics import paired_metric_statistics
+from predictive_pc_fmcw.metrics import paired_metric_statistics
 
 
 UTILITY_METRICS = (
