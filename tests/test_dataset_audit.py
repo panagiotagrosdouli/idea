@@ -24,6 +24,7 @@ class DatasetAuditTest(unittest.TestCase):
             )
             report = audit_training_npz(path)
             self.assertEqual(report["sample_count"], 2)
+            self.assertTrue(report["scenario_split_integrity"]["passed"])
             self.assertEqual(report["unique_scenarios"], 2)
             self.assertEqual(report["splits"]["training"], 1)
             self.assertTrue(report["all_numeric_values_finite"])
