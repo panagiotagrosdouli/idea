@@ -1,0 +1,35 @@
+{
+  "audit_baseline_sha": "7bed967e6ea7ce3a104f82fac0856c38c52fb1ed",
+  "ci_workflow": ".github/workflows/ci.yml",
+  "pre_fix_run": {
+    "run_id": 33730169018,
+    "status": "completed",
+    "conclusion": "failure",
+    "failed_step": "ruff check src tests scripts stages",
+    "reported_errors": 15,
+    "pytest": "skipped",
+    "scientific_validation": "skipped"
+  },
+  "stage0_fixes": {
+    "scope": "formatting/import/lint blockers only",
+    "scientific_protocol_changed": false,
+    "files": [
+      "src/predictive_pc_fmcw/rl/environment.py",
+      "src/predictive_pc_fmcw/rl/state.py",
+      "tests/test_rl_environment.py",
+      "src/predictive_pc_fmcw/learning/lambda_sweep.py",
+      "src/predictive_pc_fmcw/learning/utility_analysis.py",
+      "scripts/07_analyze_training_ablation.py",
+      "tests/test_utility_analysis.py"
+    ]
+  },
+  "post_fix_verification": {
+    "status": "PENDING_CI_COMPLETION",
+    "required_steps": [
+      "ruff check src tests scripts stages",
+      "pytest",
+      "pcfmcw validate --config configs/default.json --output results/validation.json"
+    ]
+  },
+  "gate0_status": "PARTIAL"
+}
