@@ -3,9 +3,37 @@
   "title": "Freeze Part-A PC-FMCW/DPSK physical layer",
   "depends_on": ["stage1"],
   "required_inputs": ["configs/part_a_physical_layer.json"],
-  "outputs": ["artifacts/paper_final/02_link/dbpsk_ber_lut.csv"],
-  "acceptance": ["31 SNR points", "confidence-aware BER", "monotone conservative LUT", "uncalibrated absolute power disclosed"],
+  "outputs": [
+    "artifacts/paper_final/02_link/dbpsk_ber_lut.csv",
+    "artifacts/paper_final/02_link/link_verification.json"
+  ],
+  "acceptance": [
+    "31 SNR points on the frozen -5 to 25 dB waveform-sample SNR grid",
+    "at least 250000 simulated bits per SNR point",
+    "confidence-aware BER",
+    "monotone conservative LUT",
+    "Part-A receiver and SNR semantics verified",
+    "uncalibrated absolute power disclosed"
+  ],
   "commands": [
-    ["python", "scripts/02_build_part_a_link_lut.py", "--receiver", "part-a-notebook", "--bits", "250000", "--seed", "20260827", "--output", "artifacts/paper_final/02_link/dbpsk_ber_lut.csv"]
+    [
+      "python",
+      "scripts/02_build_part_a_link_lut.py",
+      "--receiver",
+      "part-a-notebook",
+      "--bits",
+      "250000",
+      "--seed",
+      "20260827",
+      "--output",
+      "artifacts/paper_final/02_link/dbpsk_ber_lut.csv"
+    ],
+    [
+      "python",
+      "scripts/02_verify_part_a_link.py",
+      "artifacts/paper_final/02_link/dbpsk_ber_lut.csv",
+      "--output",
+      "artifacts/paper_final/02_link/link_verification.json"
+    ]
   ]
 }
