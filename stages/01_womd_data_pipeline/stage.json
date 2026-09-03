@@ -1,0 +1,12 @@
+{
+  "id": "stage1",
+  "title": "Audit causal WOMD trajectory samples",
+  "depends_on": ["stage0"],
+  "required_inputs": ["${TRAIN_NPZ}", "${VALIDATION_NPZ}"],
+  "outputs": ["artifacts/paper_final/training_audit.json", "artifacts/paper_final/validation_audit.json"],
+  "acceptance": ["true-SDC geometry", "11 history and 80 future states", "finite arrays", "scenario-safe labels"],
+  "commands": [
+    ["python", "scripts/08_audit_womd_dataset.py", "${TRAIN_NPZ}", "--output", "artifacts/paper_final/training_audit.json"],
+    ["python", "scripts/08_audit_womd_dataset.py", "${VALIDATION_NPZ}", "--output", "artifacts/paper_final/validation_audit.json"]
+  ]
+}
