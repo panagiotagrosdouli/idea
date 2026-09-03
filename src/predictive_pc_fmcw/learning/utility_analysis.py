@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+from scipy.stats import spearmanr
 
 from ..metrics import paired_metric_statistics
 
@@ -99,8 +100,6 @@ def summarize_utility(rows: list[dict[str, Any]]) -> dict[str, Any]:
             "metrics_vs_reactive": metrics,
         }
     if rows:
-        from scipy.stats import spearmanr
-
         ade = np.asarray([row["ade_m"] for row in rows], dtype=float)
         gain = np.asarray([row["delta_goodput_mbps"] for row in rows], dtype=float)
         correlation = spearmanr(ade, gain)
