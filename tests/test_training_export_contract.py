@@ -65,7 +65,10 @@ class TrainingExportContractTest(unittest.TestCase):
                 fixed_split="official_validation",
             )
             with np.load(path, allow_pickle=False) as archive:
-                self.assertEqual(set(archive["split"].astype(str)), {"official_validation"})
+                self.assertEqual(
+                    set(archive["split"].astype(str)),
+                    {"official_validation"},
+                )
                 self.assertEqual(
                     str(archive["source"]),
                     "real_WOMD_v1.3.1_true_SDC_geometry",
