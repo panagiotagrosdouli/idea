@@ -21,7 +21,9 @@ def verify_corpora(
 ) -> dict[str, Any]:
     training = audit_training_npz(training_path)
     validation = audit_training_npz(validation_path)
-    overlap = sorted(_scenario_ids(training_path).intersection(_scenario_ids(validation_path)))
+    training_ids = _scenario_ids(training_path)
+    validation_ids = _scenario_ids(validation_path)
+    overlap = sorted(training_ids.intersection(validation_ids))
 
     shape_checks = {
         "training_history_steps_11": training["history_steps"] == 11,
