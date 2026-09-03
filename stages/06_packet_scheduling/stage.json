@@ -2,10 +2,10 @@
   "id": "stage6",
   "title": "Paired official-WOMD packet scheduling",
   "depends_on": ["stage5"],
-  "required_inputs": ["${VALIDATION_TFRECORD}", "artifacts/paper_final/heldout_learned/heldout_summary.json"],
-  "outputs": ["artifacts/paper_final/official_scheduler/completed_runs.json"],
+  "required_inputs": ["${VALIDATION_TFRECORD}", "artifacts/paper_final/05_heldout/heldout_summary.json"],
+  "outputs": ["artifacts/paper_final/06_scheduling/completed_runs.json"],
   "acceptance": ["eight scheduler families", "five paired traffic seeds", "ground-truth packet realization", "per-scenario raw metrics"],
   "commands": [
-    ["python", "scripts/06_evaluate_learned_scheduler_womd.py", "${VALIDATION_TFRECORD}", "--checkpoints", "${CHECKPOINT_GLOB}", "--output", "artifacts/paper_final/official_scheduler"]
+    ["python", "scripts/06_evaluate_learned_scheduler_womd.py", "${VALIDATION_TFRECORD}", "--checkpoints", "${CHECKPOINT_GLOB}", "--output", "artifacts/paper_final/06_scheduling"]
   ]
 }

@@ -9,7 +9,7 @@ test:
 	PYTHONPATH=src python -m unittest discover -s tests -v
 
 lint:
-	ruff check src tests scripts
+	ruff check src tests scripts stages
 
 validate:
 	pcfmcw validate --config configs/default.json --output artifacts/validation.json

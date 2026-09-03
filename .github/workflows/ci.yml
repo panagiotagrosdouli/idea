@@ -14,7 +14,6 @@ jobs:
           python-version: "3.11"
       - run: python -m pip install --upgrade pip
       - run: pip install -e ".[dev]"
-      - run: ruff check src tests scripts
+      - run: ruff check src tests scripts stages
       - run: pytest
       - run: pcfmcw validate --config configs/default.json --output results/validation.json
-

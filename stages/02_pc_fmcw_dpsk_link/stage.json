@@ -3,9 +3,9 @@
   "title": "Freeze Part-A PC-FMCW/DPSK physical layer",
   "depends_on": ["stage1"],
   "required_inputs": ["configs/part_a_physical_layer.json"],
-  "outputs": ["artifacts/paper_final/ber/dbpsk_ber_lut.csv"],
+  "outputs": ["artifacts/paper_final/02_link/dbpsk_ber_lut.csv"],
   "acceptance": ["31 SNR points", "confidence-aware BER", "monotone conservative LUT", "uncalibrated absolute power disclosed"],
   "commands": [
-    ["python", "scripts/02_build_part_a_link_lut.py", "--receiver", "part-a-notebook", "--bits", "250000", "--seed", "20260827", "--output", "artifacts/paper_final/ber/dbpsk_ber_lut.csv"]
+    ["python", "scripts/02_build_part_a_link_lut.py", "--receiver", "part-a-notebook", "--bits", "250000", "--seed", "20260827", "--output", "artifacts/paper_final/02_link/dbpsk_ber_lut.csv"]
   ]
 }

@@ -10,7 +10,6 @@ import numpy as np
 
 from ..metrics import paired_metric_statistics
 
-
 METRICS = (
     "ade_m",
     "fde_m",
@@ -75,8 +74,7 @@ def paired_full_vs_trajectory(rows: list[dict[str, Any]]) -> dict[str, Any]:
         {
             (seed, scenario)
             for objective, seed, scenario in indexed
-            if objective == "full"
-            and ("trajectory_only", seed, scenario) in indexed
+            if objective == "full" and ("trajectory_only", seed, scenario) in indexed
         }
     )
     if not keys:
@@ -116,12 +114,15 @@ def write_learned_analysis(rows: list[dict[str, Any]], output: str | Path) -> Pa
     payload = {
         "scope_warning": (
             "Goodput MAE measures link-state prediction fidelity, not realized "
-            "packet-scheduler utility. Scheduler-goodput claims require packet-level runs."
+            "packet-scheduler utility. Scheduler-goodput claims require "
+            "packet-level runs."
         ),
         "objective_summary": summarize_objectives(rows),
         "full_vs_trajectory_only": paired_full_vs_trajectory(rows),
         "accuracy_link_correlations": accuracy_link_correlations(rows),
     }
     path = destination / "learned_heldout_analysis.json"
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
     return path

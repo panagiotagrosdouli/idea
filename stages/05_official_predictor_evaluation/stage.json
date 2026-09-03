@@ -2,10 +2,10 @@
   "id": "stage5",
   "title": "Untouched official-validation predictor evaluation",
   "depends_on": ["stage4"],
-  "required_inputs": ["${TRAIN_NPZ}", "${VALIDATION_NPZ}", "artifacts/paper_final/learned_ablation/completion_manifest.json"],
-  "outputs": ["artifacts/paper_final/heldout_learned/heldout_summary.json"],
+  "required_inputs": ["${TRAIN_NPZ}", "${VALIDATION_NPZ}", "artifacts/paper_final/04_learning/learned_ablation/completion_manifest.json"],
+  "outputs": ["artifacts/paper_final/05_heldout/heldout_summary.json"],
   "acceptance": ["ADE/FDE", "range/bearing/SNR/goodput/lifetime", "outage F1/AUROC", "development-fitted NLL and coverage"],
   "commands": [
-    ["python", "scripts/06_evaluate_learned_checkpoints.py", "${VALIDATION_NPZ}", "${CHECKPOINT_GLOB}", "--development-npz", "${TRAIN_NPZ}", "--output", "artifacts/paper_final/heldout_learned"]
+    ["python", "scripts/06_evaluate_learned_checkpoints.py", "${VALIDATION_NPZ}", "${CHECKPOINT_GLOB}", "--development-npz", "${TRAIN_NPZ}", "--output", "artifacts/paper_final/05_heldout"]
   ]
 }

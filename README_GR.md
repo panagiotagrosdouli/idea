@@ -1,314 +1,226 @@
 # Predictive PC-FMCW/DPSK Vehicular Communications
 
-[English](README.md) | **Ελληνικά**
+**Αιτιακή πρόβλεψη τροχιάς για deadline-aware optical vehicular scheduling**
 
-> **Οργανωμένη εκτέλεση του paper:** ακολουθήστε τον [οδηγό Stage 0-8](docs/STAGED_EXECUTION_GR.md)
-> και τον εκτελέσιμο χώρο εργασίας [`stages/`](stages).
+[English](README.md) | **Ελληνικά** · [Εκτελέσιμα stages](stages) · [Paper draft](paper/PAPER_DRAFT.md)
 
-![System overview](docs/assets/readme-hero.webp)
+![Επισκόπηση Predictive PC-FMCW/DPSK](docs/assets/readme-hero.webp)
 
-Το project μελετά ένα απλό αλλά σημαντικό ερώτημα:
+> Μπορεί η πρόβλεψη κίνησης να βοηθήσει έναν scheduler να παραδώσει πακέτα
+> πριν χαθεί ένα κατευθυντικό optical link; Και σημαίνει πράγματι ότι μικρότερο
+> trajectory error οδηγεί σε καλύτερη επικοινωνία;
 
-> Αν γνωρίζουμε πού πιθανότατα θα κινηθούν τα οχήματα, μπορούμε να στείλουμε
-> τα πακέτα νωρίτερα στα links που πρόκειται να χαθούν;
+Το repository συνδέει πραγματικές τροχιές από το Waymo Open Motion Dataset
+(WOMD) με model-based PC-FMCW/DPSK optical link και packet simulator με ουρές,
+deadlines, retries και fairness. Αποτελεί συνέχεια της supplied Εργασίας Α και
+**δεν** είναι το ξεχωριστό Joint beam/ADB project.
 
-Η Εργασία 1 παρείχε το PC-FMCW/DPSK physical-layer υπόβαθρο. Η νέα εργασία
-προσθέτει causal trajectory prediction, πρόβλεψη του μελλοντικού optical link,
-ουρές πακέτων με deadlines και predictive scheduling. Δεν είναι το ξεχωριστό
-Joint Beam/ADB project: εδώ η απόφαση είναι μόνο **ποιο όχημα εξυπηρετείται στο
-τρέχον slot**.
+## Ερευνητικά ερωτήματα
 
-## Κατάσταση με μία ματιά
-
-| Μέρος | Κατάσταση |
-|---|---|
-| Trajectory → geometry → link → packets → scheduler | Υλοποιημένο |
-| Classical predictors και 10 schedulers | Υλοποιημένα |
-| Tests και scientific sanity gates | 51/51 PASS και 5/5 PASS |
-| Corrected synthetic benchmark | Εκτελεσμένο, 12 ανεξάρτητα episodes |
-| Compact WOMD proxy benchmark | Εκτελεσμένο, μόνο 3 scenes |
-| Official WOMD true-SDC adapter | Υλοποιημένος, αλλά λείπουν τα TFRecord shards |
-| Communication-aware GRU 4-objective ablation | Υλοποιημένη υποδομή, όχι εκτελεσμένη |
-| Compatible trained checkpoint | Δεν δόθηκε |
-| Measured optical-channel validation | Δεν υπάρχει και δεν δηλώνεται |
-| Τελικό publication claim | Όχι ακόμη — research draft |
-
-Το repository είναι σήμερα **πλήρης και ελεγμένη ερευνητική υποδομή**, αλλά
-όχι τελικό paper evidence πάνω σε official WOMD. Αυτός ο διαχωρισμός είναι
-σκόπιμος: κανένα αποτέλεσμα δεν κατασκευάζεται για να φαίνεται καλύτερο.
-
-## Τι κάνει το σύστημα
-
-![Predictive scheduling concept](docs/assets/readme-predictive-scheduler.webp)
-
-1. Διαβάζει μόνο τις θέσεις μέχρι τη χρονική στιγμή `t`.
-2. Προβλέπει causal τις επόμενες θέσεις κάθε οχήματος.
-3. Μετατρέπει τις θέσεις σε απόσταση και γωνία ως προς το ego όχημα.
-4. Υπολογίζει normalized optical gain, SNR, DBPSK BER, packet error rate,
-   successful goodput, outage και link lifetime.
-5. Συνδυάζει την πρόβλεψη με queue length, deadlines, fairness και switching
-   cost.
-6. Επιλέγει το πολύ ένα όχημα ανά slot.
-7. Κρίνει την επιτυχία με το πραγματικό trajectory-derived link, ποτέ με την
-   ίδια την πρόβλεψη.
+1. Σε ποια operating regimes βελτιώνει η πρόβλεψη το scheduling;
+2. Συνεπάγεται καλύτερο ADE/FDE καλύτερο SNR, outage, link lifetime και goodput;
+3. Βελτιώνει το communication-aware GRU training την πραγματική παράδοση πακέτων;
 
 ```mermaid
-flowchart TD
-    A["Observed motion έως t"] --> B["Causal trajectory forecast"]
-    B --> C["Future range & bearing"]
-    C --> D["SNR → BER → PER → goodput"]
-    D --> E["Queues, deadlines & link lifetime"]
-    E --> F["Receiver scheduling"]
-    F --> G["Packet KPIs & paired statistics"]
+flowchart LR
+    A["Παρατηρημένο WOMD history"] --> B["Causal predictor"]
+    B --> C["Μελλοντική γεωμετρία"]
+    C --> D["PC-FMCW/DPSK link"]
+    D --> E["Ουρές και deadlines"]
+    E --> F["Predictive scheduler"]
+    F --> G["Packet KPIs και statistics"]
 ```
 
-## Τι είναι πραγματικό και τι προσομοιωμένο
+Το future ground truth χρησιμοποιείται αποκλειστικά για την πραγματοποίηση και
+αξιολόγηση του link. Κανένας deployable predictor ή scheduler δεν το βλέπει.
 
-| Στοιχείο | Προέλευση | Τι επιτρέπεται να ισχυριστούμε |
-|---|---|---|
-| Controlled trajectories | Συνθετικός generator | Software/mechanism validation |
-| Compact WOMD trajectories | Πραγματική κίνηση, 3 scene IDs | Integration test με proxy ego |
-| Official WOMD loader | True `sdc_track_index` και validity masks | Έτοιμος όταν δοθούν τα shards |
-| PC-FMCW constants | Supplied Part-A notebook/report | Frozen physical assumptions |
-| Optical power/SNR/channel | Reference-SNR model | Model-based, όχι measurement |
-| BER | Analytical DBPSK ή LUT από τον Part-A FFT/DPSK receiver | Reproducible simulation |
-| Packet delivery | PER και common random numbers | Controlled paired comparison |
+## Πραγματικό workflow Stage 0-8
 
-Η τιμή `received_power_w` είναι normalized reference quantity και συνοδεύεται
-από `received_power_calibrated=false`. Δεν παρουσιάζεται ως μετρημένη ισχύς.
+Η εργασία έχει οργανωθεί σε εννέα gated φακέλους μέσα στο [`stages/`](stages).
+Κάθε φάκελος διαθέτει δικό του `stage.json`, άμεσο `run.py`, dependencies,
+εντολές, outputs και acceptance criteria.
 
-## Μέθοδοι που περιλαμβάνονται
+| Stage | Φάκελος | Εργασία | Completion gate |
+|---:|---|---|---|
+| 0 | [`00_freeze_and_provenance`](stages/00_freeze_and_provenance) | Freeze πρωτοκόλλου και splits | Dataset hashes και μηδενικό scenario overlap |
+| 1 | [`01_womd_data_pipeline`](stages/01_womd_data_pipeline) | Audit των causal true-SDC samples | Έγκυρα arrays και split labels |
+| 2 | [`02_pc_fmcw_dpsk_link`](stages/02_pc_fmcw_dpsk_link) | Freeze του Part-A link | Confidence-aware BER LUT 31 σημείων |
+| 3 | [`03_classical_baselines`](stages/03_classical_baselines) | Last/CV/CA/Kalman/IMM | Αναπαραγώγιμα trajectory/link metrics |
+| 4 | [`04_communication_aware_gru`](stages/04_communication_aware_gru) | Lambda selection και GRU training | 4 objectives × 5 seeds = 20 checkpoints |
+| 5 | [`05_official_predictor_evaluation`](stages/05_official_predictor_evaluation) | Untouched validation | ADE/FDE, link fidelity, NLL και coverage |
+| 6 | [`06_packet_scheduling`](stages/06_packet_scheduling) | Paired packet experiments | 8 schedulers × 5 traffic seeds |
+| 7 | [`07_statistics_and_figures`](stages/07_statistics_and_figures) | Operating-region analysis | Cluster CI, Wilcoxon, Holm, ADE-goodput join |
+| 8 | [`08_final_paper`](stages/08_final_paper) | Final release | Figures, tables, paper PDF και manifest |
 
-Trajectory predictors:
+Η δομή των αποτελεσμάτων ακολουθεί ακριβώς τα stages:
+
+```text
+artifacts/paper_final/
+├── 00_freeze/       ├── 01_data/        ├── 02_link/
+├── 03_baselines/    ├── 04_learning/    ├── 05_heldout/
+├── 06_scheduling/   ├── 07_analysis/    └── 08_release/
+```
+
+Έλεγχος, preview και εκτέλεση:
+
+```bash
+make stages
+make stage STAGE=stage0
+make stage STAGE=stage0 EXECUTE=--execute
+```
+
+## Τι έχει γίνει πραγματικά
+
+| Evidence | Κατάσταση |
+|---|---|
+| Trajectory → link → packet simulation | Υλοποιημένο και ελεγμένο |
+| Scientific regression suite | **63/63 tests επιτυχή** |
+| Part-A receiver-derived LUT | Εκτελεσμένο σε 31 SNR σημεία |
+| Controlled scheduling study | 1.125 rows: 45 settings × 5 seeds × 5 policies |
+| Official WOMD training corpus | **249.137 samples, 24.182 scenarios** |
+| Training/development leakage | **0 overlapping scenario IDs** |
+| Προηγούμενο 3-seed training | 7/12 results και 8/12 checkpoints διατηρούνται |
+| Canonical learned archive | Εκκρεμεί: απαιτούνται 20 verified checkpoints |
+| Untouched official validation | Υλοποιημένο export, εκκρεμεί το artifact |
+| Official learned scheduling | Εκκρεμεί validation dataset και checkpoints |
+| Measured optical channel | Δεν υπάρχει και δεν ισχυριζόμαστε ότι υπάρχει |
+
+SHA-256 του training corpus:
+`b47faf427487a7405531e4944c5bfff9ca56d4fcb9ce3f8495df3cce534347ee`.
+
+## Γιατί δεν αρκεί το ADE
+
+Ένα μικρό Cartesian error κοντά στο FoV boundary μπορεί να προκαλέσει μεγάλη
+μεταβολή στο pointing gain ή στο outage. Γι' αυτό αξιολογείται ολόκληρη η αλυσίδα:
+
+\[
+\mathrm{ADE/FDE}\rightarrow\{r,\theta\}\rightarrow
+\{\mathrm{SNR},\mathrm{BER},\mathrm{PER},T_{link}\}\rightarrow
+\{\mathrm{goodput},\mathrm{deadline\ misses},\mathrm{latency}\}.
+\]
+
+Το learned objective είναι:
+
+\[
+\mathcal{L}=\lambda_{traj}\mathcal{L}_{traj}
++\lambda_{link}\mathcal{L}_{link}
++\lambda_{out}\mathcal{L}_{outage}.
+\]
+
+Το Stage 4 εκπαιδεύει χωριστά trajectory-only, trajectory+link,
+trajectory+outage και full communication-aware GRU.
+
+## Μέθοδοι
+
+Predictors:
 
 - Last Position, Constant Velocity και Constant Acceleration,
-- position-only Kalman CV,
-- lightweight causal CV/CA IMM,
-- optional versioned GRU checkpoint,
+- position-only Kalman CV και causal CV/CA IMM,
+- deterministic GRU με τέσσερα objectives,
+- development-fitted residual Gaussian calibration για held-out NLL και
+  coverage 50/90/95%,
 - perfect-future information reference.
-
-Η uncertainty αξιολόγηση περιλαμβάνει επίσης scenario-safe Gaussian residual
-wrappers για CV και CA. Έξι controlled scenarios χρησιμοποιούνται για
-calibration της per-horizon variance και έξι διαφορετικά για NLL και
-50/90/95% empirical coverage. Είναι classical probabilistic baseline, όχι
-υποκατάστατο του trained Gaussian/GMM checkpoint που λείπει.
 
 Schedulers:
 
 - Random, Round Robin, Reactive Greedy και Proportional Fair,
-- CV, Kalman και IMM Predictive,
-- generic Predictive Utility,
-- Link-Lifetime urgency,
-- perfect-future Oracle-information heuristic.
+- CV, Kalman, IMM και Learned Predictive,
+- Predictive Utility και Link-Lifetime urgency,
+- information-oracle heuristic.
 
-Το `oracle` δεν είναι μαθηματικό upper bound. Έχει τέλεια πληροφορία μέλλοντος,
-αλλά χρησιμοποιεί την ίδια heuristic utility.
+Το oracle δεν παρουσιάζεται ως global optimum. Διαθέτει τέλεια πληροφορία
+μέλλοντος, αλλά χρησιμοποιεί την ίδια heuristic οικογένεια scheduling.
 
-## Corrected αποτελέσματα
+## Υπάρχον controlled αποτέλεσμα
 
-Τα παρακάτω προέρχονται αποκλειστικά από `artifacts/corrected_v2/`, μετά τις
-διορθώσεις frame, heading, horizon, physical deadlines, outage semantics και
-clustered inference.
+Το controlled benchmark δεν αποδεικνύει universal gain. Η διαφορά Link-Lifetime
+μείον Reactive είναι μόλις `+0,014 Mbps`, με 95% bootstrap interval
+`[-0,0319, +0,0593] Mbps`, ενώ το P95 latency είναι περίπου 269 ms χειρότερο.
+Άλλα loads και deadlines αλλάζουν το πρόσημο του αποτελέσματος.
 
-| Policy | Goodput (Mbps) | PDR | P95 latency (ms) | Deadline ή censoring |
-|---|---:|---:|---:|---:|
-| Reactive Greedy | 2.293 | 0.644 | 699.6 | 0.356 |
-| Kalman Predictive | 2.305 | 0.647 | 933.3 | 0.353 |
-| Predictive Utility | 2.306 | 0.648 | 965.4 | 0.352 |
-| Link Lifetime | 2.307 | 0.648 | 968.3 | 0.352 |
-| Oracle-information | 2.308 | 0.648 | 968.3 | 0.352 |
+![Controlled benchmark](artifacts/corrected_v2/figures/corrected_benchmark_tradeoff.png)
 
-Η paired διαφορά Link-Lifetime − Reactive είναι **+0.014 Mbps**, αλλά το
-bootstrap 95% CI είναι **[−0.0319, +0.0593] Mbps** και το Holm-adjusted
-Wilcoxon `p=1.0`. Άρα δεν υπάρχει ισχυρή ένδειξη goodput gain στο μικρό default
-benchmark. Αντίθετα, το P95 latency χειροτερεύει κατά περίπου **269 ms**.
+Άρα το πραγματικό ερώτημα είναι: **πότε βοηθά η πρόβλεψη και ποια prediction
+errors έχουν σημασία για την επικοινωνία;**
 
-Στο compact WOMD proxy benchmark:
-
-| Policy | Goodput (Mbps) | PDR | P95 latency (ms) |
-|---|---:|---:|---:|
-| Reactive Greedy | 1.160 | 0.329 | 368.3 |
-| Link Lifetime | 1.056 | 0.299 | 400.0 |
-| Oracle-information | 1.056 | 0.299 | 400.0 |
-
-Το αποτέλεσμα είναι αρνητικό και παραμένει στο repository. Το πλήρες staged
-run έχει **1.125 policy episodes** (45 settings × 5 seeds × 5 policies) και
-βρίσκει αλλαγές προσήμου ανά load, deadline, horizon, channel, sensing και
-traffic class. Για παράδειγμα, το Link Lifetime − Reactive είναι +0,139 Mbps
-σε deadline 0,5 s, αλλά −0,232 Mbps σε 0,05–0,1 s και −0,136 Mbps σε
-urgent/bulk traffic. Καμία οικογένεια συγκρίσεων δεν περνά Holm correction με
-μόνο πέντε seeds. Η σωστή υπόθεση δεν είναι «prediction always wins», αλλά
-«πότε και υπό ποιες συνθήκες βοηθά η prediction;».
-
-![Corrected benchmark](artifacts/corrected_v2/figures/corrected_benchmark_tradeoff.png)
-
-## Έγγραφα για διάβασμα
-
-- [`output/pdf/predictive_pc_fmcw_corrected_research_draft.pdf`](output/pdf/predictive_pc_fmcw_corrected_research_draft.pdf): το corrected research draft.
-- [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md): το μοντέλο, οι εξισώσεις και το experimental protocol.
-- [`docs/RESULTS.md`](docs/RESULTS.md): αποτελέσματα, paired statistics και αρνητικά ευρήματα.
-- [`docs/PDF_REQUIREMENTS_TRACEABILITY.md`](docs/PDF_REQUIREMENTS_TRACEABILITY.md): απαίτηση-προς-κώδικα/τεστ/artifact αντιστοίχιση.
-- [`docs/PAPER_READINESS.md`](docs/PAPER_READINESS.md): τι είναι έτοιμο και τι μπλοκάρει ακόμη την υποβολή.
-
-## Εγκατάσταση σε Ubuntu 26.04 / Intel ή AMD 64-bit
-
-Από καθαρό clone:
+## Εγκατάσταση και έλεγχος
 
 ```bash
 sudo apt update
 sudo apt install -y python3 python3-venv python3-pip build-essential
-
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-pip install -e ".[dev,paper]"
-```
+pip install -e ".[dev,ml,paper]"
 
-Για το optional learned GRU:
-
-```bash
-pip install -e ".[dev,ml]"
-```
-
-Το PyTorch δεν απαιτείται για τα classical predictors, schedulers, figures ή
-packet experiments.
-
-## Γρήγορος έλεγχος
-
-```bash
 make test
 make lint
 make validate
 ```
 
-Αναμενόμενο αποτέλεσμα: 51 tests και όλα τα scientific gates σε `PASS`.
+Το PyTorch απαιτείται μόνο στα learned-model stages.
 
-## Αναπαραγωγή των corrected artifacts
+## Εξωτερικές είσοδοι
 
-Το πλήρες γρήγορο integration run:
-
-```bash
-make corrected-quick
-```
-
-Δημιουργεί νέο, ανεξάρτητο run directory με:
-
-- DBPSK BER LUT από −5 έως 25 dB με τον supplied Part-A
-  FFT-carrier/DPSK receiver και confidence bounds,
-- controlled και compact-WOMD proxy benchmarks,
-- motion/link forecast metrics,
-- traffic/channel/noise ablations,
-- urgent/bulk deadline-traffic study,
-- 1.125-row five-seed staged experiment στο full run,
-- mobility/FoV scenario slices,
-- CSV, JSON, LaTeX, figures και run manifest.
-
-Το repository περιέχει ήδη το ολοκληρωμένο five-seed run στο
-`artifacts/corrected_v2/`. Για αναπαραγωγή:
+Αντιγράφουμε το [`stages/.env.example`](stages/.env.example) και ορίζουμε:
 
 ```bash
-make corrected-full
+export TRAIN_NPZ=/data/womd/womd_v131_training.npz
+export VALIDATION_NPZ=/data/womd/womd_v131_official_validation.npz
+export VALIDATION_TFRECORD='/data/womd/validation/*.tfrecord'
+export CHECKPOINT_GLOB='artifacts/paper_final/04_learning/learned_ablation/*/seed_*/best_comm_aware_gru.pt'
+export LAMBDA_LINK=0.2
+export LAMBDA_OUTAGE=0.1
 ```
 
-Το `corrected-full` είναι υπολογιστικά βαρύτερο. Δεν μετατρέπει το compact
-proxy dataset σε official WOMD evidence.
+Τα loss weights επιλέγονται μόνο στο development set και παγώνουν πριν ανοίξει
+το official validation.
 
-## Official WOMD και learned ablation
-
-Τα μεγάλα WOMD shards δεν χρειάζεται να ανέβουν στο repository. Το GPU-enabled
-Colab workflow
-[`notebooks/WOMD_PAPER_TRAINING_COLAB.ipynb`](notebooks/WOMD_PAPER_TRAINING_COLAB.ipynb)
-συνδέεται στο Google Cloud, κατεβάζει ελεγχόμενο υποσύνολο Scenario TFRecords
-v1.3.1 στο προσωρινό Colab runtime, εκτελεί την προκαθορισμένη ablation τεσσάρων
-objectives και τριών seeds και αποθηκεύει στο Google Drive μόνο checkpoints και
-metrics. Πρώτα εκτελείται με `SMOKE = True` και αλλάζει σε `False` μόνο αφού
-περάσουν οι έλεγχοι loader και GPU. Τα official validation shards παραμένουν
-απομονωμένα για το τελικό held-out evaluation και δεν χρησιμοποιούνται στο
-training.
-
-Όταν υπάρχουν official WOMD v1.3.1 TFRecord shards και το Waymo proto package:
-
-```bash
-python scripts/01_build_official_womd_samples.py \
-  /path/to/training.tfrecord-* \
-  --output data/processed/womd_official_samples.npz \
-  --max-vehicles 16
-```
-
-Ο adapter χρησιμοποιεί το πραγματικό `sdc_track_index`, δέχεται μόνο vehicle
-tracks με έγκυρα states σε όλο το retained window και κρατά scenario-safe
-splits.
-
-Έλεγχος του 4-objective × 3-seed training plan χωρίς να ξεκινήσει training:
-
-```bash
-python scripts/04_run_training_ablation.py \
-  data/processed/womd_official_samples.npz \
-  --plan-only
-```
-
-Πραγματική εκπαίδευση:
-
-```bash
-python scripts/04_run_training_ablation.py \
-  data/processed/womd_official_samples.npz \
-  --output artifacts/learned_ablation \
-  --seeds 20260827 20260828 20260829
-```
-
-Οι τέσσερις objectives είναι trajectory-only, trajectory+link,
-trajectory+outage και full. Κάθε checkpoint αποθηκεύει versioned feature schema,
-dataset SHA-256, split metadata και training seed. Ασύνδετο upstream checkpoint
-χωρίς το σωστό schema απορρίπτεται.
-
-## Δομή του repository
+## Δομή repository
 
 ```text
-src/predictive_pc_fmcw/       core library
-├── data/                     synthetic, compact και official WOMD adapters
-├── learning/                 GRU, losses, training και checkpoint validation
-├── scheduling/               reactive και predictive policies
-├── simulation/               packet-level engine
-├── link.py / ber.py          PC-FMCW/DPSK-informed link abstraction
-├── sensing.py                declared synthetic observation uncertainty
-└── staged_experiments.py     deconfounded robustness studies
-
-configs/                      frozen assumptions και experiment designs
-scripts/                      numbered and one-command runners
-tests/                        deterministic scientific regressions
-artifacts/corrected_v2/       full post-audit reproduced evidence
-paper/                        current manuscript source
-docs/                         methods, provenance, results και traceability
-reference/                    supplied Part-A και Stage-4 provenance
+stages/                        gated work packages
+src/predictive_pc_fmcw/        κοινή επιστημονική βιβλιοθήκη
+├── data/                      WOMD adapters, exports και audits
+├── learning/                  GRU, losses, calibration και evaluation
+├── scheduling/                reactive και predictive policies
+├── simulation/                packet-level realization
+├── ber.py / link.py           PC-FMCW/DPSK abstraction
+└── research_stages.py         dependency/gate engine
+scripts/                       εκτελέσιμα experiments
+configs/                       frozen assumptions
+tests/                         regression και scientific gates
+artifacts/                     evidence και αποτελέσματα
+paper/                         manuscript source
+notebooks/                     Colab GPU workflow
+reference/                     provenance της supplied εργασίας
 ```
 
 ## Scientific guardrails
 
-- Κανένας deployable predictor δεν βλέπει future ground truth.
-- Όλοι οι schedulers παίρνουν ίδια arrivals, deadlines και random draws.
-- Το realized packet outcome υπολογίζεται από το ground-truth-derived link.
-- Τα deadlines, horizons και episode duration συγκρίνονται σε φυσικά seconds.
-- Τα statistics γίνονται σε ανεξάρτητο scenario/seed cluster level με Holm
-  correction.
-- Τα no-outage horizons και τα packets που μένουν στην ουρά καταγράφονται ως
-  censoring, δεν εξαφανίζονται.
-- Το sensing noise δηλώνεται ως synthetic assumption, όχι sensor measurement.
-- Τα παλιά/quick artifacts δεν αναμειγνύονται με τα `corrected_v2` results.
+- Κανένα future state δεν εισέρχεται σε deployable decision.
+- Απορρίπτεται overlap scenarios μεταξύ data partitions.
+- Τα hyperparameters παγώνουν πριν από official validation.
+- Οι schedulers χρησιμοποιούν paired randomness.
+- Η επιτυχία πακέτου προκύπτει από το ground-truth-derived link.
+- Ανεξάρτητο statistical cluster είναι το WOMD scenario.
+- Τα confirmatory comparisons χρησιμοποιούν CI και Holm correction.
+- Η optical ισχύς παραμένει model-based χωρίς εξωτερικά measurements.
+- Τα αρνητικά αποτελέσματα και trade-offs παραμένουν ορατά.
 
-## Τεκμηρίωση
+## Ξεκίνα από εδώ
 
-- [Methodology](docs/METHODOLOGY.md)
-- [Experiment protocol](docs/EXPERIMENTS.md)
-- [Corrected results](docs/RESULTS.md)
-- [Data provenance](docs/DATA_PROVENANCE.md)
-- [PDF requirements traceability](docs/PDF_REQUIREMENTS_TRACEABILITY.md)
-- [Exact implementation status](docs/IMPLEMENTATION_STATUS.md)
-- [Paper-readiness assessment](docs/PAPER_READINESS.md)
-- [Current manuscript](paper/PAPER_DRAFT.md)
+- [Executable stage workspace](stages)
+- [Οδηγός εκτέλεσης](docs/STAGED_EXECUTION_GR.md)
+- [Implementation status](docs/IMPLEMENTATION_STATUS.md)
+- [Requirements traceability](docs/PDF_REQUIREMENTS_TRACEABILITY.md)
+- [WOMD audit](docs/WOMD_DATASET_AUDIT.md)
+- [Partial learned results](docs/PARTIAL_WOMD_PAPER_RESULTS.md)
+- [Paper readiness](docs/PAPER_READINESS.md)
 
-## Citation status
+## Publication status
 
-Δεν υπάρχει ακόμη τελική δημοσίευση για citation. Αν χρησιμοποιηθεί το
-repository τώρα, πρέπει να περιγραφεί ως research code/protocol με controlled
-και compact-proxy evidence, όχι ως validated full-WOMD or measured-channel
-system.
+Το repository αποτελεί ελεγμένη ερευνητική υλοποίηση και σαφές publication
+protocol, αλλά όχι ακόμη submission-ready empirical paper. Για να κλείσει το
+Stage 8 απαιτούνται 20 checkpoints, untouched official-validation evaluation,
+paired packet experiments, scenario-clustered statistics και clean release.

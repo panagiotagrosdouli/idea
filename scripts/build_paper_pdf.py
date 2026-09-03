@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import html
 import re
 from pathlib import Path
@@ -24,12 +25,7 @@ from reportlab.platypus import (
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "paper" / "PAPER_DRAFT.md"
-OUTPUT = (
-    ROOT
-    / "output"
-    / "pdf"
-    / "predictive_pc_fmcw_corrected_research_draft.pdf"
-)
+OUTPUT = ROOT / "output" / "pdf" / "predictive_pc_fmcw_corrected_research_draft.pdf"
 STYLES: dict[str, ParagraphStyle] = {}
 
 
@@ -176,12 +172,15 @@ def _styles() -> dict[str, ParagraphStyle]:
     }
 
 
-def build() -> Path:
+def build(output_path: str | Path | None = None) -> Path:
+    destination = Path(output_path) if output_path is not None else OUTPUT
+    if not destination.is_absolute():
+        destination = ROOT / destination
     _register_fonts()
     global STYLES
     STYLES = _styles()
     document = SimpleDocTemplate(
-        str(OUTPUT),
+        str(destination),
         pagesize=A4,
         leftMargin=18 * mm,
         rightMargin=18 * mm,
@@ -206,9 +205,7 @@ def build() -> Path:
         elif line.startswith("!["):
             match = re.match(r"!\[(.*?)\]\((.*?)\)", line)
             if match:
-                story.append(
-                    _image(ROOT / match.group(2), width, 92 * mm)
-                )
+                story.append(_image(ROOT / match.group(2), width, 92 * mm))
         elif line.startswith("*") and line.endswith("*"):
             story.append(Paragraph(_inline(line[1:-1]), STYLES["Caption"]))
         elif line.startswith("|"):
@@ -252,10 +249,17 @@ def build() -> Path:
                 paragraph.append(next_line)
             story.append(Paragraph(_inline(" ".join(paragraph)), STYLES["Body"]))
         index += 1
-    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    destination.parent.mkdir(parents=True, exist_ok=True)
     document.build(story, onFirstPage=_footer, onLaterPages=_footer)
-    return OUTPUT
+    return destination
 
 
 if __name__ == "__main__":
-    print(build())
+    parser = argparse.ArgumentParser(description="Render the paper Markdown as PDF.")
+    parser.add_argument(
+        "--output",
+        default=str(OUTPUT.relative_to(ROOT)),
+        help="Output PDF, relative to the repository unless absolute.",
+    )
+    arguments = parser.parse_args()
+    print(build(arguments.output))

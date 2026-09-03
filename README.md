@@ -1,316 +1,226 @@
 # Predictive PC-FMCW/DPSK Vehicular Communications
 
-**English** | [Ελληνικά](README_GR.md)
+**Causal trajectory forecasting for deadline-aware optical vehicle scheduling**
 
-> **Structured paper workflow:** follow the [Stage 0-8 execution guide](docs/STAGED_EXECUTION_GR.md)
-> and the executable [`stages/`](stages) workspace.
+**English** | [Ελληνικά](README_GR.md) · [Executable stages](stages) · [Paper draft](paper/PAPER_DRAFT.md)
 
-![System overview](docs/assets/readme-hero.webp)
+![Predictive PC-FMCW/DPSK system overview](docs/assets/readme-hero.webp)
 
-This project studies a simple but consequential question:
+> Can motion forecasts help a vehicle scheduler deliver packets before a
+> directional optical link disappears - and does lower trajectory error
+> actually imply better communication performance?
 
-> If we can anticipate where vehicles are going, can we serve packets earlier
-> on optical links that are likely to disappear soon?
+This repository connects real Waymo Open Motion Dataset (WOMD) trajectories to
+a model-based PC-FMCW/DPSK optical link and a packet simulator with queues,
+deadlines, retries and fairness. It extends the supplied Part-A physical layer;
+it is **not** the separate joint beam/ADB project.
 
-Part A supplied the PC-FMCW/DPSK physical-layer foundation. This project adds
-causal trajectory prediction, future optical-link forecasting, deadline-aware
-packet queues, and predictive receiver scheduling. It is not the separate
-Joint Beam/ADB project: the decision here is only **which vehicle to serve in
-the current slot**.
+## Research questions
 
-## Status at a glance
-
-| Component | Status |
-|---|---|
-| Trajectory → geometry → link → packets → scheduler | Implemented |
-| Classical predictors and 10 schedulers | Implemented |
-| Automated tests and scientific sanity gates | 51/51 PASS and 5/5 PASS |
-| Corrected synthetic benchmark | Executed on 12 independent episodes |
-| Compact WOMD proxy benchmark | Executed on only 3 scenes |
-| Official-WOMD true-SDC adapter | Implemented; TFRecord shards not supplied |
-| Communication-aware GRU four-objective ablation | Infrastructure implemented; not executed |
-| Compatible trained checkpoint | Not supplied |
-| Measured optical-channel validation | Not available and not claimed |
-| Final publication claim | Not yet; this is a research draft |
-
-The repository is a complete and tested research implementation, but it is not
-yet final empirical evidence on official WOMD. No missing learned or real-world
-result is invented to make the system appear stronger.
-
-## What the system does
-
-![Predictive scheduling concept](docs/assets/readme-predictive-scheduler.webp)
-
-1. Reads vehicle positions only up to the current time `t`.
-2. Causally forecasts the future positions of each vehicle.
-3. Converts those positions into ego-relative range and bearing.
-4. Computes normalized optical gain, SNR, DBPSK BER, packet error rate,
-   successful goodput, outage, and remaining link lifetime.
-5. Combines the forecast with queue length, deadlines, fairness, and switching
-   cost.
-6. Selects at most one receiver in each slot.
-7. Evaluates delivery using the ground-truth-derived link, never the forecast
-   that produced the scheduling decision.
+1. In which operating regions does motion prediction improve scheduling?
+2. Does lower ADE/FDE imply better SNR, outage, link-lifetime and goodput fidelity?
+3. Can communication-aware GRU training improve downstream packet delivery?
 
 ```mermaid
-flowchart TD
-    A["Observed motion through t"] --> B["Causal trajectory forecast"]
-    B --> C["Future range and bearing"]
-    C --> D["SNR → BER → PER → goodput"]
-    D --> E["Queues, deadlines and link lifetime"]
-    E --> F["Receiver scheduling"]
-    F --> G["Packet KPIs and paired statistics"]
+flowchart LR
+    A["Observed WOMD history"] --> B["Causal predictor"]
+    B --> C["Future geometry"]
+    C --> D["PC-FMCW/DPSK link"]
+    D --> E["Queues and deadlines"]
+    E --> F["Predictive scheduler"]
+    F --> G["Packet KPIs and statistics"]
 ```
 
-## What is real and what is simulated
+Ground-truth future motion is used only to realize and evaluate the link. A
+deployable predictor or scheduler never sees it.
 
-| Element | Source | Defensible interpretation |
-|---|---|---|
-| Controlled trajectories | Synthetic generator | Software and mechanism validation |
-| Compact WOMD trajectories | Real mobility, 3 scene IDs | Integration test with a proxy ego |
-| Official WOMD loader | True `sdc_track_index` and validity masks | Ready when the shards are supplied |
-| PC-FMCW constants | Supplied Part-A notebook/report | Frozen physical assumptions |
-| Optical power/SNR/channel | Reference-SNR model | Model-based, not a measurement |
-| BER | Analytical DBPSK or supplied Part-A FFT/DPSK receiver LUT | Reproducible simulation |
-| Packet delivery | PER and common random numbers | Controlled paired comparison |
+## Executable Stage 0-8 workflow
 
-`received_power_w` is a normalized reference quantity and is accompanied by
-`received_power_calibrated=false`. It is not reported as measured optical power.
+The project is organized as nine gated folders under [`stages/`](stages).
+Every folder owns its `stage.json`, direct `run.py`, dependencies, commands,
+outputs and acceptance criteria.
+
+| Stage | Folder | Purpose | Completion gate |
+|---:|---|---|---|
+| 0 | [`00_freeze_and_provenance`](stages/00_freeze_and_provenance) | Freeze protocol and split policy | Dataset hashes and zero scenario overlap |
+| 1 | [`01_womd_data_pipeline`](stages/01_womd_data_pipeline) | Audit causal true-SDC samples | Valid history/future arrays and split labels |
+| 2 | [`02_pc_fmcw_dpsk_link`](stages/02_pc_fmcw_dpsk_link) | Freeze the Part-A link mapping | 31-point confidence-aware BER LUT |
+| 3 | [`03_classical_baselines`](stages/03_classical_baselines) | Evaluate Last/CV/CA/Kalman/IMM | Reproducible trajectory and link metrics |
+| 4 | [`04_communication_aware_gru`](stages/04_communication_aware_gru) | Select loss weights and train GRUs | Four objectives × five seeds = 20 checkpoints |
+| 5 | [`05_official_predictor_evaluation`](stages/05_official_predictor_evaluation) | Evaluate untouched validation | ADE/FDE, link fidelity, NLL and coverage |
+| 6 | [`06_packet_scheduling`](stages/06_packet_scheduling) | Run paired packet experiments | Eight schedulers × five traffic seeds |
+| 7 | [`07_statistics_and_figures`](stages/07_statistics_and_figures) | Analyze operating regions | Cluster CI, Wilcoxon, Holm and ADE-goodput join |
+| 8 | [`08_final_paper`](stages/08_final_paper) | Build the release | Final figures, tables, paper and manifest |
+
+Generated evidence mirrors the stages:
+
+```text
+artifacts/paper_final/
+├── 00_freeze/       ├── 01_data/        ├── 02_link/
+├── 03_baselines/    ├── 04_learning/    ├── 05_heldout/
+├── 06_scheduling/   ├── 07_analysis/    └── 08_release/
+```
+
+Inspect, preview and execute:
+
+```bash
+make stages
+make stage STAGE=stage0
+make stage STAGE=stage0 EXECUTE=--execute
+```
+
+## Current evidence - honestly separated
+
+| Evidence | State |
+|---|---|
+| Trajectory → link → packet simulation | Implemented and tested |
+| Scientific regression suite | **63/63 tests pass** |
+| Part-A receiver-derived LUT | Executed on a 31-point SNR grid |
+| Controlled scheduling study | 1,125 rows: 45 settings × 5 seeds × 5 policies |
+| Official WOMD training corpus | **249,137 samples, 24,182 scenarios** |
+| Training/development leakage audit | **0 overlapping scenario IDs** |
+| Earlier three-seed training attempt | 7/12 results and 8/12 checkpoints preserved |
+| Canonical learned archive | Pending: 20 verified checkpoints required |
+| Untouched official-validation corpus | Export implemented; artifact pending |
+| Official learned scheduling evidence | Pending validation data and checkpoints |
+| Measured optical-channel validation | Not available and not claimed |
+
+Training corpus SHA-256:
+`b47faf427487a7405531e4944c5bfff9ca56d4fcb9ce3f8495df3cce534347ee`.
+
+## Why ADE is not enough
+
+A small Cartesian error near the optical FoV boundary may cause a large
+pointing-gain or outage error. The paper therefore evaluates the full chain:
+
+\[
+\mathrm{ADE/FDE}\rightarrow\{r,\theta\}\rightarrow
+\{\mathrm{SNR},\mathrm{BER},\mathrm{PER},T_{link}\}\rightarrow
+\{\mathrm{goodput},\mathrm{misses},\mathrm{latency}\}.
+\]
+
+The learned objective is
+
+\[
+\mathcal{L}=\lambda_{traj}\mathcal{L}_{traj}
++\lambda_{link}\mathcal{L}_{link}
++\lambda_{out}\mathcal{L}_{outage}.
+\]
+
+Stage 4 separately trains trajectory-only, trajectory+link,
+trajectory+outage and full communication-aware GRUs.
 
 ## Included methods
 
-Trajectory predictors:
+Predictors:
 
-- Last Position, Constant Velocity, and Constant Acceleration;
-- position-only Kalman CV;
-- lightweight causal CV/CA IMM;
-- optional versioned GRU checkpoint;
+- Last Position, Constant Velocity and Constant Acceleration;
+- position-only Kalman CV and causal CV/CA IMM;
+- deterministic GRU with four communication-loss objectives;
+- development-fitted residual Gaussian calibration for held-out NLL and
+  50/90/95% coverage;
 - perfect-future information reference.
-
-Uncertainty evaluation also includes scenario-safe residual Gaussian wrappers
-for CV and CA. Six controlled scenarios calibrate per-horizon variance and six
-disjoint scenarios evaluate NLL and 50/90/95% coverage. This is a classical
-probabilistic baseline, not a replacement for the missing trained Gaussian/GMM
-checkpoint.
 
 Schedulers:
 
-- Random, Round Robin, Reactive Greedy, and Proportional Fair;
-- CV, Kalman, and IMM Predictive;
-- generic Predictive Utility;
-- Link-Lifetime urgency;
-- perfect-future Oracle-information heuristic.
+- Random, Round Robin, Reactive Greedy and Proportional Fair;
+- CV, Kalman, IMM and Learned Predictive;
+- Predictive Utility and Link-Lifetime urgency;
+- information-oracle heuristic.
 
-The `oracle` is not a mathematical upper bound. It has perfect future
-information but uses the same heuristic utility rather than a globally optimal
-offline schedule.
+The oracle is not a global optimum: it has perfect future information but uses
+the same heuristic scheduling family.
 
-## Corrected results
+## Existing controlled result
 
-The following values come only from `artifacts/corrected_v2/`, after correcting
-coordinate frames, stationary heading, horizon truncation, physical deadlines,
-outage semantics, censoring, and clustered inference.
+The controlled benchmark does **not** establish a universal gain. Link-Lifetime
+minus Reactive gives only `+0.014 Mbps`, with 95% bootstrap interval
+`[-0.0319, +0.0593] Mbps`, while P95 latency is about 269 ms worse. Other loads
+and deadlines change the sign of the effect.
 
-| Policy | Goodput (Mbps) | PDR | P95 latency (ms) | Deadline or censoring |
-|---|---:|---:|---:|---:|
-| Reactive Greedy | 2.293 | 0.644 | 699.6 | 0.356 |
-| Kalman Predictive | 2.305 | 0.647 | 933.3 | 0.353 |
-| Predictive Utility | 2.306 | 0.648 | 965.4 | 0.352 |
-| Link Lifetime | 2.307 | 0.648 | 968.3 | 0.352 |
-| Oracle-information | 2.308 | 0.648 | 968.3 | 0.352 |
+![Controlled benchmark trade-off](artifacts/corrected_v2/figures/corrected_benchmark_tradeoff.png)
 
-The paired Link-Lifetime minus Reactive goodput difference is **+0.014 Mbps**,
-but its bootstrap 95% interval is **[-0.0319, +0.0593] Mbps** and the
-Holm-adjusted Wilcoxon value is `p=1.0`. The default benchmark therefore does
-not provide strong evidence of a goodput gain. P95 latency is approximately
-**269 ms worse**.
+The scientific question is therefore: **when does prediction help, and which
+prediction errors matter to communication?**
 
-Compact WOMD proxy benchmark:
-
-| Policy | Goodput (Mbps) | PDR | P95 latency (ms) |
-|---|---:|---:|---:|
-| Reactive Greedy | 1.160 | 0.329 | 368.3 |
-| Link Lifetime | 1.056 | 0.299 | 400.0 |
-| Oracle-information | 1.056 | 0.299 | 400.0 |
-
-This negative result is retained. The full staged run contains **1,125 policy
-episodes** (45 settings × 5 seeds × 5 policies) and finds sign changes across
-load, deadline, horizon, channel, sensing, and traffic-class assumptions. For
-example, Link Lifetime minus Reactive is +0.139 Mbps at a 0.5 s deadline, but
-−0.232 Mbps at 0.05–0.1 s deadlines and −0.136 Mbps with urgent/bulk traffic.
-No reported family survives Holm correction with only five seeds. The research
-question is therefore not “does prediction always win?” but “when, and under
-which conditions, does prediction help?”
-
-![Corrected benchmark](artifacts/corrected_v2/figures/corrected_benchmark_tradeoff.png)
-
-## Reading guide
-
-- [`output/pdf/predictive_pc_fmcw_corrected_research_draft.pdf`](output/pdf/predictive_pc_fmcw_corrected_research_draft.pdf): corrected research draft.
-- [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md): model, equations, and experimental protocol.
-- [`docs/RESULTS.md`](docs/RESULTS.md): corrected results, paired statistics, and negative findings.
-- [`docs/PDF_REQUIREMENTS_TRACEABILITY.md`](docs/PDF_REQUIREMENTS_TRACEABILITY.md): requirement-to-code/test/artifact mapping.
-- [`docs/PAPER_READINESS.md`](docs/PAPER_READINESS.md): completed evidence and remaining publication blockers.
-
-## Installation on Ubuntu 26.04, Intel or AMD 64-bit
-
-From a clean clone:
+## Installation and verification
 
 ```bash
 sudo apt update
 sudo apt install -y python3 python3-venv python3-pip build-essential
-
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-pip install -e ".[dev,paper]"
-```
+pip install -e ".[dev,ml,paper]"
 
-For the optional learned GRU:
-
-```bash
-pip install -e ".[dev,ml]"
-```
-
-PyTorch is not required for the classical predictors, schedulers, packet
-experiments, or publication figures.
-
-## Quick verification
-
-```bash
 make test
 make lint
 make validate
 ```
 
-Expected outcome: 51 tests and every scientific gate in `PASS` state.
+PyTorch is needed only for learned-model stages.
 
-## Reproducing the corrected artifacts
+## External stage inputs
 
-Run the complete quick integration experiment:
-
-```bash
-make corrected-quick
-```
-
-It creates a fresh and isolated run directory containing:
-
-- a DBPSK BER LUT from -5 to 25 dB using the supplied Part-A
-  FFT-carrier/DPSK receiver and confidence-limited zero-error points;
-- controlled and compact-WOMD proxy benchmarks;
-- motion and link forecast metrics;
-- traffic, channel, and sensing-noise ablations;
-- an urgent/bulk deadline-traffic study;
-- a 1,125-row, five-seed staged experiment in the full run;
-- mobility and FoV scenario slices;
-- CSV, JSON, LaTeX, figures, and a run manifest.
-
-The repository already contains the completed five-seed run under
-`artifacts/corrected_v2/`. To regenerate it:
+Copy [`stages/.env.example`](stages/.env.example) and set:
 
 ```bash
-make corrected-full
+export TRAIN_NPZ=/data/womd/womd_v131_training.npz
+export VALIDATION_NPZ=/data/womd/womd_v131_official_validation.npz
+export VALIDATION_TFRECORD='/data/womd/validation/*.tfrecord'
+export CHECKPOINT_GLOB='artifacts/paper_final/04_learning/learned_ablation/*/seed_*/best_comm_aware_gru.pt'
+export LAMBDA_LINK=0.2
+export LAMBDA_OUTAGE=0.1
 ```
 
-`corrected-full` is more computationally expensive. It does not turn the
-compact proxy dataset into official-WOMD evidence.
-
-## Official WOMD and learned ablation
-
-Large WOMD shards do not need to be uploaded to this repository. The
-GPU-enabled Colab workflow in
-[`notebooks/WOMD_PAPER_TRAINING_COLAB.ipynb`](notebooks/WOMD_PAPER_TRAINING_COLAB.ipynb)
-authenticates to Google Cloud, downloads a controlled v1.3.1 Scenario-TFRecord
-subset into the temporary Colab runtime, runs the preregistered four-objective
-three-seed ablation, and writes only checkpoints and metrics to Google Drive.
-Run it first with `SMOKE = True`; change to `False` only after the loader and
-GPU checks pass. The official validation shards remain isolated for the final
-held-out evaluation and must not be used for model fitting.
-
-When official WOMD v1.3.1 TFRecord shards and the Waymo proto package are
-available:
-
-```bash
-python scripts/01_build_official_womd_samples.py \
-  /path/to/training.tfrecord-* \
-  --output data/processed/womd_official_samples.npz \
-  --max-vehicles 16
-```
-
-The adapter uses the true `sdc_track_index`, accepts only vehicle tracks with
-valid states throughout the retained window, and preserves scenario-safe
-splits.
-
-Inspect the four-objective, three-seed training plan without training:
-
-```bash
-python scripts/04_run_training_ablation.py \
-  data/processed/womd_official_samples.npz \
-  --plan-only
-```
-
-Run the actual training ablation:
-
-```bash
-python scripts/04_run_training_ablation.py \
-  data/processed/womd_official_samples.npz \
-  --output artifacts/learned_ablation \
-  --seeds 20260827 20260828 20260829
-```
-
-The objectives are trajectory-only, trajectory+link, trajectory+outage, and
-full. Every checkpoint records a versioned feature schema, dataset SHA-256,
-split metadata, and training seed. An incompatible upstream checkpoint is
-rejected instead of being silently evaluated.
+Loss weights are selected only on development data and frozen before official
+validation is opened.
 
 ## Repository layout
 
 ```text
-src/predictive_pc_fmcw/       core library
-├── data/                     synthetic, compact, and official WOMD adapters
-├── learning/                 GRU, losses, training, checkpoint validation
-├── scheduling/               reactive and predictive policies
-├── simulation/               packet-level engine
-├── link.py / ber.py          PC-FMCW/DPSK-informed link abstraction
-├── sensing.py                declared observation uncertainty
-└── staged_experiments.py     deconfounded robustness studies
-
-configs/                      frozen assumptions and experiment designs
-scripts/                      numbered and one-command runners
-tests/                        deterministic scientific regressions
-artifacts/corrected_v2/       full post-audit reproduced evidence
-paper/                        current manuscript source
-docs/                         methods, provenance, results, traceability
-reference/                    supplied Part-A and Stage-4 provenance
+stages/                        gated research work packages
+src/predictive_pc_fmcw/        reusable scientific library
+├── data/                      WOMD adapters, exports and audits
+├── learning/                  GRU, objectives, calibration, evaluation
+├── scheduling/                reactive and predictive policies
+├── simulation/                packet-level realization
+├── ber.py / link.py           PC-FMCW/DPSK abstraction
+└── research_stages.py         dependency and gate engine
+scripts/                       executable experiments
+configs/                       frozen physical/experimental assumptions
+tests/                         regression and scientific gates
+artifacts/                     evidence and generated results
+paper/                         manuscript source
+notebooks/                     Colab GPU workflow
+reference/                     supplied-work provenance
 ```
 
 ## Scientific guardrails
 
-- No deployable predictor sees future ground truth.
-- Every scheduler receives identical arrivals, deadlines, and random draws.
-- Realized packet outcomes use the ground-truth-derived link.
-- Deadlines, horizons, and episode durations are compared in physical seconds.
-- Statistics operate at independent scenario/seed-cluster level and apply Holm
-  correction.
-- No-outage horizons and packets remaining in queues are recorded as censoring.
-- Sensing noise is a declared synthetic assumption, not a sensor measurement.
-- Pre-fix and quick artifacts are never mixed with `corrected_v2` results.
+- No future information enters deployable decisions.
+- Scenario overlap across data partitions is rejected.
+- Hyperparameters are frozen before official validation.
+- Schedulers receive paired traffic and channel randomness.
+- Packet success uses the ground-truth-derived link.
+- WOMD scenario ID is the independent statistical cluster.
+- Confirmatory comparisons use confidence intervals and Holm correction.
+- Optical power is model-based unless measurements are supplied.
+- Negative results and latency/reliability trade-offs remain visible.
 
-## Documentation
+## Start here
 
-- [Methodology](docs/METHODOLOGY.md)
-- [Experiment protocol](docs/EXPERIMENTS.md)
-- [Corrected results](docs/RESULTS.md)
-- [Data provenance](docs/DATA_PROVENANCE.md)
-- [PDF requirements traceability](docs/PDF_REQUIREMENTS_TRACEABILITY.md)
-- [Exact implementation status](docs/IMPLEMENTATION_STATUS.md)
-- [Paper-readiness assessment](docs/PAPER_READINESS.md)
-- [Current manuscript](paper/PAPER_DRAFT.md)
-- [Greek README](README_GR.md)
+- [Executable stage workspace](stages)
+- [Greek execution guide](docs/STAGED_EXECUTION_GR.md)
+- [Implementation status](docs/IMPLEMENTATION_STATUS.md)
+- [Requirements traceability](docs/PDF_REQUIREMENTS_TRACEABILITY.md)
+- [WOMD audit](docs/WOMD_DATASET_AUDIT.md)
+- [Partial learned results](docs/PARTIAL_WOMD_PAPER_RESULTS.md)
+- [Paper readiness](docs/PAPER_READINESS.md)
 
-## Citation status
+## Publication status
 
-There is no final publication to cite yet. At its current stage, the repository
-should be described as research code and protocol supported by controlled and
-compact-proxy evidence, not as a validated full-WOMD or measured-channel
-system.
+This is a tested research implementation and a frozen publication protocol,
+not yet a submission-ready empirical paper. Stage 8 requires the 20-checkpoint
+archive, untouched official-validation results, paired packet experiments,
+scenario-clustered statistics and a clean reproducibility release.

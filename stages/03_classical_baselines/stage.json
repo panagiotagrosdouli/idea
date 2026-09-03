@@ -3,9 +3,9 @@
   "title": "Classical causal motion and link baselines",
   "depends_on": ["stage2"],
   "required_inputs": ["${TRAIN_NPZ}"],
-  "outputs": ["artifacts/paper_final/motion_baselines/forecast_summary.json"],
+  "outputs": ["artifacts/paper_final/03_baselines/forecast_summary.json"],
   "acceptance": ["Last/CV/CA/Kalman/IMM evaluated", "ADE/FDE and link metrics recorded", "no future information used"],
   "commands": [
-    ["python", "scripts/03_eval_npz_baselines.py", "${TRAIN_NPZ}", "--split", "development", "--output", "artifacts/paper_final/motion_baselines"]
+    ["python", "scripts/03_eval_npz_baselines.py", "${TRAIN_NPZ}", "--split", "development", "--output", "artifacts/paper_final/03_baselines"]
   ]
 }

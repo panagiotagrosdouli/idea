@@ -23,6 +23,7 @@ INCLUDED_ROOTS = (
     "configs",
     "docs",
     "paper",
+    "stages",
     "data/example",
     "reference/part_b_stage4",
 )
@@ -111,10 +112,13 @@ def main() -> None:
             "pytorch_available": importlib.util.find_spec("torch") is not None,
         },
         "scientific_scope": {
-            "mobility": "controlled synthetic and compact real-WOMD export",
+            "mobility": (
+                "official WOMD trajectories when stage inputs are supplied; "
+                "controlled data otherwise"
+            ),
             "communication": "model-based PC-FMCW/DPSK simulation",
             "measured_optical_channel": False,
-            "true_womd_ego_in_compact_export": False,
+            "official_validation_required_for_final_claims": True,
         },
         "file_count": len(files),
         "files": files,
