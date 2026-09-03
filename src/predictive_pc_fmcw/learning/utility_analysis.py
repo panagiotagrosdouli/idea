@@ -5,8 +5,9 @@ import json
 from pathlib import Path
 from typing import Any
 
-import numpy as np
 from scipy.stats import spearmanr
+
+import numpy as np
 
 from ..metrics import paired_metric_statistics
 
