@@ -45,7 +45,9 @@ def feature_names(include_prediction: bool = True) -> tuple[str, ...]:
     return names
 
 
-def _safe_fraction(values: NDArray[np.float64], denominator: float) -> NDArray[np.float64]:
+def _safe_fraction(
+    values: NDArray[np.float64], denominator: float
+) -> NDArray[np.float64]:
     return np.clip(values / max(float(denominator), 1e-12), 0.0, 1.0)
 
 
@@ -55,7 +57,7 @@ def build_observation(
 ) -> NDArray[np.float32]:
     """Build a per-vehicle, causal observation matrix.
 
-    Rows correspond to vehicles.  No ground-truth future link state is used:
+    Rows correspond to vehicles. No ground-truth future link state is used:
     predictive features come only from ``SchedulerContext.predicted_*``.
     """
 
@@ -101,7 +103,9 @@ def build_observation(
         predicted_goodput = np.asarray(context.predicted_goodput_bps, dtype=np.float64)
         predicted_outage = np.asarray(context.predicted_outage, dtype=np.float64)
         if predicted_goodput.ndim != 2 or predicted_goodput.shape[0] != vehicles:
-            raise ValueError("predicted_goodput_bps must have shape (vehicles, horizon)")
+            raise ValueError(
+                "predicted_goodput_bps must have shape (vehicles, horizon)"
+            )
         if predicted_outage.shape != predicted_goodput.shape:
             raise ValueError("predicted_outage must match predicted_goodput_bps")
 
@@ -124,7 +128,9 @@ def build_observation(
     observation = np.column_stack(columns).astype(np.float32, copy=False)
     expected = (vehicles, len(feature_names(config.include_prediction)))
     if observation.shape != expected:
-        raise AssertionError(f"Unexpected observation shape {observation.shape}, expected {expected}")
+        raise AssertionError(
+            f"Unexpected observation shape {observation.shape}, expected {expected}"
+        )
     if not np.all(np.isfinite(observation)):
         raise ValueError("RL observation contains non-finite values")
     return observation
