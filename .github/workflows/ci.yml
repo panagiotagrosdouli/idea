@@ -16,4 +16,5 @@ jobs:
       - run: pip install -e ".[dev]"
       - run: ruff check src tests scripts stages
       - run: pytest
+      - run: python scripts/check_stage_entrypoints.py
       - run: pcfmcw validate --config configs/default.json --output results/validation.json
