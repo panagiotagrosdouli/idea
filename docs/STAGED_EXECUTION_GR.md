@@ -79,5 +79,6 @@ sweep. Μετά την επιλογή παγώνουν και δεν αλλάζ�
 - Official held-out και packet-level αριθμοί δεν αντικαθίστανται με proxy ή
   synthetic αποτελέσματα.
 
-Η μηχανή των stages βρίσκεται στο `research_stages.py`, το πρωτόκολλο στο
-`configs/research_stages.json` και το CLI στο `scripts/run_research_stage.py`.
+Η μηχανή των stages βρίσκεται στο `research_stages.py`, κάθε εκτελέσιμο
+specification στον αντίστοιχο υποφάκελο του `stages/` και το CLI στο
+`scripts/run_research_stage.py`.
