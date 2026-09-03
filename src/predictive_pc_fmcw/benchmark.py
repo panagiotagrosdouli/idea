@@ -15,7 +15,6 @@ from .link import LinkModel
 from .metrics import (
     bootstrap_mean_ci,
     holm_adjusted_pvalues,
-    paired_bootstrap_difference,
     paired_metric_statistics,
 )
 from .predictors import TrajectoryPredictor
@@ -151,21 +150,29 @@ def summarize_outputs(
     comparisons: dict[str, object] = {}
     if baseline is not None:
         baseline_by_scenario = {
-            str(row["scenario_id"]): row for row in baseline
+            (str(row["scenario_id"]), int(row["seed"])): row for row in baseline
         }
         for scheduler, rows in grouped.items():
             if scheduler == "reactive_greedy":
                 continue
-            current_by_scenario = {str(row["scenario_id"]): row for row in rows}
+            current_by_scenario = {
+                (str(row["scenario_id"]), int(row["seed"])): row for row in rows
+            }
             shared = sorted(set(baseline_by_scenario) & set(current_by_scenario))
             comparisons[scheduler] = {}
             for metric in PRIMARY_METRICS:
-                proposed = [float(current_by_scenario[key][metric]) for key in shared]
-                reference = [float(baseline_by_scenario[key][metric]) for key in shared]
+                by_cluster: dict[str, list[float]] = {}
+                for key in shared:
+                    by_cluster.setdefault(key[0], []).append(
+                        float(current_by_scenario[key][metric])
+                        - float(baseline_by_scenario[key][metric])
+                    )
+                cluster_differences = [
+                    float(np.mean(values)) for values in by_cluster.values()
+                ]
                 comparisons[scheduler][metric] = asdict(
-                    paired_bootstrap_difference(
-                        proposed,
-                        reference,
+                    bootstrap_mean_ci(
+                        cluster_differences,
                         samples=config.benchmark.bootstrap_samples,
                         seed=config.seed,
                     )
@@ -174,26 +181,26 @@ def summarize_outputs(
     statistical_comparisons: dict[str, object] = {}
     if baseline is not None:
         baseline_by_scenario = {
-            str(row["scenario_id"]): row for row in baseline
+            (str(row["scenario_id"]), int(row["seed"])): row for row in baseline
         }
         for scheduler, rows in grouped.items():
             if scheduler == "reactive_greedy":
                 continue
-            current_by_scenario = {str(row["scenario_id"]): row for row in rows}
+            current_by_scenario = {
+                (str(row["scenario_id"]), int(row["seed"])): row for row in rows
+            }
             shared = sorted(set(baseline_by_scenario) & set(current_by_scenario))
             statistical_comparisons[scheduler] = {}
             for metric in PRIMARY_METRICS:
                 proposed = [float(current_by_scenario[key][metric]) for key in shared]
                 reference = [float(baseline_by_scenario[key][metric]) for key in shared]
-                statistical_comparisons[scheduler][metric] = (
-                    paired_metric_statistics(
-                        proposed,
-                        reference,
-                        higher_is_better=metric not in LOWER_IS_BETTER,
-                        clusters=shared,
-                        samples=config.benchmark.bootstrap_samples,
-                        seed=config.seed,
-                    )
+                statistical_comparisons[scheduler][metric] = paired_metric_statistics(
+                    proposed,
+                    reference,
+                    higher_is_better=metric not in LOWER_IS_BETTER,
+                    clusters=[key[0] for key in shared],
+                    samples=config.benchmark.bootstrap_samples,
+                    seed=config.seed,
                 )
         policy_names = sorted(statistical_comparisons)
         for metric in PRIMARY_METRICS:
@@ -203,9 +210,7 @@ def summarize_outputs(
             ]
             adjusted = holm_adjusted_pvalues(raw)
             for name, value in zip(policy_names, adjusted, strict=True):
-                statistical_comparisons[name][metric][
-                    "wilcoxon_holm_p_value"
-                ] = value
+                statistical_comparisons[name][metric]["wilcoxon_holm_p_value"] = value
     summary["paired_statistics_vs_reactive"] = statistical_comparisons
     return summary
 
@@ -291,8 +296,7 @@ def _plot_summary(summary: dict[str, object], path: Path) -> None:
         highs = np.asarray([schedulers[name][metric]["high"] for name in names])
         errors = np.vstack([means - lows, highs - means])
         colors = [
-            "#d97706" if name == "reactive_greedy" else "#2563eb"
-            for name in names
+            "#d97706" if name == "reactive_greedy" else "#2563eb" for name in names
         ]
         axis.bar(np.arange(len(names)), means, yerr=errors, capsize=3, color=colors)
         axis.set_xticks(np.arange(len(names)), short, rotation=28, ha="right")
