@@ -20,7 +20,7 @@ def _scenario_ids(path: str | Path) -> set[str]:
 
 
 def _split_labels(audit: dict[str, Any]) -> set[str]:
-    return set(str(label) for label in audit["split_counts"])
+    return set(str(label) for label in audit["splits"])
 
 
 def verify_corpora(
