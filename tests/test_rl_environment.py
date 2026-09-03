@@ -10,7 +10,9 @@ from predictive_pc_fmcw.rl.state import ObservationConfig
 from predictive_pc_fmcw.scheduling.base import SchedulerContext
 
 
-def _context(*, oracle: bool = False, queues: tuple[int, int] = (2, 0)) -> SchedulerContext:
+def _context(
+    *, oracle: bool = False, queues: tuple[int, int] = (2, 0)
+) -> SchedulerContext:
     return SchedulerContext(
         slot=0,
         queue_lengths=np.asarray(queues, dtype=np.int64),
