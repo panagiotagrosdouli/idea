@@ -2,10 +2,32 @@
   "id": "stage3",
   "title": "Classical causal motion and link baselines",
   "depends_on": ["stage2"],
-  "required_inputs": ["${TRAIN_NPZ}"],
-  "outputs": ["artifacts/paper_final/03_baselines/forecast_summary.json"],
-  "acceptance": ["Last/CV/CA/Kalman/IMM evaluated", "ADE/FDE and link metrics recorded", "no future information used"],
+  "required_inputs": [
+    "${TRAIN_NPZ}",
+    "artifacts/paper_final/02_link/dbpsk_ber_lut.csv",
+    "artifacts/paper_final/02_link/link_verification.json"
+  ],
+  "outputs": [
+    "artifacts/paper_final/03_baselines/forecast_summary.json",
+    "artifacts/paper_final/03_baselines/forecast_metrics_by_scenario.csv"
+  ],
+  "acceptance": [
+    "Last/CV/CA/Kalman/IMM evaluated",
+    "ADE/FDE and link metrics recorded",
+    "verified frozen Part-A BER LUT used for link metrics",
+    "no future information used"
+  ],
   "commands": [
-    ["python", "scripts/03_eval_npz_baselines.py", "${TRAIN_NPZ}", "--split", "development", "--output", "artifacts/paper_final/03_baselines"]
+    [
+      "python",
+      "scripts/03_eval_npz_baselines.py",
+      "${TRAIN_NPZ}",
+      "--split",
+      "development",
+      "--ber-lut",
+      "artifacts/paper_final/02_link/dbpsk_ber_lut.csv",
+      "--output",
+      "artifacts/paper_final/03_baselines"
+    ]
   ]
 }
