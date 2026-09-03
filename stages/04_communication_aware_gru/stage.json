@@ -1,0 +1,12 @@
+{
+  "id": "stage4",
+  "title": "Communication-aware GRU selection and five-seed training",
+  "depends_on": ["stage3"],
+  "required_inputs": ["${TRAIN_NPZ}"],
+  "outputs": ["artifacts/paper_final/learned_ablation/completion_manifest.json"],
+  "acceptance": ["lambda selected on development only", "four objectives times five seeds", "20 verified checkpoints", "dataset/config hashes embedded"],
+  "commands": [
+    ["python", "scripts/04_run_lambda_sweep.py", "${TRAIN_NPZ}", "--output", "artifacts/paper_final/lambda_sweep", "--epochs", "80", "--batch-size", "32", "--seeds", "20260827", "20260828", "20260829", "20260830", "20260831"],
+    ["python", "scripts/04_run_training_ablation.py", "${TRAIN_NPZ}", "--output", "artifacts/paper_final/learned_ablation", "--epochs", "80", "--batch-size", "32", "--seeds", "20260827", "20260828", "20260829", "20260830", "20260831", "--lambda-link", "${LAMBDA_LINK}", "--lambda-outage", "${LAMBDA_OUTAGE}"]
+  ]
+}
