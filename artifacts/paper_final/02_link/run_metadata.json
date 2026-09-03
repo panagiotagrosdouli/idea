@@ -1,0 +1,13 @@
+{
+  "builder": "scripts/02_build_part_a_link_lut.py",
+  "bits_per_snr_point": 250000,
+  "receiver": "supplied_part_a_fft_dpsk",
+  "seed": 20260827,
+  "snr_grid_db": {
+    "start": -5,
+    "stop": 25,
+    "step": 1,
+    "points": 31,
+    "semantics": "waveform_sample_snr_db"
+  }
+}
