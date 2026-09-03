@@ -12,7 +12,7 @@ from predictive_pc_fmcw.research_stages import (
 
 class ResearchStagesTest(unittest.TestCase):
     def test_repository_stage_graph_is_valid_and_ordered(self):
-        stages = load_research_stages("configs/research_stages.json")
+        stages = load_research_stages("stages")
         self.assertEqual(
             [stage.stage_id for stage in stages], [f"stage{i}" for i in range(9)]
         )
@@ -46,7 +46,7 @@ class ResearchStagesTest(unittest.TestCase):
             self.assertEqual(rows[1]["status"], "ready")
 
     def test_command_expansion_is_fail_closed(self):
-        stage = load_research_stages("configs/research_stages.json")[0]
+        stage = load_research_stages("stages")[0]
         with self.assertRaises(ValueError):
             expanded_commands(stage, environment={})
 
