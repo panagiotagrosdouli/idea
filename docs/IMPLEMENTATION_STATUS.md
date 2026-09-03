@@ -23,7 +23,7 @@
 
 ## Executed evidence
 
-- 60/60 tests, compilation and 5/5 scientific gates;
+- 63/63 tests, compilation and 5/5 scientific gates;
 - 31-point Part-A receiver BER LUT from -5 to 25 dB;
 - 120 controlled policy episodes (12 scenarios × 10 policies);
 - synthetic and compact-proxy motion/link evaluation;
