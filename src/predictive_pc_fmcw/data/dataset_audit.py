@@ -7,7 +7,6 @@ from typing import Any
 
 import numpy as np
 
-
 REQUIRED_ARRAYS = {
     "history_xy",
     "future_xy",
@@ -52,12 +51,18 @@ def audit_training_npz(path: str | Path) -> dict[str, Any]:
                 raise ValueError(f"{name} has inconsistent sample count")
         numeric = (history, future, headings)
         finite = all(bool(np.all(np.isfinite(values))) for values in numeric)
-        split_names, split_counts = np.unique(
-            archive["split"], return_counts=True
+        split_names, split_counts = np.unique(archive["split"], return_counts=True)
+        scenario_values = np.asarray(archive["scenario_id"]).astype(str)
+        split_values = np.asarray(archive["split"]).astype(str)
+        scenario_to_splits: dict[str, set[str]] = {}
+        for scenario_id, split_name in zip(scenario_values, split_values, strict=True):
+            scenario_to_splits.setdefault(scenario_id, set()).add(split_name)
+        internally_leaked = sorted(
+            scenario_id
+            for scenario_id, labels in scenario_to_splits.items()
+            if len(labels) > 1
         )
-        future_displacement = np.linalg.norm(
-            future[:, -1] - history[:, -1], axis=1
-        )
+        future_displacement = np.linalg.norm(future[:, -1] - history[:, -1], axis=1)
         history_step = np.linalg.norm(np.diff(history, axis=1), axis=2)
         report = {
             "path": str(source_path),
@@ -73,6 +78,11 @@ def audit_training_npz(path: str | Path) -> dict[str, Any]:
             "splits": {
                 str(name): int(count)
                 for name, count in zip(split_names, split_counts, strict=True)
+            },
+            "scenario_split_integrity": {
+                "passed": not internally_leaked,
+                "overlap_count": len(internally_leaked),
+                "overlapping_scenario_ids": internally_leaked,
             },
             "source": str(archive["source"].item()),
             "coordinate_frame": str(archive["coordinate_frame"].item()),
