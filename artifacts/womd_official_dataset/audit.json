@@ -15,8 +15,13 @@
     "p95": 0.9715941802693714
   },
   "history_steps": 11,
-  "path": "/workspace/scratch/1385c5ec521c/upload/womd_training_paper.npz",
+  "path": "../upload/womd_training_paper.npz",
   "sample_count": 249137,
+  "scenario_split_integrity": {
+    "overlap_count": 0,
+    "overlapping_scenario_ids": [],
+    "passed": true
+  },
   "sha256": "b47faf427487a7405531e4944c5bfff9ca56d4fcb9ce3f8495df3cce534347ee",
   "source": "real_WOMD_v1.3.0_true_SDC_geometry",
   "splits": {
