@@ -7,7 +7,6 @@ from typing import Any
 
 import numpy as np
 from scipy import stats
-
 from ..metrics import paired_metric_statistics
 
 
