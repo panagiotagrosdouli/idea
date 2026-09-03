@@ -99,7 +99,9 @@ class RLSchedulingEnv:
     def reset(self, *, seed: int) -> tuple[NDArray[np.float32], dict[str, object]]:
         context = self.backend.reset(seed)
         if context.oracle_forecast:
-            raise ValueError("RL training/evaluation cannot consume oracle future state")
+            raise ValueError(
+                "RL training/evaluation cannot consume oracle future state"
+            )
         if context.vehicles != self.action_spec.vehicles:
             raise ValueError("backend vehicle count changed across reset")
         self._context = context
