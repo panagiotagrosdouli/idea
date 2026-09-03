@@ -18,7 +18,12 @@ def main() -> None:
     parser.add_argument("--max-vehicles", type=int, default=16)
     parser.add_argument(
         "--fixed-split",
-        help="Label every sample identically, e.g. official_validation.",
+        choices=("official_validation",),
+        help=(
+            "Label every sample as the untouched official-validation role. "
+            "Omit this option for official training, which is split "
+            "scenario-safely into training/development."
+        ),
     )
     args = parser.parse_args()
     scenarios = load_official_womd_tfrecords(
