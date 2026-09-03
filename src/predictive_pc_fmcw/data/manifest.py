@@ -4,6 +4,8 @@ import hashlib
 import json
 from pathlib import Path
 
+import numpy as np
+
 
 def sha256_file(path: str | Path) -> str:
     digest = hashlib.sha256()
@@ -33,9 +35,7 @@ def build_compact_womd_manifest(
         records = json.load(handle)
     scenario_ids = sorted({str(record["scenario_id"]) for record in records})
     split_by_scenario = {
-        scenario_id: deterministic_development_split(
-            scenario_id, development_fraction
-        )
+        scenario_id: deterministic_development_split(scenario_id, development_fraction)
         for scenario_id in scenario_ids
     }
     return {
@@ -67,9 +67,56 @@ def write_compact_womd_manifest(
     destination = Path(output_path)
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(
-        json.dumps(
-            build_compact_womd_manifest(womd_json, release=release), indent=2
-        ),
+        json.dumps(build_compact_womd_manifest(womd_json, release=release), indent=2),
         encoding="utf-8",
     )
     return destination
+
+
+def load_npz_scenario_ids(path: str | Path) -> set[str]:
+    """Return unique scenario identifiers without exposing sample-level ordering."""
+    with np.load(path, allow_pickle=False) as data:
+        if "scenario_id" not in data.files:
+            raise ValueError(f"{path} does not contain scenario_id.")
+        return set(np.asarray(data["scenario_id"]).astype(str).tolist())
+
+
+def audit_scenario_overlap(
+    named_npz_paths: dict[str, str | Path],
+) -> dict[str, object]:
+    """Audit scenario-level leakage across train/dev/held-out NPZ corpora.
+
+    Samples belonging to the same WOMD scenario are a statistical cluster and
+    must never appear in more than one corpus supplied to this function.
+    """
+    if len(named_npz_paths) < 2:
+        raise ValueError("At least two named NPZ corpora are required.")
+    scenario_sets = {
+        name: load_npz_scenario_ids(path)
+        for name, path in sorted(named_npz_paths.items())
+    }
+    overlaps: dict[str, object] = {}
+    names = sorted(scenario_sets)
+    total_overlap = 0
+    for left_index, left in enumerate(names):
+        for right in names[left_index + 1 :]:
+            shared = sorted(scenario_sets[left] & scenario_sets[right])
+            total_overlap += len(shared)
+            overlaps[f"{left}__{right}"] = {
+                "count": len(shared),
+                "scenario_ids": shared,
+            }
+    return {
+        "corpora": {
+            name: {
+                "path": str(named_npz_paths[name]),
+                "sha256": sha256_file(named_npz_paths[name]),
+                "scenario_count": len(scenario_sets[name]),
+            }
+            for name in names
+        },
+        "pairwise_overlaps": overlaps,
+        "total_pairwise_overlap_count": total_overlap,
+        "passed": total_overlap == 0,
+        "statistical_unit": "WOMD scenario_id",
+    }
