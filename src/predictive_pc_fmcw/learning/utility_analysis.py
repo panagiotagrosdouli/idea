@@ -10,7 +10,6 @@ from scipy.stats import spearmanr
 
 from ..metrics import paired_metric_statistics
 
-
 UTILITY_METRICS = (
     "goodput_mbps",
     "packet_delivery_ratio",
