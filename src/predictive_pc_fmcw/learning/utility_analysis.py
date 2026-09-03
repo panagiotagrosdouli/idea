@@ -8,7 +8,7 @@ from typing import Any
 import numpy as np
 from scipy import stats
 
-from ..metrics import paired_metric_statistics
+from ..metrics import holm_adjusted_pvalues, paired_metric_statistics
 
 UTILITY_METRICS = (
     "goodput_mbps",
@@ -68,6 +68,21 @@ def join_accuracy_and_scheduler_utility(
     return joined
 
 
+def _apply_holm_family(metrics: dict[str, dict[str, Any]]) -> None:
+    names = list(metrics)
+    t_adjusted = holm_adjusted_pvalues(
+        metrics[name]["paired_t_test_p_value"] for name in names
+    )
+    wilcoxon_adjusted = holm_adjusted_pvalues(
+        metrics[name]["wilcoxon_p_value"] for name in names
+    )
+    for name, t_value, wilcoxon_value in zip(
+        names, t_adjusted, wilcoxon_adjusted, strict=True
+    ):
+        metrics[name]["paired_t_test_holm_p_value"] = t_value
+        metrics[name]["wilcoxon_holm_p_value"] = wilcoxon_value
+
+
 def summarize_utility(rows: list[dict[str, Any]]) -> dict[str, Any]:
     summary = {}
     for objective in sorted({row["objective"] for row in rows}):
@@ -91,6 +106,7 @@ def summarize_utility(rows: list[dict[str, Any]]) -> dict[str, Any]:
                 },
                 clusters=[row["scenario_id"] for row in selected],
             )
+        _apply_holm_family(metrics)
         summary[objective] = {
             "scenario_seed_rows": len(selected),
             "independent_scenarios": len(
