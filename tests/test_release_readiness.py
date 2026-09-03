@@ -25,7 +25,8 @@ class ReleaseReadinessTest(unittest.TestCase):
             root = Path(temporary)
             manuscript = root / "paper.md"
             manuscript.write_text(
-                "# Evidence-backed final manuscript\n\nOfficial results are versioned.\n",
+                "# Evidence-backed final manuscript\n\n"
+                "Official results are versioned.\n",
                 encoding="utf-8",
             )
             evidence = root / "official.json"
