@@ -23,7 +23,7 @@
 
 ## Executed evidence
 
-- 57/57 tests, compilation and 5/5 scientific gates;
+- 60/60 tests, compilation and 5/5 scientific gates;
 - 31-point Part-A receiver BER LUT from -5 to 25 dB;
 - 120 controlled policy episodes (12 scenarios × 10 policies);
 - synthetic and compact-proxy motion/link evaluation;
@@ -43,6 +43,12 @@
 - official-WOMD learned/reactive/oracle packet evaluation and the joined
   ADE-vs-realized-goodput analysis;
 - compatible learned-checkpoint evaluation in the packet scheduler.
+
+The roadmap update adds a fail-closed cross-corpus scenario-overlap audit,
+development-only residual-Gaussian GRU calibration, and an eight-policy official
+WOMD scheduler runner with five paired traffic seeds. These paths are tested but
+do not create official numerical evidence until the required validation corpus
+and complete checkpoints are supplied.
 
 The official training NPZ is no longer a blocker: it contains 249,137 samples
 from 24,182 scenarios and passed integrity/finiteness checks. Colab also
