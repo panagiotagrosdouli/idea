@@ -6,9 +6,9 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from scipy.stats import spearmanr
+from scipy import stats
 
-from predictive_pc_fmcw.metrics import paired_metric_statistics
+from ..metrics import paired_metric_statistics
 
 
 UTILITY_METRICS = (
@@ -102,7 +102,7 @@ def summarize_utility(rows: list[dict[str, Any]]) -> dict[str, Any]:
     if rows:
         ade = np.asarray([row["ade_m"] for row in rows], dtype=float)
         gain = np.asarray([row["delta_goodput_mbps"] for row in rows], dtype=float)
-        correlation = spearmanr(ade, gain)
+        correlation = stats.spearmanr(ade, gain)
         summary["ade_vs_realized_goodput_gain"] = {
             "spearman_rho": float(correlation.statistic),
             "p_value": float(correlation.pvalue),
