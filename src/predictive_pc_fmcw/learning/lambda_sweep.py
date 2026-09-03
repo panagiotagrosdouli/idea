@@ -27,7 +27,12 @@ def default_lambda_settings() -> tuple[LambdaSetting, ...]:
     } | {
         LambdaSetting(0.2, value) for value in (0.05, 0.1, 0.2)
     }
-    return tuple(sorted(settings, key=lambda item: (item.lambda_link, item.lambda_outage)))
+    return tuple(
+        sorted(
+            settings,
+            key=lambda item: (item.lambda_link, item.lambda_outage),
+        )
+    )
 
 
 def run_lambda_sweep(
