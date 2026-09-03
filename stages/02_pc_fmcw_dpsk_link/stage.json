@@ -19,8 +19,6 @@
     [
       "python",
       "scripts/02_build_part_a_link_lut.py",
-      "--receiver",
-      "part-a-notebook",
       "--bits",
       "250000",
       "--seed",
