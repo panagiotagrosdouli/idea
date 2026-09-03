@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import json
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 import numpy as np
@@ -27,11 +28,24 @@ class TrainingResult:
     dataset_sha256: str
 
 
+def _link_config_provenance(link: LinkConfig) -> dict[str, object]:
+    values = asdict(link)
+    canonical = json.dumps(values, sort_keys=True, separators=(",", ":")).encode()
+    return {
+        "values": values,
+        "sha256": hashlib.sha256(canonical).hexdigest(),
+        "training_semantics": (
+            "Differentiable communication-aware loss surrogate; frozen Stage-2 BER "
+            "LUT is used for held-out/scheduling evaluation."
+        ),
+    }
+
+
 def train_from_npz(
     dataset_path: str | Path,
     output_dir: str | Path,
     epochs: int = 80,
-    batch_size: int = 64,
+    batch_size: int = 32,
     learning_rate: float = 1e-3,
     hidden_size: int = 128,
     layers: int = 2,
@@ -130,6 +144,7 @@ def train_from_npz(
         objective_name
     ]
     link = link_config or LinkConfig()
+    link_provenance = _link_config_provenance(link)
     objective_module = CommunicationAwareObjective(
         reference_distance_m=link.reference_distance_m,
         reference_snr_db=link.reference_snr_db,
@@ -210,6 +225,7 @@ def train_from_npz(
                         "sha256": sha256_file(dataset_path),
                         "scenario_safe_split": True,
                     },
+                    "link_config": link_provenance,
                     "training": {
                         "objective": objective_name,
                         "lambda_trajectory": lambda_trajectory,
