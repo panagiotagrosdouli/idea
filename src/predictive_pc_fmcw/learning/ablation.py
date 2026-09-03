@@ -90,4 +90,21 @@ def run_training_ablation(
                 json.dumps([asdict(item) for item in results], indent=2),
                 encoding="utf-8",
             )
+    expected = len(OBJECTIVES) * len(seeds)
+    checkpoints = [Path(result.checkpoint) for result in results]
+    if len(results) == expected and all(path.is_file() for path in checkpoints):
+        completion = {
+            "complete": True,
+            "completed_runs": len(results),
+            "expected_runs": expected,
+            "dataset_sha256": plan.dataset_sha256,
+            "objectives": list(OBJECTIVES),
+            "seeds": list(seeds),
+            "lambda_link": lambda_link,
+            "lambda_outage": lambda_outage,
+            "checkpoints": [str(path) for path in checkpoints],
+        }
+        (destination / "completion_manifest.json").write_text(
+            json.dumps(completion, indent=2) + "\n", encoding="utf-8"
+        )
     return results
