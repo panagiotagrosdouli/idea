@@ -1,7 +1,7 @@
 .PHONY: install test lint validate benchmark womd ablation matrix paper-quick \
 	paper-full motion manifest paper-ablation staged corrected-quick \
 	corrected-full paper-draft reproducibility reproduce split-audit stages stage \
-	stage2-diagnostic
+	stage2-diagnostic womd-preflight
 
 install:
 	python -m pip install -e ".[dev]"
@@ -44,6 +44,11 @@ split-audit:
 		(echo "Set TRAIN_NPZ and VALIDATION_NPZ"; exit 2)
 	PYTHONPATH=src python scripts/00_audit_womd_split_integrity.py \
 		training=$(TRAIN_NPZ) official_validation=$(VALIDATION_NPZ)
+
+womd-preflight:
+	@test -n "$(WOMD_ROOTS)" || (echo "Set WOMD_ROOTS to files/directories"; exit 2)
+	PYTHONPATH=src python scripts/womd_preflight.py $(WOMD_ROOTS) \
+		--output womd_preflight.json
 
 stages:
 	PYTHONPATH=src python scripts/run_research_stage.py
