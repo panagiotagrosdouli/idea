@@ -85,8 +85,8 @@ def freeze_selection(
         return
     if lambda_link is None or lambda_outage is None:
         raise RuntimeError(
-            "No frozen lambda selection exists. Inspect the development-only sweep, "
-            "then rerun with --lambda-link and --lambda-outage."
+            "No frozen lambda selection exists. Inspect the development-only "
+            "sweep, then rerun with --lambda-link and --lambda-outage."
         )
     run(
         [
@@ -185,7 +185,9 @@ def downstream(
     )
     checkpoints = sorted(learned.rglob("best_comm_aware_gru.pt"))
     if len(checkpoints) != 20:
-        raise RuntimeError(f"Canonical archive incomplete: {len(checkpoints)}/20 checkpoints")
+        raise RuntimeError(
+            f"Canonical archive incomplete: {len(checkpoints)}/20 checkpoints"
+        )
     completion = learned / "completion_manifest.json"
     require_file(completion, "Stage-4 completion manifest")
     heldout = root / "artifacts/paper_final/05_heldout"
@@ -208,7 +210,9 @@ def downstream(
     )
     tfrecords = [Path(path) for path in sorted(glob.glob(validation_glob))]
     if not tfrecords:
-        raise FileNotFoundError(f"No validation TFRecords matched: {validation_glob}")
+        raise FileNotFoundError(
+            f"No validation TFRecords matched: {validation_glob}"
+        )
     scheduling = root / "artifacts/paper_final/06_scheduling"
     run(
         [
@@ -225,6 +229,7 @@ def downstream(
             str(ber),
             "--heldout-metrics",
             str(heldout / "heldout_metrics_by_scenario.csv"),
+            "--canonical",
             "--output",
             str(scheduling),
         ],
