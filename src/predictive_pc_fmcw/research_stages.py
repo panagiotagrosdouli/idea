@@ -15,6 +15,7 @@ class ResearchStage:
     depends_on: tuple[str, ...]
     required_inputs: tuple[str, ...]
     outputs: tuple[str, ...]
+    verification_reports: tuple[str, ...]
     acceptance: tuple[str, ...]
     commands: tuple[tuple[str, ...], ...]
 
@@ -39,6 +40,7 @@ def load_research_stages(path: str | Path) -> tuple[ResearchStage, ...]:
             depends_on=tuple(item.get("depends_on", [])),
             required_inputs=tuple(item.get("required_inputs", [])),
             outputs=tuple(item.get("outputs", [])),
+            verification_reports=tuple(item.get("verification_reports", [])),
             acceptance=tuple(item.get("acceptance", [])),
             commands=tuple(tuple(command) for command in item.get("commands", [])),
         )
@@ -88,6 +90,9 @@ def stage_status(
     for stage in stages:
         expanded_inputs = [_expand(item, env) for item in stage.required_inputs]
         expanded_outputs = [_expand(item, env) for item in stage.outputs]
+        expanded_reports = [
+            _expand(item, env) for item in stage.verification_reports
+        ]
         command_arguments = [
             _expand(argument, env) for command in stage.commands for argument in command
         ]
@@ -119,12 +124,29 @@ def stage_status(
             for item in expanded_outputs
             if not unresolved_variables(item) and not exists(item)
         ]
+        failed_reports: list[dict[str, str]] = []
+        for item in expanded_reports:
+            if unresolved_variables(item) or not exists(item):
+                continue
+            report_path = Path(item)
+            if not report_path.is_absolute():
+                report_path = project_root / report_path
+            try:
+                report_status = str(
+                    json.loads(report_path.read_text(encoding="utf-8")).get("status")
+                )
+            except (OSError, ValueError, AttributeError):
+                report_status = "INVALID"
+            if report_status != "PASS":
+                failed_reports.append({"path": item, "status": report_status})
         blocked_dependencies = [
             dependency
             for dependency in stage.depends_on
             if status_by_id.get(dependency) != "complete"
         ]
-        if not unresolved and not missing_outputs:
+        if failed_reports:
+            state = "failed"
+        elif not unresolved and not missing_outputs:
             state = "complete"
         elif unresolved or missing_inputs or blocked_dependencies:
             state = "blocked"
@@ -139,6 +161,7 @@ def stage_status(
                 "unresolved_variables": unresolved,
                 "missing_inputs": missing_inputs,
                 "missing_outputs": missing_outputs,
+                "failed_verification_reports": failed_reports,
                 "blocked_dependencies": blocked_dependencies,
                 "acceptance": list(stage.acceptance),
             }

@@ -212,11 +212,11 @@ reference/                     provenance της supplied εργασίας
 
 - [Executable stage workspace](stages)
 - [Οδηγός εκτέλεσης](docs/STAGED_EXECUTION_GR.md)
-- [Implementation status](docs/IMPLEMENTATION_STATUS.md)
-- [Requirements traceability](docs/PDF_REQUIREMENTS_TRACEABILITY.md)
+- [Πρόοδος — 2026-09-03](docs/PROGRESS_2026-09-03.md)
+- [Επιστημονικό audit και πλάνο](docs/SCIENTIFIC_AUDIT_AND_PLAN.md)
 - [WOMD audit](docs/WOMD_DATASET_AUDIT.md)
-- [Partial learned results](docs/PARTIAL_WOMD_PAPER_RESULTS.md)
-- [Paper readiness](docs/PAPER_READINESS.md)
+- [Προέλευση δεδομένων](docs/DATA_PROVENANCE.md)
+- [Οδικός χάρτης υλοποίησης 2026](docs/ROADMAP_IMPLEMENTATION_2026.md)
 
 ## Publication status
 
