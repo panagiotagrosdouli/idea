@@ -4,10 +4,33 @@ import unittest
 from pathlib import Path
 
 from predictive_pc_fmcw.learning.utility_analysis import (
+    UTILITY_METRICS,
     aggregate_scenario_relationship,
     join_accuracy_and_scheduler_utility,
     summarize_utility,
 )
+
+
+def utility_row(
+    scenario_id: str,
+    seed: int,
+    ade_m: float,
+    goodput_gain: float,
+) -> dict[str, float | int | str]:
+    row: dict[str, float | int | str] = {
+        "objective": "a",
+        "seed": seed,
+        "scenario_id": scenario_id,
+        "ade_m": ade_m,
+        "fde_m": ade_m,
+    }
+    for metric in UTILITY_METRICS:
+        baseline = 1.0
+        proposed = baseline + (goodput_gain if metric == "goodput_mbps" else 0.1)
+        row[f"learned_{metric}"] = proposed
+        row[f"reactive_{metric}"] = baseline
+        row[f"delta_{metric}"] = proposed - baseline
+    return row
 
 
 class UtilityAnalysisTest(unittest.TestCase):
@@ -82,27 +105,9 @@ class UtilityAnalysisTest(unittest.TestCase):
 
     def test_relationship_collapses_model_seeds_within_scenario(self):
         rows = [
-            {
-                "objective": "a",
-                "seed": 1,
-                "scenario_id": "s1",
-                "ade_m": 1.0,
-                "delta_goodput_mbps": 0.1,
-            },
-            {
-                "objective": "a",
-                "seed": 2,
-                "scenario_id": "s1",
-                "ade_m": 3.0,
-                "delta_goodput_mbps": 0.3,
-            },
-            {
-                "objective": "a",
-                "seed": 1,
-                "scenario_id": "s2",
-                "ade_m": 4.0,
-                "delta_goodput_mbps": -0.2,
-            },
+            utility_row("s1", 1, 1.0, 0.1),
+            utility_row("s1", 2, 3.0, 0.3),
+            utility_row("s2", 1, 4.0, -0.2),
         ]
         aggregated = aggregate_scenario_relationship(rows)
         self.assertEqual(len(aggregated), 2)
