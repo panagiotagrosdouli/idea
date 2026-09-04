@@ -14,12 +14,14 @@ from predictive_pc_fmcw.learning.utility_analysis import (
 def utility_row(
     scenario_id: str,
     seed: int,
+    simulation_seed: int,
     ade_m: float,
     goodput_gain: float,
 ) -> dict[str, float | int | str]:
     row: dict[str, float | int | str] = {
         "objective": "a",
         "seed": seed,
+        "simulation_seed": simulation_seed,
         "scenario_id": scenario_id,
         "ade_m": ade_m,
         "fde_m": ade_m,
@@ -34,7 +36,7 @@ def utility_row(
 
 
 class UtilityAnalysisTest(unittest.TestCase):
-    def test_join_uses_same_objective_seed_and_scenario(self):
+    def test_join_preserves_paired_traffic_realizations(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             heldout = root / "heldout.csv"
@@ -64,6 +66,7 @@ class UtilityAnalysisTest(unittest.TestCase):
             fields = [
                 "scheduler",
                 "scenario_id",
+                "seed",
                 "goodput_mbps",
                 "packet_delivery_ratio",
                 "scheduled_outage_fraction",
@@ -83,45 +86,55 @@ class UtilityAnalysisTest(unittest.TestCase):
                     "deadline_miss_ratio": 0.1,
                     "jain_fairness": 0.9,
                 }
-                writer.writerow(
-                    {
-                        **base,
-                        "scheduler": "reactive_greedy",
-                        "goodput_mbps": 1.0,
-                    }
-                )
-                writer.writerow(
-                    {
-                        **base,
-                        "scheduler": "learned_predictive",
-                        "goodput_mbps": 1.2,
-                    }
-                )
+                for simulation_seed, reactive, learned in (
+                    (101, 1.0, 1.2),
+                    (102, 0.9, 1.3),
+                ):
+                    writer.writerow(
+                        {
+                            **base,
+                            "scheduler": "reactive_greedy",
+                            "seed": simulation_seed,
+                            "goodput_mbps": reactive,
+                        }
+                    )
+                    writer.writerow(
+                        {
+                            **base,
+                            "scheduler": "learned_predictive",
+                            "seed": simulation_seed,
+                            "goodput_mbps": learned,
+                        }
+                    )
             rows = join_accuracy_and_scheduler_utility(heldout, root / "scheduler")
-            self.assertEqual(len(rows), 1)
+            self.assertEqual(len(rows), 2)
+            self.assertEqual({row["simulation_seed"] for row in rows}, {101, 102})
             self.assertAlmostEqual(rows[0]["delta_goodput_mbps"], 0.2)
+            self.assertAlmostEqual(rows[1]["delta_goodput_mbps"], 0.4)
             summary = summarize_utility(rows)
             self.assertEqual(summary["full"]["independent_scenarios"], 1)
+            self.assertEqual(summary["full"]["paired_model_traffic_rows"], 2)
 
-    def test_relationship_collapses_model_seeds_within_scenario(self):
+    def test_relationship_collapses_model_and_traffic_seeds_within_scenario(self):
         rows = [
-            utility_row("s1", 1, 1.0, 0.1),
-            utility_row("s1", 2, 3.0, 0.3),
-            utility_row("s2", 1, 4.0, -0.2),
+            utility_row("s1", 1, 101, 1.0, 0.1),
+            utility_row("s1", 1, 102, 1.0, 0.3),
+            utility_row("s1", 2, 101, 3.0, 0.2),
+            utility_row("s2", 1, 101, 4.0, -0.2),
         ]
         aggregated = aggregate_scenario_relationship(rows)
         self.assertEqual(len(aggregated), 2)
         first = aggregated[0]
         self.assertEqual(first["scenario_id"], "s1")
-        self.assertAlmostEqual(first["ade_m"], 2.0)
+        self.assertAlmostEqual(first["ade_m"], 5.0 / 3.0)
         self.assertAlmostEqual(first["delta_goodput_mbps"], 0.2)
-        self.assertEqual(first["model_seed_rows"], 2)
+        self.assertEqual(first["paired_model_traffic_rows"], 3)
 
         summary = summarize_utility(rows)
         relationship = summary["ade_vs_realized_goodput_gain"]
-        self.assertEqual(relationship["scenario_seed_rows"], 3)
+        self.assertEqual(relationship["paired_model_traffic_rows"], 4)
         self.assertEqual(relationship["independent_scenarios"], 2)
-        self.assertIn("averaged", relationship["aggregation"])
+        self.assertIn("paired traffic realizations", relationship["aggregation"])
 
 
 if __name__ == "__main__":
