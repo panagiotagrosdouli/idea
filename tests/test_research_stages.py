@@ -50,6 +50,36 @@ class ResearchStagesTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             expanded_commands(stage, environment={})
 
+    def test_failed_verification_report_prevents_complete_status(self):
+        payload = {
+            "stages": [
+                {
+                    "id": "stage0",
+                    "title": "verified",
+                    "outputs": ["artifact.csv", "verification.json"],
+                    "verification_reports": ["verification.json"],
+                }
+            ]
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            config = root / "stages.json"
+            config.write_text(json.dumps(payload), encoding="utf-8")
+            (root / "artifact.csv").write_text("value\n1\n", encoding="utf-8")
+            report = root / "verification.json"
+            report.write_text('{"status": "FAIL"}', encoding="utf-8")
+            stages = load_research_stages(config)
+            rows = stage_status(stages, root, environment={})
+            self.assertEqual(rows[0]["status"], "failed")
+            self.assertEqual(
+                rows[0]["failed_verification_reports"],
+                [{"path": "verification.json", "status": "FAIL"}],
+            )
+            report.write_text('{"status": "PASS"}', encoding="utf-8")
+            self.assertEqual(
+                stage_status(stages, root, environment={})[0]["status"], "complete"
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

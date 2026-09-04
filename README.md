@@ -212,11 +212,11 @@ reference/                     supplied-work provenance
 
 - [Executable stage workspace](stages)
 - [Greek execution guide](docs/STAGED_EXECUTION_GR.md)
-- [Implementation status](docs/IMPLEMENTATION_STATUS.md)
-- [Requirements traceability](docs/PDF_REQUIREMENTS_TRACEABILITY.md)
+- [Progress — 2026-09-03](docs/PROGRESS_2026-09-03.md)
+- [Scientific audit and plan](docs/SCIENTIFIC_AUDIT_AND_PLAN.md)
 - [WOMD audit](docs/WOMD_DATASET_AUDIT.md)
-- [Partial learned results](docs/PARTIAL_WOMD_PAPER_RESULTS.md)
-- [Paper readiness](docs/PAPER_READINESS.md)
+- [Data provenance](docs/DATA_PROVENANCE.md)
+- [2026 implementation roadmap](docs/ROADMAP_IMPLEMENTATION_2026.md)
 
 ## Publication status
 
