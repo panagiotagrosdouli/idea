@@ -2,23 +2,66 @@
   "id": "stage1",
   "title": "Freeze and verify causal WOMD train/validation corpora",
   "depends_on": ["stage0"],
-  "required_inputs": ["${TRAIN_NPZ}", "${VALIDATION_NPZ}"],
+  "required_inputs": [
+    "${WOMD_DATA_ROOT}",
+    "${TRAIN_NPZ}",
+    "${VALIDATION_NPZ}"
+  ],
   "outputs": [
+    "artifacts/paper_final/01_data/source_shard_manifest.json",
     "artifacts/paper_final/01_data/training_audit.json",
     "artifacts/paper_final/01_data/validation_audit.json",
+    "artifacts/paper_final/01_data/historical_fingerprint.json",
     "artifacts/paper_final/01_data/corpus_verification.json"
   ],
   "acceptance": [
+    "all frozen source shards are present and hashed",
     "true-SDC geometry",
     "11 history and 80 future states",
     "finite arrays",
     "scenario-safe labels",
     "zero scenario overlap between training and untouched validation",
-    "SHA-256 hashes recorded for both frozen corpora"
+    "SHA-256 hashes recorded for both frozen corpora",
+    "historical training fingerprint is compared without forcing old counts"
   ],
   "commands": [
-    ["python", "scripts/08_audit_womd_dataset.py", "${TRAIN_NPZ}", "--output", "artifacts/paper_final/01_data/training_audit.json"],
-    ["python", "scripts/08_audit_womd_dataset.py", "${VALIDATION_NPZ}", "--output", "artifacts/paper_final/01_data/validation_audit.json"],
-    ["python", "scripts/01_verify_womd_corpora.py", "${TRAIN_NPZ}", "${VALIDATION_NPZ}", "--output", "artifacts/paper_final/01_data/corpus_verification.json"]
+    [
+      "python",
+      "scripts/01_materialize_womd_manifest.py",
+      "${WOMD_DATA_ROOT}",
+      "--config",
+      "configs/womd_paper_corpus.json",
+      "--output",
+      "artifacts/paper_final/01_data/source_shard_manifest.json"
+    ],
+    [
+      "python",
+      "scripts/08_audit_womd_dataset.py",
+      "${TRAIN_NPZ}",
+      "--output",
+      "artifacts/paper_final/01_data/training_audit.json"
+    ],
+    [
+      "python",
+      "scripts/08_audit_womd_dataset.py",
+      "${VALIDATION_NPZ}",
+      "--output",
+      "artifacts/paper_final/01_data/validation_audit.json"
+    ],
+    [
+      "python",
+      "scripts/01_verify_historical_womd_fingerprint.py",
+      "${TRAIN_NPZ}",
+      "--output",
+      "artifacts/paper_final/01_data/historical_fingerprint.json"
+    ],
+    [
+      "python",
+      "scripts/01_verify_womd_corpora.py",
+      "${TRAIN_NPZ}",
+      "${VALIDATION_NPZ}",
+      "--output",
+      "artifacts/paper_final/01_data/corpus_verification.json"
+    ]
   ]
 }
