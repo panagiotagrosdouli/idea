@@ -110,7 +110,9 @@ def paired_full_vs_trajectory(rows: list[dict[str, Any]]) -> dict[str, Any]:
     return {"pairs": len(keys), "metrics": results}
 
 
-def _scenario_means(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def aggregate_scenario_metrics(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Average dependent model-seed rows within each independent WOMD scenario."""
+
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in rows:
         grouped[str(row["scenario_id"])].append(row)
@@ -130,7 +132,7 @@ def _scenario_means(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 def accuracy_link_correlations(rows: list[dict[str, Any]]) -> dict[str, Any]:
     from scipy.stats import spearmanr
 
-    scenario_rows = _scenario_means(rows)
+    scenario_rows = aggregate_scenario_metrics(rows)
     ade = np.asarray([row["ade_m"] for row in scenario_rows], dtype=np.float64)
     results: dict[str, Any] = {
         "model_seed_rows": len(rows),
