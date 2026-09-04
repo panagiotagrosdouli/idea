@@ -38,23 +38,31 @@ def join_accuracy_and_scheduler_utility(
     pattern = "*/seed_*/episode_metrics.csv"
     for metrics_path in sorted(Path(scheduler_root).glob(pattern)):
         objective = metrics_path.parent.parent.name
-        seed = int(metrics_path.parent.name.removeprefix("seed_"))
+        model_seed = int(metrics_path.parent.name.removeprefix("seed_"))
         rows = _read_csv(metrics_path)
-        indexed = {(row["scheduler"], row["scenario_id"]): row for row in rows}
-        scenarios = sorted(
-            scenario
-            for scheduler, scenario in indexed
+        if rows and "seed" not in rows[0]:
+            raise ValueError(
+                f"{metrics_path} is missing simulation seed required for pairing."
+            )
+        indexed = {
+            (row["scheduler"], row["scenario_id"], int(row["seed"])): row
+            for row in rows
+        }
+        learned_keys = sorted(
+            (scenario, simulation_seed)
+            for scheduler, scenario, simulation_seed in indexed
             if scheduler == "learned_predictive"
-            and ("reactive_greedy", scenario) in indexed
-            and (objective, seed, scenario) in accuracy
+            and ("reactive_greedy", scenario, simulation_seed) in indexed
+            and (objective, model_seed, scenario) in accuracy
         )
-        for scenario in scenarios:
-            learned = indexed[("learned_predictive", scenario)]
-            reactive = indexed[("reactive_greedy", scenario)]
-            motion = accuracy[(objective, seed, scenario)]
+        for scenario, simulation_seed in learned_keys:
+            learned = indexed[("learned_predictive", scenario, simulation_seed)]
+            reactive = indexed[("reactive_greedy", scenario, simulation_seed)]
+            motion = accuracy[(objective, model_seed, scenario)]
             item: dict[str, Any] = {
                 "objective": objective,
-                "seed": seed,
+                "seed": model_seed,
+                "simulation_seed": simulation_seed,
                 "scenario_id": scenario,
                 "ade_m": float(motion["ade_m"]),
                 "fde_m": float(motion["fde_m"]),
@@ -87,7 +95,7 @@ def _apply_holm_family(metrics: dict[str, dict[str, Any]]) -> None:
 def aggregate_scenario_relationship(
     rows: list[dict[str, Any]],
 ) -> list[dict[str, float | str | int]]:
-    """Collapse model-seed rows to one independent observation per scenario."""
+    """Collapse model/traffic-seed rows to one observation per WOMD scenario."""
 
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in rows:
@@ -102,7 +110,7 @@ def aggregate_scenario_relationship(
                 "delta_goodput_mbps": float(
                     np.mean([row["delta_goodput_mbps"] for row in selected])
                 ),
-                "model_seed_rows": len(selected),
+                "paired_model_traffic_rows": len(selected),
             }
         )
     return aggregated
@@ -133,7 +141,7 @@ def summarize_utility(rows: list[dict[str, Any]]) -> dict[str, Any]:
             )
         _apply_holm_family(metrics)
         summary[objective] = {
-            "scenario_seed_rows": len(selected),
+            "paired_model_traffic_rows": len(selected),
             "independent_scenarios": len(
                 {row["scenario_id"] for row in selected}
             ),
@@ -155,11 +163,12 @@ def summarize_utility(rows: list[dict[str, Any]]) -> dict[str, Any]:
         summary["ade_vs_realized_goodput_gain"] = {
             "spearman_rho": rho,
             "p_value": p_value,
-            "scenario_seed_rows": len(rows),
+            "paired_model_traffic_rows": len(rows),
             "independent_scenarios": len(scenario_rows),
             "aggregation": (
                 "ADE and goodput gain are averaged across model objectives/seeds "
-                "within each WOMD scenario before correlation."
+                "and paired traffic realizations within each WOMD scenario before "
+                "correlation."
             ),
             "interpretation": (
                 "This scenario-level association is descriptive and does not by "
