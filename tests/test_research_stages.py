@@ -38,7 +38,8 @@ class ResearchStagesTest(unittest.TestCase):
         self.assertIn("exactly eight frozen scheduler families", stage6.acceptance)
 
     def test_stage8_requires_end_to_end_provenance(self):
-        stage8 = {stage.stage_id: stage for stage in load_research_stages("stages")}["stage8"]
+        stages = {stage.stage_id: stage for stage in load_research_stages("stages")}
+        stage8 = stages["stage8"]
         required = set(stage8.required_inputs)
         self.assertIn(
             "artifacts/paper_final/01_data/source_shard_manifest.json", required
