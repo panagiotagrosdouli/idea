@@ -32,7 +32,13 @@ def inspect_split(root: Path, spec: dict) -> dict:
         if not path.is_file():
             missing.append(name)
             continue
-        records.append({"name": name, "bytes": path.stat().st_size, "sha256": sha256(path)})
+        records.append(
+            {
+                "name": name,
+                "bytes": path.stat().st_size,
+                "sha256": sha256(path),
+            }
+        )
     return {
         "split": spec["split"],
         "expected_count": len(names),
@@ -44,10 +50,18 @@ def inspect_split(root: Path, spec: dict) -> dict:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Materialize immutable provenance for the frozen WOMD shard selection.")
-    parser.add_argument("data_root", help="Directory containing training/ and validation/ TFRecord directories")
+    parser = argparse.ArgumentParser(
+        description="Materialize provenance for the frozen WOMD shard selection."
+    )
+    parser.add_argument(
+        "data_root",
+        help="Directory containing training/ and validation/ TFRecord directories",
+    )
     parser.add_argument("--config", default="configs/womd_paper_corpus.json")
-    parser.add_argument("--output", default="artifacts/paper_final/01_data/source_shard_manifest.json")
+    parser.add_argument(
+        "--output",
+        default="artifacts/paper_final/01_data/source_shard_manifest.json",
+    )
     args = parser.parse_args()
 
     config_path = Path(args.config)
@@ -67,7 +81,10 @@ def main() -> None:
     }
     destination = Path(args.output)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    destination.write_text(
+        json.dumps(report, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
     print(json.dumps(report, indent=2, sort_keys=True))
     if not report["complete"]:
         raise SystemExit(2)
