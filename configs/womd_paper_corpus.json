@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "dataset": "Waymo Open Motion Dataset",
+  "version": "1.3.1",
+  "source": "gs://waymo_open_dataset_motion_v_1_3_1/uncompressed/scenario",
+  "geometry": "true_SDC",
+  "history_steps": 11,
+  "future_steps": 80,
+  "max_vehicles_per_scenario": 16,
+  "training": {
+    "split": "training",
+    "total_shards": 1000,
+    "selected_shard_start": 0,
+    "selected_shard_stop_exclusive": 50,
+    "output": "womd_training_paper.npz",
+    "role": "training_and_internal_development"
+  },
+  "validation": {
+    "split": "validation",
+    "total_shards": 150,
+    "selected_shard_start": 0,
+    "selected_shard_stop_exclusive": 40,
+    "output": "womd_validation_paper.npz",
+    "role": "official_validation"
+  },
+  "historical_training_fingerprint": {
+    "sample_count": 249137,
+    "unique_scenarios": 24182,
+    "sha256": "b47faf427487a7405531e4944c5bfff9ca56d4fcb9ce3f8495df3cce534347ee"
+  },
+  "policy": {
+    "scenario_overlap_allowed": false,
+    "validation_for_model_selection": false,
+    "force_historical_counts": false
+  }
+}
