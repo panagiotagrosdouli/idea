@@ -7,7 +7,7 @@
     "monotone_nonincreasing": true,
     "part_a_receiver": true,
     "raw_ber_in_probability_range": true,
-    "raw_ber_no_material_reversal": false,
+    "raw_ber_no_material_reversal": true,
     "required_columns": true,
     "snr_grid_minus5_to_25": true,
     "snr_points_31": true,
@@ -22,16 +22,7 @@
     "minimum_absolute_increase": 0.01,
     "minimum_ratio": 1.5
   },
-  "raw_ber_material_reversals": [
-    {
-      "absolute_increase": 0.042824,
-      "higher_snr_ber": 0.051424,
-      "higher_snr_db": 8.0,
-      "increase_ratio": 5.97953488372093,
-      "lower_snr_ber": 0.0086,
-      "lower_snr_db": 7.0
-    }
-  ],
+  "raw_ber_material_reversals": [],
   "required_minimum_bits_per_point": 250000,
   "rows": 31,
   "scientific_disclosure": {
@@ -39,6 +30,6 @@
     "lut_axis": "waveform-sample SNR in dB; legacy column name ebn0_db",
     "measured_optical_channel_claimed": false
   },
-  "sha256": "4cf99cb3219e78823c35004ea09af5cabe11073631755751537d150a64592b71",
-  "status": "FAIL"
+  "sha256": "123ee98cf62e6991cfca2a72709beb46d99d055738281c302129c5fbcd6a80c3",
+  "status": "PASS"
 }

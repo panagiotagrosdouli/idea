@@ -5,20 +5,20 @@
   "method": "independent_one_chirp_trials_with_cluster_bootstrap",
   "rows": [
     {
-      "catastrophic_chirp_rate": 0.1,
-      "catastrophic_chirps": 5,
+      "catastrophic_chirp_rate": 0.0,
+      "catastrophic_chirps": 0,
       "cluster_bootstrap_ci_95": [
-        0.00536,
-        0.043359999999999996
+        0.0,
+        0.0
       ],
       "decisions_per_trial": 1000,
       "independent_chirp_trials": 50,
-      "max_chirp_ber": 0.214,
-      "mean_ber": 0.02228,
+      "max_chirp_ber": 0.0,
+      "mean_ber": 0.0,
       "median_ber": 0.0,
-      "p95_chirp_ber": 0.214,
+      "p95_chirp_ber": 0.0,
       "snr_db": 5.0,
-      "std_ber_across_chirps": 0.06443349363522682,
+      "std_ber_across_chirps": 0.0,
       "trials": [
         {
           "ber": 0.0,
@@ -28,16 +28,16 @@
           "trial": 0
         },
         {
-          "ber": 0.004,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 4,
+          "errors": 0,
           "seed": 3180925944,
           "trial": 1
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 1428164462,
           "trial": 2
         },
@@ -77,9 +77,9 @@
           "trial": 7
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 4107525436,
           "trial": 8
         },
@@ -91,9 +91,9 @@
           "trial": 9
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 1353206384,
           "trial": 10
         },
@@ -105,23 +105,23 @@
           "trial": 11
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 203969953,
           "trial": 12
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 3385369635,
           "trial": 13
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 431946835,
           "trial": 14
         },
@@ -133,16 +133,16 @@
           "trial": 15
         },
         {
-          "ber": 0.212,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 212,
+          "errors": 0,
           "seed": 2758855254,
           "trial": 16
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 1649396546,
           "trial": 17
         },
@@ -182,9 +182,9 @@
           "trial": 22
         },
         {
-          "ber": 0.004,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 4,
+          "errors": 0,
           "seed": 3869351576,
           "trial": 23
         },
@@ -203,9 +203,9 @@
           "trial": 25
         },
         {
-          "ber": 0.214,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 214,
+          "errors": 0,
           "seed": 161963140,
           "trial": 26
         },
@@ -231,16 +231,16 @@
           "trial": 29
         },
         {
-          "ber": 0.004,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 4,
+          "errors": 0,
           "seed": 3892276857,
           "trial": 30
         },
         {
-          "ber": 0.214,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 214,
+          "errors": 0,
           "seed": 3885075678,
           "trial": 31
         },
@@ -259,44 +259,44 @@
           "trial": 33
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 1659033537,
           "trial": 34
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 1175426631,
           "trial": 35
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 1682895718,
           "trial": 36
         },
         {
-          "ber": 0.004,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 4,
+          "errors": 0,
           "seed": 2019104162,
           "trial": 37
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 3152620351,
           "trial": 38
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 660207312,
           "trial": 39
         },
@@ -308,9 +308,9 @@
           "trial": 40
         },
         {
-          "ber": 0.214,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 214,
+          "errors": 0,
           "seed": 3519752463,
           "trial": 41
         },
@@ -322,9 +322,9 @@
           "trial": 42
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 2734190334,
           "trial": 43
         },
@@ -343,23 +343,23 @@
           "trial": 45
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 2372062856,
           "trial": 46
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 1311514250,
           "trial": 47
         },
         {
-          "ber": 0.214,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 214,
+          "errors": 0,
           "seed": 200586297,
           "trial": 48
         },
@@ -373,20 +373,20 @@
       ]
     },
     {
-      "catastrophic_chirp_rate": 0.1,
-      "catastrophic_chirps": 5,
+      "catastrophic_chirp_rate": 0.0,
+      "catastrophic_chirps": 0,
       "cluster_bootstrap_ci_95": [
-        0.004920000000000001,
-        0.03916
+        0.0,
+        0.0
       ],
       "decisions_per_trial": 1000,
       "independent_chirp_trials": 50,
-      "max_chirp_ber": 0.214,
-      "mean_ber": 0.021920000000000002,
+      "max_chirp_ber": 0.0,
+      "mean_ber": 0.0,
       "median_ber": 0.0,
-      "p95_chirp_ber": 0.214,
+      "p95_chirp_ber": 0.0,
       "snr_db": 7.0,
-      "std_ber_across_chirps": 0.06454861796841706,
+      "std_ber_across_chirps": 0.0,
       "trials": [
         {
           "ber": 0.0,
@@ -403,23 +403,23 @@
           "trial": 1
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 20978603,
           "trial": 2
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 1375580577,
           "trial": 3
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 779560306,
           "trial": 4
         },
@@ -438,9 +438,9 @@
           "trial": 6
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 3874041907,
           "trial": 7
         },
@@ -452,9 +452,9 @@
           "trial": 8
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 2867281755,
           "trial": 9
         },
@@ -473,9 +473,9 @@
           "trial": 11
         },
         {
-          "ber": 0.214,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 214,
+          "errors": 0,
           "seed": 2978347272,
           "trial": 12
         },
@@ -494,9 +494,9 @@
           "trial": 14
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 535322376,
           "trial": 15
         },
@@ -543,9 +543,9 @@
           "trial": 21
         },
         {
-          "ber": 0.214,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 214,
+          "errors": 0,
           "seed": 2043667440,
           "trial": 22
         },
@@ -564,9 +564,9 @@
           "trial": 24
         },
         {
-          "ber": 0.212,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 212,
+          "errors": 0,
           "seed": 238701598,
           "trial": 25
         },
@@ -585,9 +585,9 @@
           "trial": 27
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 1128620792,
           "trial": 28
         },
@@ -599,16 +599,16 @@
           "trial": 29
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 1528390071,
           "trial": 30
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 1112975672,
           "trial": 31
         },
@@ -620,9 +620,9 @@
           "trial": 32
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 137907599,
           "trial": 33
         },
@@ -648,16 +648,16 @@
           "trial": 36
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 706186148,
           "trial": 37
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 2149106734,
           "trial": 38
         },
@@ -683,9 +683,9 @@
           "trial": 41
         },
         {
-          "ber": 0.214,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 214,
+          "errors": 0,
           "seed": 1317240710,
           "trial": 42
         },
@@ -697,9 +697,9 @@
           "trial": 43
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 645354991,
           "trial": 44
         },
@@ -711,9 +711,9 @@
           "trial": 45
         },
         {
-          "ber": 0.214,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 214,
+          "errors": 0,
           "seed": 3698596909,
           "trial": 46
         },
@@ -725,9 +725,9 @@
           "trial": 47
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 3371954610,
           "trial": 48
         },
@@ -741,20 +741,20 @@
       ]
     },
     {
-      "catastrophic_chirp_rate": 0.12,
-      "catastrophic_chirps": 6,
+      "catastrophic_chirp_rate": 0.0,
+      "catastrophic_chirps": 0,
       "cluster_bootstrap_ci_95": [
-        0.00884,
-        0.04736
+        0.0,
+        0.0
       ],
       "decisions_per_trial": 1000,
       "independent_chirp_trials": 50,
-      "max_chirp_ber": 0.214,
-      "mean_ber": 0.026000000000000002,
+      "max_chirp_ber": 0.0,
+      "mean_ber": 0.0,
       "median_ber": 0.0,
-      "p95_chirp_ber": 0.214,
+      "p95_chirp_ber": 0.0,
       "snr_db": 8.0,
-      "std_ber_across_chirps": 0.07013223661230901,
+      "std_ber_across_chirps": 0.0,
       "trials": [
         {
           "ber": 0.0,
@@ -785,16 +785,16 @@
           "trial": 3
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 1568411070,
           "trial": 4
         },
         {
-          "ber": 0.214,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 214,
+          "errors": 0,
           "seed": 1169674131,
           "trial": 5
         },
@@ -855,9 +855,9 @@
           "trial": 13
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 555744363,
           "trial": 14
         },
@@ -869,9 +869,9 @@
           "trial": 15
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 1456569210,
           "trial": 16
         },
@@ -883,9 +883,9 @@
           "trial": 17
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 2157442240,
           "trial": 18
         },
@@ -925,16 +925,16 @@
           "trial": 23
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 2574411008,
           "trial": 24
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 3229669756,
           "trial": 25
         },
@@ -953,16 +953,16 @@
           "trial": 27
         },
         {
-          "ber": 0.214,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 214,
+          "errors": 0,
           "seed": 3567028149,
           "trial": 28
         },
         {
-          "ber": 0.214,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 214,
+          "errors": 0,
           "seed": 754581508,
           "trial": 29
         },
@@ -981,16 +981,16 @@
           "trial": 31
         },
         {
-          "ber": 0.214,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 214,
+          "errors": 0,
           "seed": 2204105548,
           "trial": 32
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 1631348978,
           "trial": 33
         },
@@ -1058,16 +1058,16 @@
           "trial": 42
         },
         {
-          "ber": 0.214,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 214,
+          "errors": 0,
           "seed": 3893735811,
           "trial": 43
         },
         {
-          "ber": 0.214,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 214,
+          "errors": 0,
           "seed": 3606754345,
           "trial": 44
         },
@@ -1093,9 +1093,9 @@
           "trial": 47
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 2063993547,
           "trial": 48
         },
@@ -1109,20 +1109,20 @@
       ]
     },
     {
-      "catastrophic_chirp_rate": 0.02,
-      "catastrophic_chirps": 1,
+      "catastrophic_chirp_rate": 0.0,
+      "catastrophic_chirps": 0,
       "cluster_bootstrap_ci_95": [
-        4e-05,
-        0.013080000000000001
+        0.0,
+        0.0
       ],
       "decisions_per_trial": 1000,
       "independent_chirp_trials": 50,
-      "max_chirp_ber": 0.214,
-      "mean_ber": 0.00444,
+      "max_chirp_ber": 0.0,
+      "mean_ber": 0.0,
       "median_ber": 0.0,
-      "p95_chirp_ber": 0.002,
+      "p95_chirp_ber": 0.0,
       "snr_db": 10.0,
-      "std_ber_across_chirps": 0.030246038701668962,
+      "std_ber_across_chirps": 0.0,
       "trials": [
         {
           "ber": 0.0,
@@ -1132,9 +1132,9 @@
           "trial": 0
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 2933995697,
           "trial": 1
         },
@@ -1265,16 +1265,16 @@
           "trial": 19
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 2088577450,
           "trial": 20
         },
         {
-          "ber": 0.214,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 214,
+          "errors": 0,
           "seed": 2766878528,
           "trial": 21
         },
@@ -1293,9 +1293,9 @@
           "trial": 23
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 945213122,
           "trial": 24
         },
@@ -1468,9 +1468,9 @@
           "trial": 48
         },
         {
-          "ber": 0.002,
+          "ber": 0.0,
           "decisions": 1000,
-          "errors": 2,
+          "errors": 0,
           "seed": 1629637738,
           "trial": 49
         }

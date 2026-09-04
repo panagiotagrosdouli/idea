@@ -279,18 +279,29 @@ def simulate_part_a_notebook_receiver_ber(
                 )
                 delta[rows] = np.clip(refined, -0.5, 0.5)
             cycles_per_sample = (peaks + delta) / fft_length
+            # Use the same continuous alias branch for both carrier projection
+            # and midpoint phase compensation.  Projecting with wrapped FFT
+            # frequencies but compensating with their unwrapped equivalents is
+            # not representation-invariant when adjacent symbol centres are a
+            # half-integer number of samples apart (the 13/14-sample timing
+            # pattern used here).  A one-cycle/sample branch difference can
+            # otherwise introduce a spurious pi rotation and invert a fixed
+            # subset of DPSK decisions for an entire chirp.
+            unwrapped = (
+                np.unwrap(2.0 * np.pi * cycles_per_sample)
+                / (2.0 * np.pi)
+            )
             projection = np.exp(
                 -1j
                 * 2.0
                 * np.pi
-                * cycles_per_sample[:, None]
+                * unwrapped[:, None]
                 * centered_indices
             )
             coefficients = (
                 np.sum(segments * projection * sample_mask, axis=1) / lengths
             )
             differential = coefficients[1:] * np.conj(coefficients[:-1])
-            unwrapped = np.unwrap(2.0 * np.pi * cycles_per_sample) / (2.0 * np.pi)
             carrier_midpoint = 0.5 * (unwrapped[1:] + unwrapped[:-1])
             carrier_step = 2.0 * np.pi * carrier_midpoint * np.diff(centers)
             observations = differential * np.exp(-1j * carrier_step)
