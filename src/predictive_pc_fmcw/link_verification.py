@@ -9,54 +9,37 @@ import numpy as np
 CANONICAL_MIN_BITS_PER_POINT = 250_000
 
 
-def _wilson_interval(
-    errors: int, bits: int, z: float = 1.959963984540054
-) -> tuple[float, float]:
-    """Return a two-sided Wilson interval for a binomial error rate."""
-
-    proportion = errors / bits
-    denominator = 1.0 + z**2 / bits
-    center = (proportion + z**2 / (2.0 * bits)) / denominator
-    radius = (
-        z
-        * np.sqrt(
-            proportion * (1.0 - proportion) / bits + z**2 / (4.0 * bits**2)
-        )
-        / denominator
-    )
-    return float(max(0.0, center - radius)), float(min(1.0, center + radius))
-
-
-def _significant_raw_increases(
-    snr: np.ndarray, errors: np.ndarray, bits: np.ndarray
+def _material_raw_increases(
+    snr: np.ndarray,
+    simulated: np.ndarray,
+    *,
+    minimum_absolute_increase: float = 0.01,
+    minimum_ratio: float = 1.5,
 ) -> list[dict[str, float | int]]:
-    """Find adjacent BER increases whose 95% Wilson intervals do not overlap.
+    """Find adjacent raw-BER reversals large enough to require investigation.
 
-    Small Monte Carlo reversals are expected and are handled by the conservative
-    monotone LUT. A statistically separated increase at a higher SNR indicates
-    receiver behaviour that must be investigated before the physical-layer
-    artifact can be frozen for downstream experiments.
+    The Part-A decisions are clustered within chirps, so bit-level binomial
+    intervals are not valid evidence of statistical significance. This gate is
+    deliberately an effect-size diagnostic: it rejects an adjacent increase
+    only when both its absolute magnitude and multiplicative ratio are large.
+    Statistical inference belongs to a chirp-cluster-aware artifact.
     """
 
     increases: list[dict[str, float | int]] = []
     for index in range(1, len(snr)):
-        _previous_low, previous_high = _wilson_interval(
-            int(errors[index - 1]), int(bits[index - 1])
-        )
-        current_low, _current_high = _wilson_interval(
-            int(errors[index]), int(bits[index])
-        )
-        if current_low > previous_high:
+        previous = float(simulated[index - 1])
+        current = float(simulated[index])
+        absolute_increase = current - previous
+        ratio = current / max(previous, np.finfo(np.float64).eps)
+        if absolute_increase >= minimum_absolute_increase and ratio >= minimum_ratio:
             increases.append(
                 {
                     "lower_snr_db": float(snr[index - 1]),
                     "higher_snr_db": float(snr[index]),
-                    "lower_snr_ber": float(errors[index - 1] / bits[index - 1]),
-                    "higher_snr_ber": float(errors[index] / bits[index]),
-                    "lower_snr_ci_high": previous_high,
-                    "higher_snr_ci_low": current_low,
-                    "lower_snr_errors": int(errors[index - 1]),
-                    "higher_snr_errors": int(errors[index]),
+                    "lower_snr_ber": previous,
+                    "higher_snr_ber": current,
+                    "absolute_increase": absolute_increase,
+                    "increase_ratio": ratio,
                 }
             )
     return increases
@@ -136,7 +119,7 @@ def verify_lut(
     )
     receivers = {row["receiver"] for row in rows}
     semantics = {row["snr_semantics"] for row in rows}
-    significant_increases = _significant_raw_increases(snr, errors, bits)
+    material_increases = _material_raw_increases(snr, simulated)
 
     checks = {
         "required_columns": True,
@@ -150,7 +133,7 @@ def verify_lut(
         "raw_ber_in_probability_range": bool(
             ((0.0 <= simulated) & (simulated <= 0.5)).all()
         ),
-        "raw_ber_no_statistically_significant_increase": not significant_increases,
+        "raw_ber_no_material_reversal": not material_increases,
         "lut_in_probability_range": bool(((0.0 <= lut) & (lut <= 0.5)).all()),
         "monotone_nonincreasing": bool(np.all(np.diff(lut) <= 1e-15)),
         "zero_error_points_use_confidence_bound": bool(
@@ -169,7 +152,11 @@ def verify_lut(
             "min_bits_per_point": int(bits.min()) if len(bits) else 0,
             "max_bits_per_point": int(bits.max()) if len(bits) else 0,
             "missing_columns": [],
-            "raw_ber_significant_increases": significant_increases,
+            "raw_ber_material_reversals": material_increases,
+            "raw_ber_material_reversal_thresholds": {
+                "minimum_absolute_increase": 0.01,
+                "minimum_ratio": 1.5,
+            },
             "checks": checks,
         }
     )

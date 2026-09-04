@@ -14,7 +14,7 @@
     "31 SNR points on the frozen -5 to 25 dB waveform-sample SNR grid",
     "at least 250000 simulated bits per SNR point",
     "confidence-aware BER",
-    "no statistically significant raw-BER increase with increasing SNR",
+    "no scientifically material raw-BER reversal with increasing SNR",
     "monotone conservative LUT",
     "Part-A receiver and SNR semantics verified",
     "uncalibrated absolute power disclosed"

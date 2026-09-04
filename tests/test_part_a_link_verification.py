@@ -83,7 +83,7 @@ class PartALinkVerificationTest(unittest.TestCase):
                     )
             self.assertEqual(verify_lut(path)["status"], "FAIL")
 
-    def test_significant_raw_ber_increase_fails_even_with_monotone_lut(self):
+    def test_material_raw_ber_increase_fails_even_with_monotone_lut(self):
         points = self._canonical_points()
         points[12] = BERPoint(
             ebn0_db=7.0,
@@ -113,10 +113,10 @@ class PartALinkVerificationTest(unittest.TestCase):
             report = verify_lut(path)
             self.assertEqual(report["status"], "FAIL")
             self.assertFalse(
-                report["checks"]["raw_ber_no_statistically_significant_increase"]
+                report["checks"]["raw_ber_no_material_reversal"]
             )
             self.assertEqual(
-                report["raw_ber_significant_increases"][0]["higher_snr_db"], 8.0
+                report["raw_ber_material_reversals"][0]["higher_snr_db"], 8.0
             )
 
     def test_small_raw_monte_carlo_reversal_does_not_fail(self):
@@ -148,7 +148,7 @@ class PartALinkVerificationTest(unittest.TestCase):
             write_ber_lut(points, path)
             report = verify_lut(path)
             self.assertTrue(
-                report["checks"]["raw_ber_no_statistically_significant_increase"]
+                report["checks"]["raw_ber_no_material_reversal"]
             )
 
 
