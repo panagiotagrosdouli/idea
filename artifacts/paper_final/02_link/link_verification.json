@@ -7,7 +7,7 @@
     "monotone_nonincreasing": true,
     "part_a_receiver": true,
     "raw_ber_in_probability_range": true,
-    "raw_ber_no_statistically_significant_increase": false,
+    "raw_ber_no_material_reversal": false,
     "required_columns": true,
     "snr_grid_minus5_to_25": true,
     "snr_points_31": true,
@@ -18,46 +18,18 @@
   "min_bits_per_point": 250000,
   "missing_columns": [],
   "path": "artifacts/paper_final/02_link/dbpsk_ber_lut.csv",
-  "raw_ber_significant_increases": [
+  "raw_ber_material_reversal_thresholds": {
+    "minimum_absolute_increase": 0.01,
+    "minimum_ratio": 1.5
+  },
+  "raw_ber_material_reversals": [
     {
-      "higher_snr_ber": 0.08698,
-      "higher_snr_ci_low": 0.08588167832343507,
-      "higher_snr_db": 2.0,
-      "higher_snr_errors": 21745,
-      "lower_snr_ber": 0.080348,
-      "lower_snr_ci_high": 0.08142001823493607,
-      "lower_snr_db": 1.0,
-      "lower_snr_errors": 20087
-    },
-    {
-      "higher_snr_ber": 0.042984,
-      "higher_snr_ci_low": 0.04219595353875541,
-      "higher_snr_db": 4.0,
-      "higher_snr_errors": 10746,
-      "lower_snr_ber": 0.034568,
-      "lower_snr_ci_high": 0.03529128578226065,
-      "lower_snr_db": 3.0,
-      "lower_snr_errors": 8642
-    },
-    {
-      "higher_snr_ber": 0.051496,
-      "higher_snr_ci_low": 0.05063653865514856,
-      "higher_snr_db": 5.0,
-      "higher_snr_errors": 12874,
-      "lower_snr_ber": 0.042984,
-      "lower_snr_ci_high": 0.04378609111059201,
-      "lower_snr_db": 4.0,
-      "lower_snr_errors": 10746
-    },
-    {
+      "absolute_increase": 0.042824,
       "higher_snr_ber": 0.051424,
-      "higher_snr_ci_low": 0.05056511272280409,
       "higher_snr_db": 8.0,
-      "higher_snr_errors": 12856,
+      "increase_ratio": 5.97953488372093,
       "lower_snr_ber": 0.0086,
-      "lower_snr_ci_high": 0.008969579280835718,
-      "lower_snr_db": 7.0,
-      "lower_snr_errors": 2150
+      "lower_snr_db": 7.0
     }
   ],
   "required_minimum_bits_per_point": 250000,
