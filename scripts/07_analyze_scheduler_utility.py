@@ -9,6 +9,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from predictive_pc_fmcw.learning.utility_analysis import (
+    aggregate_scenario_relationship,
     join_accuracy_and_scheduler_utility,
     write_utility_analysis,
 )
@@ -27,25 +28,20 @@ def main() -> None:
         args.heldout_csv, args.scheduler_root
     )
     artifacts = write_utility_analysis(rows, destination)
-    objectives = sorted({row["objective"] for row in rows})
-    palette = ["#2563eb", "#dc2626", "#0f766e", "#7c3aed"]
+    scenario_rows = aggregate_scenario_relationship(rows)
+
     fig, axis = plt.subplots(figsize=(6.4, 4.6))
-    for objective, color in zip(objectives, palette, strict=False):
-        selected = [row for row in rows if row["objective"] == objective]
-        axis.scatter(
-            [row["ade_m"] for row in selected],
-            [row["delta_goodput_mbps"] for row in selected],
-            s=18,
-            alpha=0.45,
-            color=color,
-            label=objective,
-        )
-    axis.axhline(0, color="black", linewidth=0.8, linestyle="--")
-    axis.set_xlabel("Held-out ADE (m)")
-    axis.set_ylabel("Learned minus reactive goodput (Mbps)")
+    axis.scatter(
+        [row["ade_m"] for row in scenario_rows],
+        [row["delta_goodput_mbps"] for row in scenario_rows],
+        s=24,
+        alpha=0.65,
+    )
+    axis.axhline(0, linewidth=0.8, linestyle="--")
+    axis.set_xlabel("Scenario-mean held-out ADE (m)")
+    axis.set_ylabel("Scenario-mean learned minus reactive goodput (Mbps)")
     axis.set_title("Trajectory accuracy vs realized communication utility")
     axis.grid(alpha=0.2)
-    axis.legend(frameon=False, fontsize=8)
     fig.tight_layout()
     for extension in ("png", "pdf"):
         fig.savefig(
