@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 from pathlib import Path
 
@@ -51,6 +52,12 @@ def main() -> None:
     )
 
     scenario_rows = aggregate_scenario_metrics(rows)
+    scenario_csv = destination / "heldout_link_fidelity_by_scenario.csv"
+    with scenario_csv.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=scenario_rows[0].keys())
+        writer.writeheader()
+        writer.writerows(scenario_rows)
+
     fig, axes = plt.subplots(1, 2, figsize=(10.2, 4.1))
     axes[0].scatter(
         [row["ade_m"] for row in scenario_rows],
@@ -87,6 +94,7 @@ def main() -> None:
         json.dumps(
             {
                 "analysis": str(report_path),
+                "scenario_csv": str(scenario_csv),
                 "raw_rows": len(rows),
                 "independent_scenarios": len(scenario_rows),
             },
