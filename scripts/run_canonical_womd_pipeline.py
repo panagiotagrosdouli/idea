@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import glob
 import json
-import os
 import subprocess
 import sys
 from pathlib import Path
-
 
 CANONICAL_SEEDS = [20260827, 20260828, 20260829, 20260830, 20260831]
 
@@ -36,26 +35,20 @@ def stage1(root: Path, data_root: Path, train_npz: Path, val_npz: Path) -> None:
         ],
         cwd=root,
     )
-    run(
-        [
-            sys.executable,
-            "scripts/08_audit_womd_dataset.py",
-            str(train_npz),
-            "--output",
-            str(out / "training_audit.json"),
-        ],
-        cwd=root,
-    )
-    run(
-        [
-            sys.executable,
-            "scripts/08_audit_womd_dataset.py",
-            str(val_npz),
-            "--output",
-            str(out / "validation_audit.json"),
-        ],
-        cwd=root,
-    )
+    for source, name in (
+        (train_npz, "training_audit.json"),
+        (val_npz, "validation_audit.json"),
+    ):
+        run(
+            [
+                sys.executable,
+                "scripts/08_audit_womd_dataset.py",
+                str(source),
+                "--output",
+                str(out / name),
+            ],
+            cwd=root,
+        )
     run(
         [
             sys.executable,
@@ -79,7 +72,50 @@ def stage1(root: Path, data_root: Path, train_npz: Path, val_npz: Path) -> None:
     )
 
 
-def downstream(root: Path, train_npz: Path, val_npz: Path, validation_glob: str) -> None:
+def freeze_selection(
+    root: Path,
+    train_npz: Path,
+    sweep: Path,
+    selection: Path,
+    lambda_link: float | None,
+    lambda_outage: float | None,
+    rationale: str,
+) -> None:
+    if selection.is_file():
+        return
+    if lambda_link is None or lambda_outage is None:
+        raise RuntimeError(
+            "No frozen lambda selection exists. Inspect the development-only sweep, "
+            "then rerun with --lambda-link and --lambda-outage."
+        )
+    run(
+        [
+            sys.executable,
+            "scripts/04_freeze_lambda_selection.py",
+            str(sweep),
+            str(train_npz),
+            "--lambda-link",
+            str(lambda_link),
+            "--lambda-outage",
+            str(lambda_outage),
+            "--rationale",
+            rationale,
+            "--output",
+            str(selection),
+        ],
+        cwd=root,
+    )
+
+
+def downstream(
+    root: Path,
+    train_npz: Path,
+    val_npz: Path,
+    validation_glob: str,
+    lambda_link: float | None,
+    lambda_outage: float | None,
+    rationale: str,
+) -> None:
     ber = root / "artifacts/paper_final/02_link/dbpsk_ber_lut.csv"
     require_file(ber, "Stage-2 BER LUT")
     seeds = [str(seed) for seed in CANONICAL_SEEDS]
@@ -117,9 +153,14 @@ def downstream(root: Path, train_npz: Path, val_npz: Path, validation_glob: str)
         cwd=root,
     )
     selection = root / "artifacts/paper_final/04_learning/lambda_selection.json"
-    require_file(
+    freeze_selection(
+        root,
+        train_npz,
+        sweep,
         selection,
-        "Frozen development-only lambda selection (run 04_freeze_lambda_selection.py)",
+        lambda_link,
+        lambda_outage,
+        rationale,
     )
     learned = root / "artifacts/paper_final/04_learning/learned_ablation"
     run(
@@ -165,7 +206,7 @@ def downstream(root: Path, train_npz: Path, val_npz: Path, validation_glob: str)
         ],
         cwd=root,
     )
-    tfrecords = sorted(Path().glob(validation_glob))
+    tfrecords = [Path(path) for path in sorted(glob.glob(validation_glob))]
     if not tfrecords:
         raise FileNotFoundError(f"No validation TFRecords matched: {validation_glob}")
     scheduling = root / "artifacts/paper_final/06_scheduling"
@@ -219,6 +260,12 @@ def main() -> None:
     parser.add_argument("--train-npz", required=True)
     parser.add_argument("--validation-npz", required=True)
     parser.add_argument("--validation-glob")
+    parser.add_argument("--lambda-link", type=float)
+    parser.add_argument("--lambda-outage", type=float)
+    parser.add_argument(
+        "--selection-rationale",
+        default="Selected from the declared development-only sweep.",
+    )
     parser.add_argument(
         "--mode",
         choices=("stage1", "full"),
@@ -236,7 +283,15 @@ def main() -> None:
     if args.mode == "full":
         if not args.validation_glob:
             raise ValueError("--validation-glob is required for --mode full")
-        downstream(root, train_npz, val_npz, args.validation_glob)
+        downstream(
+            root,
+            train_npz,
+            val_npz,
+            args.validation_glob,
+            args.lambda_link,
+            args.lambda_outage,
+            args.selection_rationale,
+        )
 
     summary = {
         "mode": args.mode,
