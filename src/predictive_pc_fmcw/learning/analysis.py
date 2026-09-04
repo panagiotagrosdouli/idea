@@ -110,17 +110,48 @@ def paired_full_vs_trajectory(rows: list[dict[str, Any]]) -> dict[str, Any]:
     return {"pairs": len(keys), "metrics": results}
 
 
-def accuracy_link_correlations(rows: list[dict[str, Any]]) -> dict[str, float]:
+def _scenario_means(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        grouped[str(row["scenario_id"])].append(row)
+    return [
+        {
+            "scenario_id": scenario_id,
+            **{
+                metric: float(np.nanmean([row[metric] for row in selected]))
+                for metric in METRICS
+            },
+            "model_seed_rows": len(selected),
+        }
+        for scenario_id, selected in sorted(grouped.items())
+    ]
+
+
+def accuracy_link_correlations(rows: list[dict[str, Any]]) -> dict[str, Any]:
     from scipy.stats import spearmanr
 
-    ade = np.asarray([row["ade_m"] for row in rows], dtype=np.float64)
-    results = {}
+    scenario_rows = _scenario_means(rows)
+    ade = np.asarray([row["ade_m"] for row in scenario_rows], dtype=np.float64)
+    results: dict[str, Any] = {
+        "model_seed_rows": len(rows),
+        "independent_scenarios": len(scenario_rows),
+        "aggregation": (
+            "Metrics are averaged across objectives/model seeds within each WOMD "
+            "scenario before Spearman correlation."
+        ),
+    }
     for metric in ("snr_mae_db", "goodput_mae_mbps", "link_lifetime_mae_s"):
-        values = np.asarray([row[metric] for row in rows], dtype=np.float64)
+        values = np.asarray([row[metric] for row in scenario_rows], dtype=np.float64)
         finite = np.isfinite(ade) & np.isfinite(values)
-        statistic = spearmanr(ade[finite], values[finite])
-        results[f"ade_vs_{metric}_spearman_rho"] = float(statistic.statistic)
-        results[f"ade_vs_{metric}_p_value"] = float(statistic.pvalue)
+        if int(finite.sum()) > 1:
+            statistic = spearmanr(ade[finite], values[finite])
+            rho = float(statistic.statistic)
+            p_value = float(statistic.pvalue)
+        else:
+            rho = float("nan")
+            p_value = float("nan")
+        results[f"ade_vs_{metric}_spearman_rho"] = rho
+        results[f"ade_vs_{metric}_p_value"] = p_value
     return results
 
 
