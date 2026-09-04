@@ -4,6 +4,10 @@
   "depends_on": ["stage7"],
   "required_inputs": [
     "paper/PAPER_DRAFT.md",
+    "artifacts/paper_final/01_data/source_shard_manifest.json",
+    "artifacts/paper_final/01_data/corpus_verification.json",
+    "artifacts/paper_final/02_link/link_verification.json",
+    "artifacts/paper_final/04_learning/learned_ablation/completion_manifest.json",
     "artifacts/paper_final/05_heldout/heldout_provenance.json",
     "artifacts/paper_final/06_scheduling/evaluation_manifest.json",
     "artifacts/paper_final/07_analysis/learned/learned_heldout_analysis.json",
@@ -11,6 +15,7 @@
     "artifacts/paper_final/07_analysis/learned/ade_vs_link_fidelity.pdf",
     "artifacts/paper_final/07_analysis/statistics/scheduler_utility_summary.json",
     "artifacts/paper_final/07_analysis/statistics/ade_vs_scheduler_utility.csv",
+    "artifacts/paper_final/07_analysis/statistics/ade_vs_scheduler_utility_by_scenario.csv",
     "artifacts/paper_final/07_analysis/statistics/ade_vs_realized_goodput.pdf"
   ],
   "outputs": [
@@ -20,8 +25,12 @@
   ],
   "acceptance": [
     "release-readiness gate passes",
+    "Stage-1 source and corpus provenance is present",
+    "verified Stage-2 link evidence is present",
+    "exactly 20 Stage-4 checkpoints are represented by the completion manifest",
     "no stale corrected_v2/proxy results remain in manuscript",
     "official figures and LaTeX tables exist",
+    "scenario-level scheduler utility evidence exists",
     "claims follow versioned evidence",
     "model-based optical-channel limitation disclosed",
     "clean reproduction manifest recorded"
@@ -33,6 +42,10 @@
       "--manuscript",
       "paper/PAPER_DRAFT.md",
       "--evidence",
+      "artifacts/paper_final/01_data/source_shard_manifest.json",
+      "artifacts/paper_final/01_data/corpus_verification.json",
+      "artifacts/paper_final/02_link/link_verification.json",
+      "artifacts/paper_final/04_learning/learned_ablation/completion_manifest.json",
       "artifacts/paper_final/05_heldout/heldout_provenance.json",
       "artifacts/paper_final/06_scheduling/evaluation_manifest.json",
       "artifacts/paper_final/07_analysis/learned/learned_heldout_analysis.json",
@@ -40,6 +53,7 @@
       "artifacts/paper_final/07_analysis/learned/ade_vs_link_fidelity.pdf",
       "artifacts/paper_final/07_analysis/statistics/scheduler_utility_summary.json",
       "artifacts/paper_final/07_analysis/statistics/ade_vs_scheduler_utility.csv",
+      "artifacts/paper_final/07_analysis/statistics/ade_vs_scheduler_utility_by_scenario.csv",
       "artifacts/paper_final/07_analysis/statistics/ade_vs_realized_goodput.pdf",
       "--output",
       "artifacts/paper_final/08_release/release_readiness.json"
