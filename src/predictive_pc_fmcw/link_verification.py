@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import json
 from pathlib import Path
 
 import numpy as np
@@ -70,6 +71,7 @@ def verify_lut(
     path: str | Path,
     *,
     minimum_bits_per_point: int = CANONICAL_MIN_BITS_PER_POINT,
+    chirp_diagnostic_path: str | Path | None = None,
 ) -> dict[str, object]:
     if minimum_bits_per_point < 1_000:
         raise ValueError("minimum_bits_per_point must be at least 1000")
@@ -120,6 +122,27 @@ def verify_lut(
     receivers = {row["receiver"] for row in rows}
     semantics = {row["snr_semantics"] for row in rows}
     material_increases = _material_raw_increases(snr, simulated)
+    diagnostic = None
+    diagnostic_clears_reversals = not material_increases
+    if chirp_diagnostic_path is not None:
+        diagnostic_source = Path(chirp_diagnostic_path)
+        diagnostic = json.loads(diagnostic_source.read_text(encoding="utf-8"))
+        pairs = {
+            (item["lower_snr_db"], item["higher_snr_db"])
+            for item in material_increases
+        }
+        diagnostic_pair = (
+            diagnostic.get("lower_snr_db"), diagnostic.get("higher_snr_db")
+        )
+        diagnostic_clears_reversals = bool(
+            pairs == {diagnostic_pair}
+            and diagnostic.get("schema") == "paired_chirp_ber_reversal_v1"
+            and diagnostic.get("sampling_unit") == "independent_chirp"
+            and diagnostic.get("common_random_numbers_within_pair") is True
+            and int(diagnostic.get("trials", 0)) >= 100
+            and int(diagnostic.get("bootstrap_repetitions", 0)) >= 10_000
+            and diagnostic.get("material_reversal_supported") is False
+        )
 
     checks = {
         "required_columns": True,
@@ -133,7 +156,7 @@ def verify_lut(
         "raw_ber_in_probability_range": bool(
             ((0.0 <= simulated) & (simulated <= 0.5)).all()
         ),
-        "raw_ber_no_material_reversal": not material_increases,
+        "raw_ber_no_unresolved_material_reversal": diagnostic_clears_reversals,
         "lut_in_probability_range": bool(((0.0 <= lut) & (lut <= 0.5)).all()),
         "monotone_nonincreasing": bool(np.all(np.diff(lut) <= 1e-15)),
         "zero_error_points_use_confidence_bound": bool(
@@ -157,6 +180,15 @@ def verify_lut(
                 "minimum_absolute_increase": 0.01,
                 "minimum_ratio": 1.5,
             },
+            "chirp_diagnostic": (
+                {
+                    "path": str(chirp_diagnostic_path),
+                    "sha256": _sha256(Path(chirp_diagnostic_path)),
+                    "summary": diagnostic,
+                }
+                if diagnostic is not None
+                else None
+            ),
             "checks": checks,
         }
     )

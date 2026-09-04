@@ -1,6 +1,7 @@
 .PHONY: install test lint validate benchmark womd ablation matrix paper-quick \
 	paper-full motion manifest paper-ablation staged corrected-quick \
-	corrected-full paper-draft reproducibility reproduce split-audit stages stage
+	corrected-full paper-draft reproducibility reproduce split-audit stages stage \
+	stage2-diagnostic
 
 install:
 	python -m pip install -e ".[dev]"
@@ -50,6 +51,9 @@ stages:
 stage:
 	@test -n "$(STAGE)" || (echo "Set STAGE=stage0 ... stage8"; exit 2)
 	PYTHONPATH=src python scripts/run_research_stage.py --stage $(STAGE) $(EXECUTE)
+
+stage2-diagnostic:
+	PYTHONPATH=src python scripts/02_diagnose_part_a_receiver.py
 
 paper-ablation:
 	pcfmcw paper-ablation --config configs/default.json \
