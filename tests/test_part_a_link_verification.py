@@ -1,4 +1,5 @@
 import csv
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -113,7 +114,7 @@ class PartALinkVerificationTest(unittest.TestCase):
             report = verify_lut(path)
             self.assertEqual(report["status"], "FAIL")
             self.assertFalse(
-                report["checks"]["raw_ber_no_material_reversal"]
+                report["checks"]["raw_ber_no_unresolved_material_reversal"]
             )
             self.assertEqual(
                 report["raw_ber_material_reversals"][0]["higher_snr_db"], 8.0
@@ -148,8 +149,36 @@ class PartALinkVerificationTest(unittest.TestCase):
             write_ber_lut(points, path)
             report = verify_lut(path)
             self.assertTrue(
-                report["checks"]["raw_ber_no_material_reversal"]
+                report["checks"]["raw_ber_no_unresolved_material_reversal"]
             )
+
+    def test_paired_chirp_diagnostic_can_clear_apparent_reversal(self):
+        points = self._canonical_points()
+        points[12] = BERPoint(7.0, 0.008, 0.0, 250_000, 2_000, 0.009, 0.06,
+                              "supplied_part_a_fft_dpsk", "waveform_sample_snr_db")
+        points[13] = BERPoint(8.0, 0.05, 0.0, 250_000, 12_500, 0.052, 0.05,
+                              "supplied_part_a_fft_dpsk", "waveform_sample_snr_db")
+        for index in range(14, len(points)):
+            value = max(0.001, 0.04 - (index - 14) * 0.001)
+            points[index] = BERPoint(
+                float(index - 5), value, 0.0, 250_000, round(value * 250_000),
+                value + 0.001, value, "supplied_part_a_fft_dpsk",
+                "waveform_sample_snr_db",
+            )
+        diagnostic = {
+            "schema": "paired_chirp_ber_reversal_v1", "lower_snr_db": 7.0,
+            "higher_snr_db": 8.0, "sampling_unit": "independent_chirp",
+            "common_random_numbers_within_pair": True, "trials": 100,
+            "bootstrap_repetitions": 10_000, "material_reversal_supported": False,
+        }
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            lut = root / "lut.csv"
+            diag = root / "diag.json"
+            write_ber_lut(points, lut)
+            diag.write_text(json.dumps(diagnostic))
+            report = verify_lut(lut, chirp_diagnostic_path=diag)
+            self.assertEqual(report["status"], "PASS")
 
 
 if __name__ == "__main__":
