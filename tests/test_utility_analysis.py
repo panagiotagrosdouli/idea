@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 from predictive_pc_fmcw.learning.utility_analysis import (
+    aggregate_scenario_relationship,
     join_accuracy_and_scheduler_utility,
     summarize_utility,
 )
@@ -78,6 +79,44 @@ class UtilityAnalysisTest(unittest.TestCase):
             self.assertAlmostEqual(rows[0]["delta_goodput_mbps"], 0.2)
             summary = summarize_utility(rows)
             self.assertEqual(summary["full"]["independent_scenarios"], 1)
+
+    def test_relationship_collapses_model_seeds_within_scenario(self):
+        rows = [
+            {
+                "objective": "a",
+                "seed": 1,
+                "scenario_id": "s1",
+                "ade_m": 1.0,
+                "delta_goodput_mbps": 0.1,
+            },
+            {
+                "objective": "a",
+                "seed": 2,
+                "scenario_id": "s1",
+                "ade_m": 3.0,
+                "delta_goodput_mbps": 0.3,
+            },
+            {
+                "objective": "a",
+                "seed": 1,
+                "scenario_id": "s2",
+                "ade_m": 4.0,
+                "delta_goodput_mbps": -0.2,
+            },
+        ]
+        aggregated = aggregate_scenario_relationship(rows)
+        self.assertEqual(len(aggregated), 2)
+        first = aggregated[0]
+        self.assertEqual(first["scenario_id"], "s1")
+        self.assertAlmostEqual(first["ade_m"], 2.0)
+        self.assertAlmostEqual(first["delta_goodput_mbps"], 0.2)
+        self.assertEqual(first["model_seed_rows"], 2)
+
+        summary = summarize_utility(rows)
+        relationship = summary["ade_vs_realized_goodput_gain"]
+        self.assertEqual(relationship["scenario_seed_rows"], 3)
+        self.assertEqual(relationship["independent_scenarios"], 2)
+        self.assertIn("averaged", relationship["aggregation"])
 
 
 if __name__ == "__main__":
