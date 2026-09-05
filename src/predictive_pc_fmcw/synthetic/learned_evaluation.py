@@ -36,7 +36,8 @@ def _validate_official_npz(
     freeze: dict[str, object],
 ) -> tuple[str, dict[str, np.ndarray]]:
     if not official_npz.is_file():
-        raise FileNotFoundError(f"official evaluation artifact not found: {official_npz}")
+        message = f"official evaluation artifact not found: {official_npz}"
+        raise FileNotFoundError(message)
     with np.load(official_npz, allow_pickle=False) as data:
         split_values = np.asarray(data["split"]).astype(str)
         unique = set(split_values.tolist())
@@ -176,7 +177,8 @@ def run_official_learned_evaluation(
     expected_pairs = len(OBJECTIVES) * len(CANONICAL_SEEDS)
     observed_pairs = {(str(row["objective"]), int(row["seed"])) for row in rows}
     if len(observed_pairs) != expected_pairs:
-        raise RuntimeError("official learned evaluation is missing objective/seed pairs")
+        message = "official learned evaluation is missing objective/seed pairs"
+        raise RuntimeError(message)
 
     report = {
         "status": "COMPLETED",
