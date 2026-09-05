@@ -58,7 +58,9 @@ def validate_operating_region_protocol() -> None:
             1 <= condition.prediction_horizon_steps <= 10
         ):
             raise ValueError("frozen learned checkpoint supports horizons up to 10")
-        if condition.offered_load is not None and not (0 <= condition.offered_load <= 2):
+        if condition.offered_load is not None and not (
+            0 <= condition.offered_load <= 2
+        ):
             raise ValueError("offered-load sweep value is invalid")
         if condition.deadline_s is not None and condition.deadline_s <= 0:
             raise ValueError("deadline sweep values must be positive")
@@ -324,22 +326,21 @@ def analyze_operating_region(
                     ]
                 if not selected:
                     continue
+                goodput_gain = [
+                    float(row["goodput_gain_mbps"]) for row in selected
+                ]
+                deadline_gain = [
+                    float(row["deadline_miss_reduction"]) for row in selected
+                ]
                 heatmap_rows.append(
                     {
                         "mobility_axis": axis,
                         "difficulty_bin": label,
                         "horizon_steps": horizon_values[condition],
                         "episodes": len(selected),
-                        "mean_goodput_gain_mbps": float(
-                            np.mean([float(row["goodput_gain_mbps"]) for row in selected])
-                        ),
+                        "mean_goodput_gain_mbps": float(np.mean(goodput_gain)),
                         "mean_deadline_miss_reduction": float(
-                            np.mean(
-                                [
-                                    float(row["deadline_miss_reduction"])
-                                    for row in selected
-                                ]
-                            )
+                            np.mean(deadline_gain)
                         ),
                     }
                 )
@@ -354,13 +355,15 @@ def analyze_operating_region(
             "deadline": "S0_minus_S6_deadline_miss_ratio",
         },
         "scientific_guard": (
-            "mobility bins are episode-level descriptive strata, not independent timesteps"
+            "mobility bins are episode-level descriptive strata, not independent "
+            "timesteps"
         ),
     }
     destination = Path(output_path)
     destination.parent.mkdir(parents=True, exist_ok=True)
     if destination.exists():
-        raise FileExistsError(f"refusing to overwrite operating analysis: {destination}")
+        message = f"refusing to overwrite operating analysis: {destination}"
+        raise FileExistsError(message)
     destination.write_text(
         json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
