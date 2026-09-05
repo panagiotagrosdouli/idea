@@ -107,10 +107,13 @@ class ResumeHardeningTest(unittest.TestCase):
             checkpoint = run_dir / "best_comm_aware_gru.pt"
             checkpoint.write_bytes(b"checkpoint")
             result_path = run_dir / "training_result.json"
+            mismatched = self._result(
+                dataset,
+                checkpoint,
+                objective="trajectory_only",
+            )
             result_path.write_text(
-                json.dumps(
-                    asdict(self._result(dataset, checkpoint, objective="trajectory_only"))
-                ),
+                json.dumps(asdict(mismatched)),
                 encoding="utf-8",
             )
             validation = validate_training_resume(
