@@ -26,6 +26,16 @@ class BERTest(unittest.TestCase):
         self.assertEqual(points[1].snr_semantics, "waveform_sample_snr_db")
         self.assertGreaterEqual(points[0].ber_for_lut, points[1].ber_for_lut)
 
+    def test_part_a_receiver_does_not_suffer_alias_branch_burst(self):
+        # These independent chirp seeds previously produced exactly 214/1000
+        # errors because projection and compensation used different FFT alias
+        # branches across half-sample symbol-centre transitions.
+        for seed in (161963140, 3885075678, 3519752463):
+            point = simulate_part_a_notebook_receiver_ber(
+                [5.0], bits=1_000, seed=seed
+            )[0]
+            self.assertLess(point.simulated_ber, 0.05)
+
 
 if __name__ == "__main__":
     unittest.main()

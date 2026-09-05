@@ -1,0 +1,1484 @@
+{
+  "bootstrap_resamples": 10000,
+  "catastrophic_ber_threshold": 0.05,
+  "decisions_per_trial": 1000,
+  "method": "independent_one_chirp_trials_with_cluster_bootstrap",
+  "rows": [
+    {
+      "catastrophic_chirp_rate": 0.0,
+      "catastrophic_chirps": 0,
+      "cluster_bootstrap_ci_95": [
+        0.0,
+        0.0
+      ],
+      "decisions_per_trial": 1000,
+      "independent_chirp_trials": 50,
+      "max_chirp_ber": 0.0,
+      "mean_ber": 0.0,
+      "median_ber": 0.0,
+      "p95_chirp_ber": 0.0,
+      "snr_db": 5.0,
+      "std_ber_across_chirps": 0.0,
+      "trials": [
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 651498517,
+          "trial": 0
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3180925944,
+          "trial": 1
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1428164462,
+          "trial": 2
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 644533757,
+          "trial": 3
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3968314499,
+          "trial": 4
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2877137869,
+          "trial": 5
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 689189384,
+          "trial": 6
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3665577340,
+          "trial": 7
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 4107525436,
+          "trial": 8
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1247814275,
+          "trial": 9
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1353206384,
+          "trial": 10
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2489101260,
+          "trial": 11
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 203969953,
+          "trial": 12
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3385369635,
+          "trial": 13
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 431946835,
+          "trial": 14
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1289133894,
+          "trial": 15
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2758855254,
+          "trial": 16
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1649396546,
+          "trial": 17
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3317113628,
+          "trial": 18
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1315508774,
+          "trial": 19
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 4249496387,
+          "trial": 20
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 39721118,
+          "trial": 21
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1233912578,
+          "trial": 22
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3869351576,
+          "trial": 23
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2935808314,
+          "trial": 24
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 572606425,
+          "trial": 25
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 161963140,
+          "trial": 26
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3091348244,
+          "trial": 27
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3384635071,
+          "trial": 28
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1727305320,
+          "trial": 29
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3892276857,
+          "trial": 30
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3885075678,
+          "trial": 31
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2402062183,
+          "trial": 32
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3906362348,
+          "trial": 33
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1659033537,
+          "trial": 34
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1175426631,
+          "trial": 35
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1682895718,
+          "trial": 36
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2019104162,
+          "trial": 37
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3152620351,
+          "trial": 38
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 660207312,
+          "trial": 39
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3214725941,
+          "trial": 40
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3519752463,
+          "trial": 41
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3209911946,
+          "trial": 42
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2734190334,
+          "trial": 43
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3156882560,
+          "trial": 44
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1642128921,
+          "trial": 45
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2372062856,
+          "trial": 46
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1311514250,
+          "trial": 47
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 200586297,
+          "trial": 48
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 4027218559,
+          "trial": 49
+        }
+      ]
+    },
+    {
+      "catastrophic_chirp_rate": 0.0,
+      "catastrophic_chirps": 0,
+      "cluster_bootstrap_ci_95": [
+        0.0,
+        0.0
+      ],
+      "decisions_per_trial": 1000,
+      "independent_chirp_trials": 50,
+      "max_chirp_ber": 0.0,
+      "mean_ber": 0.0,
+      "median_ber": 0.0,
+      "p95_chirp_ber": 0.0,
+      "snr_db": 7.0,
+      "std_ber_across_chirps": 0.0,
+      "trials": [
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 4126776579,
+          "trial": 0
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3107419265,
+          "trial": 1
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 20978603,
+          "trial": 2
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1375580577,
+          "trial": 3
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 779560306,
+          "trial": 4
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 203741845,
+          "trial": 5
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2112736784,
+          "trial": 6
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3874041907,
+          "trial": 7
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3897195481,
+          "trial": 8
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2867281755,
+          "trial": 9
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3025786315,
+          "trial": 10
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 29331521,
+          "trial": 11
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2978347272,
+          "trial": 12
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3188722968,
+          "trial": 13
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3656480835,
+          "trial": 14
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 535322376,
+          "trial": 15
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2935951802,
+          "trial": 16
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1316381108,
+          "trial": 17
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3872105067,
+          "trial": 18
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2630474180,
+          "trial": 19
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 374838637,
+          "trial": 20
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1321918447,
+          "trial": 21
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2043667440,
+          "trial": 22
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1591725982,
+          "trial": 23
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2341178442,
+          "trial": 24
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 238701598,
+          "trial": 25
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2488293122,
+          "trial": 26
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1097621690,
+          "trial": 27
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1128620792,
+          "trial": 28
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3115702240,
+          "trial": 29
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1528390071,
+          "trial": 30
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1112975672,
+          "trial": 31
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2200704337,
+          "trial": 32
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 137907599,
+          "trial": 33
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2627174926,
+          "trial": 34
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2273183310,
+          "trial": 35
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 201338473,
+          "trial": 36
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 706186148,
+          "trial": 37
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2149106734,
+          "trial": 38
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1646768842,
+          "trial": 39
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 467300691,
+          "trial": 40
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 668326985,
+          "trial": 41
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1317240710,
+          "trial": 42
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 4279240498,
+          "trial": 43
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 645354991,
+          "trial": 44
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 807548383,
+          "trial": 45
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3698596909,
+          "trial": 46
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1118860027,
+          "trial": 47
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3371954610,
+          "trial": 48
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3311683026,
+          "trial": 49
+        }
+      ]
+    },
+    {
+      "catastrophic_chirp_rate": 0.0,
+      "catastrophic_chirps": 0,
+      "cluster_bootstrap_ci_95": [
+        0.0,
+        0.0
+      ],
+      "decisions_per_trial": 1000,
+      "independent_chirp_trials": 50,
+      "max_chirp_ber": 0.0,
+      "mean_ber": 0.0,
+      "median_ber": 0.0,
+      "p95_chirp_ber": 0.0,
+      "snr_db": 8.0,
+      "std_ber_across_chirps": 0.0,
+      "trials": [
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3605833215,
+          "trial": 0
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2685781507,
+          "trial": 1
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1920483416,
+          "trial": 2
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 998690217,
+          "trial": 3
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1568411070,
+          "trial": 4
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1169674131,
+          "trial": 5
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2813492469,
+          "trial": 6
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1632216671,
+          "trial": 7
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 863425619,
+          "trial": 8
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 23567478,
+          "trial": 9
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1651662031,
+          "trial": 10
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 484726776,
+          "trial": 11
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 931284655,
+          "trial": 12
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 419488364,
+          "trial": 13
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 555744363,
+          "trial": 14
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1868195279,
+          "trial": 15
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1456569210,
+          "trial": 16
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1619119501,
+          "trial": 17
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2157442240,
+          "trial": 18
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3248201347,
+          "trial": 19
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3853190305,
+          "trial": 20
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3021464304,
+          "trial": 21
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 4109804147,
+          "trial": 22
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3521876113,
+          "trial": 23
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2574411008,
+          "trial": 24
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3229669756,
+          "trial": 25
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3601729828,
+          "trial": 26
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1568881857,
+          "trial": 27
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3567028149,
+          "trial": 28
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 754581508,
+          "trial": 29
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3760783477,
+          "trial": 30
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3930257040,
+          "trial": 31
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2204105548,
+          "trial": 32
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1631348978,
+          "trial": 33
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3905299319,
+          "trial": 34
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 559961987,
+          "trial": 35
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 4285094332,
+          "trial": 36
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2379538251,
+          "trial": 37
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1297575137,
+          "trial": 38
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2448545156,
+          "trial": 39
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 737163617,
+          "trial": 40
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 466411485,
+          "trial": 41
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 4130114960,
+          "trial": 42
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3893735811,
+          "trial": 43
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3606754345,
+          "trial": 44
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2364860346,
+          "trial": 45
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1487751179,
+          "trial": 46
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 568572548,
+          "trial": 47
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2063993547,
+          "trial": 48
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 884546105,
+          "trial": 49
+        }
+      ]
+    },
+    {
+      "catastrophic_chirp_rate": 0.0,
+      "catastrophic_chirps": 0,
+      "cluster_bootstrap_ci_95": [
+        0.0,
+        0.0
+      ],
+      "decisions_per_trial": 1000,
+      "independent_chirp_trials": 50,
+      "max_chirp_ber": 0.0,
+      "mean_ber": 0.0,
+      "median_ber": 0.0,
+      "p95_chirp_ber": 0.0,
+      "snr_db": 10.0,
+      "std_ber_across_chirps": 0.0,
+      "trials": [
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3036940055,
+          "trial": 0
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2933995697,
+          "trial": 1
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 4082032170,
+          "trial": 2
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1653860867,
+          "trial": 3
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3528936430,
+          "trial": 4
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1647367423,
+          "trial": 5
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3311243833,
+          "trial": 6
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3073149152,
+          "trial": 7
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3873610691,
+          "trial": 8
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1263668872,
+          "trial": 9
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1196414850,
+          "trial": 10
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2617182970,
+          "trial": 11
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2749690064,
+          "trial": 12
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 169942289,
+          "trial": 13
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 840709150,
+          "trial": 14
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3026298342,
+          "trial": 15
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2252914086,
+          "trial": 16
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1198414039,
+          "trial": 17
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2950470628,
+          "trial": 18
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1356874513,
+          "trial": 19
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2088577450,
+          "trial": 20
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2766878528,
+          "trial": 21
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1622466436,
+          "trial": 22
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3340871003,
+          "trial": 23
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 945213122,
+          "trial": 24
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3004829281,
+          "trial": 25
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1261445284,
+          "trial": 26
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1005532631,
+          "trial": 27
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2336795151,
+          "trial": 28
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3978823243,
+          "trial": 29
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2547368425,
+          "trial": 30
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 938047001,
+          "trial": 31
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 834184123,
+          "trial": 32
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3647656684,
+          "trial": 33
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1016102803,
+          "trial": 34
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 831541545,
+          "trial": 35
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1410299959,
+          "trial": 36
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 122424853,
+          "trial": 37
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1777479099,
+          "trial": 38
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3187538293,
+          "trial": 39
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1270423950,
+          "trial": 40
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 852254098,
+          "trial": 41
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2571082741,
+          "trial": 42
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3659965937,
+          "trial": 43
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 2232304166,
+          "trial": 44
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 4126101619,
+          "trial": 45
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3873381388,
+          "trial": 46
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1490802997,
+          "trial": 47
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 3459765386,
+          "trial": 48
+        },
+        {
+          "ber": 0.0,
+          "decisions": 1000,
+          "errors": 0,
+          "seed": 1629637738,
+          "trial": 49
+        }
+      ]
+    }
+  ],
+  "scientific_note": "Bits within a chirp are not treated as independent inference units. This diagnostic measures receiver stability; it does not validate the physical-layer model or replace the canonical LUT.",
+  "seed": 20260827,
+  "snr_semantics": "waveform_sample_snr_db",
+  "trials_per_snr": 50
+}
