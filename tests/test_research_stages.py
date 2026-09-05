@@ -49,12 +49,12 @@ class ResearchStagesTest(unittest.TestCase):
             required,
         )
         self.assertIn(
-            "artifacts/paper_final/07_analysis/learned/"
+            "artifacts/paper_final/07_statistics/learned/"
             "heldout_link_fidelity_by_scenario.csv",
             required,
         )
         self.assertIn(
-            "artifacts/paper_final/07_analysis/statistics/"
+            "artifacts/paper_final/07_statistics/scheduler/"
             "ade_vs_scheduler_utility_by_scenario.csv",
             required,
         )
