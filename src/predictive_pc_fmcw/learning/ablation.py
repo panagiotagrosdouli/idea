@@ -44,6 +44,16 @@ def _link_config_sha256(link_config: LinkConfig) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
+def _resolve_checkpoint(checkpoint_value: str, run_dir: Path) -> Path:
+    checkpoint = Path(checkpoint_value)
+    if checkpoint.is_absolute():
+        return checkpoint.resolve()
+    cwd_candidate = (Path.cwd() / checkpoint).resolve()
+    if cwd_candidate.exists():
+        return cwd_candidate
+    return (run_dir / checkpoint).resolve()
+
+
 def validate_training_resume(
     result_path: str | Path,
     *,
@@ -57,6 +67,8 @@ def validate_training_resume(
         return ResumeValidation(False, "missing_result", None)
     try:
         payload = json.loads(source.read_text(encoding="utf-8"))
+        if not isinstance(payload, dict):
+            raise TypeError("training result must be a JSON object")
         result = TrainingResult(**payload)
     except (OSError, ValueError, TypeError, json.JSONDecodeError) as exc:
         return ResumeValidation(False, f"invalid_result_json:{type(exc).__name__}", None)
@@ -69,11 +81,7 @@ def validate_training_resume(
         return ResumeValidation(False, "dataset_hash_mismatch", None)
 
     run_dir = Path(expected_run_dir).resolve()
-    checkpoint = Path(result.checkpoint)
-    if not checkpoint.is_absolute():
-        checkpoint = (Path.cwd() / checkpoint).resolve()
-    else:
-        checkpoint = checkpoint.resolve()
+    checkpoint = _resolve_checkpoint(result.checkpoint, run_dir)
     try:
         checkpoint.relative_to(run_dir)
     except ValueError:
@@ -130,7 +138,7 @@ def _write_execution_state(
         ),
         "planned_runs": plan.planned_runs,
         "completed_runs": sum(status == "completed" for status in statuses),
-        "pending_runs": plan.planned_runs - len(runs),
+        "pending_runs": plan.planned_runs - sum(status == "completed" for status in statuses),
         "invalid_runs": sum(status == "invalid" for status in statuses),
         "rerun_required_runs": sum(status == "rerun_required" for status in statuses),
         "dataset": plan.dataset,
