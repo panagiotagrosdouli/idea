@@ -44,9 +44,12 @@ def canonical_execution_preflight(
 
         cuda_available = bool(torch.cuda.is_available())
 
+    repo_contract_files_present = all(
+        path.is_file() for path in required_repo_files
+    )
     checks = {
         "python_supported": sys.version_info >= (3, 10),
-        "repo_contract_files_present": all(path.is_file() for path in required_repo_files),
+        "repo_contract_files_present": repo_contract_files_present,
         "data_root_present": data.is_dir(),
         "training_npz_present": train.is_file(),
         "validation_npz_present": validation.is_file(),
@@ -57,7 +60,9 @@ def canonical_execution_preflight(
         "cuda_available": cuda_available if require_gpu else True,
         "free_disk_sufficient": free_gb >= min_free_gb,
     }
-    missing_repo_files = [str(path) for path in required_repo_files if not path.is_file()]
+    missing_repo_files = [
+        str(path) for path in required_repo_files if not path.is_file()
+    ]
     return {
         "status": "PASS" if all(checks.values()) else "BLOCKED",
         "mode": "full" if full else "stage1",
