@@ -2,7 +2,7 @@
 	paper-full motion manifest paper-ablation staged corrected-quick \
 	corrected-full paper-draft reproducibility reproduce split-audit stages stage \
 	stage2-diagnostic womd-preflight canonical-preflight canonical-stage1 \
-	canonical-full
+	canonical-full synthetic-dataset synthetic-dataset-validate
 
 install:
 	python -m pip install -e ".[dev]"
@@ -15,6 +15,14 @@ lint:
 
 validate:
 	pcfmcw validate --config configs/default.json --output artifacts/validation.json
+
+synthetic-dataset:
+	PYTHONPATH=src python scripts/build_synthetic_dataset_v1.py \
+		--output artifacts/synthetic_dataset_v1
+
+synthetic-dataset-validate:
+	PYTHONPATH=src python scripts/build_synthetic_dataset_v1.py \
+		--output artifacts/synthetic_dataset_v1 --validate-only
 
 benchmark:
 	pcfmcw benchmark --config configs/default.json --output artifacts/synthetic_benchmark
