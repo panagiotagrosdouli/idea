@@ -40,9 +40,11 @@ def aggregate_traffic_seeds(rows: list[dict[str, object]]) -> list[dict[str, obj
     for (episode, protocol_id), selected in sorted(grouped.items()):
         seeds = {int(row["traffic_seed"]) for row in selected}
         if len(seeds) != 5:
-            raise ValueError(
-                f"{episode}/{protocol_id} must contain exactly five paired traffic seeds"
+            message = (
+                f"{episode}/{protocol_id} must contain exactly five paired "
+                "traffic seeds"
             )
+            raise ValueError(message)
         aggregated.append(
             {
                 "scenario_id": episode,
@@ -156,7 +158,8 @@ def analyze_scheduling_rows(
     return {
         "inferential_unit": "scenario_episode",
         "traffic_seed_handling": (
-            "five paired traffic-seed replicates averaged within episode before inference"
+            "five paired traffic-seed replicates averaged within episode "
+            "before inference"
         ),
         "episode_rows": episode_rows,
         "scheduler_summary": _scheduler_summary(
@@ -188,7 +191,8 @@ def analyze_scheduling_file(
     destination = Path(output_json)
     destination.parent.mkdir(parents=True, exist_ok=True)
     if destination.exists():
-        raise FileExistsError(f"refusing to overwrite statistics artifact: {destination}")
+        message = f"refusing to overwrite statistics artifact: {destination}"
+        raise FileExistsError(message)
     destination.write_text(
         json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
