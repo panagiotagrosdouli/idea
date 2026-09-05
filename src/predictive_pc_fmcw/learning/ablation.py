@@ -126,6 +126,7 @@ def _write_execution_state(
     runs: list[dict[str, Any]],
 ) -> None:
     statuses = [str(item["status"]) for item in runs]
+    completed = sum(status == "completed" for status in statuses)
     state = {
         "schema": "stage4_execution_state_v1",
         "operational_only": True,
@@ -133,12 +134,12 @@ def _write_execution_state(
         "stage": "stage4",
         "status": (
             "completed"
-            if len(runs) == plan.planned_runs and all(status == "completed" for status in statuses)
+            if completed == plan.planned_runs
             else "in_progress"
         ),
         "planned_runs": plan.planned_runs,
-        "completed_runs": sum(status == "completed" for status in statuses),
-        "pending_runs": plan.planned_runs - sum(status == "completed" for status in statuses),
+        "completed_runs": completed,
+        "pending_runs": plan.planned_runs - completed,
         "invalid_runs": sum(status == "invalid" for status in statuses),
         "rerun_required_runs": sum(status == "rerun_required" for status in statuses),
         "dataset": plan.dataset,
@@ -166,6 +167,7 @@ def run_training_ablation(
 
     results: list[TrainingResult] = []
     run_states: list[dict[str, Any]] = []
+    verified_checkpoints: list[Path] = []
     _write_execution_state(destination, plan, run_states)
 
     for objective in OBJECTIVES:
@@ -229,14 +231,16 @@ def run_training_ablation(
                 result = post_validation.result
                 reason = f"rerun_after:{validation.reason}"
 
+            checkpoint = _resolve_checkpoint(result.checkpoint, run_dir.resolve())
             results.append(result)
+            verified_checkpoints.append(checkpoint)
             run_states.append(
                 {
                     "objective": objective,
                     "seed": seed,
                     "status": "completed",
                     "result_path": str(completed_result),
-                    "checkpoint": result.checkpoint,
+                    "checkpoint": str(checkpoint),
                     "validation_reason": reason,
                 }
             )
@@ -247,9 +251,8 @@ def run_training_ablation(
             _write_execution_state(destination, plan, run_states)
 
     expected = len(OBJECTIVES) * len(seeds)
-    checkpoints = [Path(result.checkpoint) for result in results]
     if len(results) == expected and all(
-        validate_completed_file(path).valid for path in checkpoints
+        validate_completed_file(path).valid for path in verified_checkpoints
     ):
         completion = {
             "complete": True,
@@ -264,7 +267,7 @@ def run_training_ablation(
             "batch_size": batch_size,
             "lambda_link": lambda_link,
             "lambda_outage": lambda_outage,
-            "checkpoints": [str(path) for path in checkpoints],
+            "checkpoints": [str(path) for path in verified_checkpoints],
         }
         atomic_write_json(destination / "completion_manifest.json", completion)
     return results
