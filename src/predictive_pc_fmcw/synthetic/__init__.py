@@ -15,6 +15,12 @@ from .link_evaluation import (
 from .mobility import Scenario, SyntheticMobilityConfig, generate_scenario
 from .observations import CausalObservations, ObservationNoiseConfig, observe_scenario
 from .official_export import build_official_evaluation_npz
+from .scheduling_protocol import (
+    SCHEDULER_FAMILIES,
+    SchedulerFamily,
+    scheduler_protocol_manifest,
+    validate_scheduler_protocol,
+)
 from .splits import SplitManifest, build_split_manifest, validate_split_manifest
 from .training_export import (
     build_synthetic_training_npz,
@@ -27,7 +33,9 @@ __all__ = [
     "DatasetBuildConfig",
     "LinkPredictionMetrics",
     "ObservationNoiseConfig",
+    "SCHEDULER_FAMILIES",
     "Scenario",
+    "SchedulerFamily",
     "SplitManifest",
     "SyntheticMobilityConfig",
     "build_dataset",
@@ -40,7 +48,9 @@ __all__ = [
     "observe_scenario",
     "save_baseline_results",
     "save_link_prediction_results",
+    "scheduler_protocol_manifest",
     "validate_dataset",
+    "validate_scheduler_protocol",
     "validate_split_manifest",
     "validate_synthetic_training_npz",
     "verify_publication_training_freeze",
