@@ -111,10 +111,13 @@ def _write_scenario(
         config=traffic_config,
         slot_duration_s=dt_s,
     )
-    deadline_json = json.dumps(
-        [[int(value) for value in row[0]] for row in traffic.deadlines],
-        separators=(",", ":"),
-    )
+    deadline_rows = [[int(value) for value in row[0]] for row in traffic.deadlines]
+    deadline_json = json.dumps(deadline_rows, separators=(",", ":"))
+    packet_size_rows = [
+        [int(link_model.config.packet_bits)] * len(deadlines)
+        for deadlines in deadline_rows
+    ]
+    packet_sizes_json = json.dumps(packet_size_rows, separators=(",", ":"))
     path = output / f"{scenario.scenario_id}.npz"
     np.savez_compressed(
         path,
@@ -143,7 +146,9 @@ def _write_scenario(
         outage=link["outage"].astype(np.uint8),
         link_lifetime_s=np.asarray(_link_lifetime_seconds(link["outage"], dt_s)),
         packet_arrivals=traffic.arrivals[:, 0],
+        packet_size_bits=np.asarray(link_model.config.packet_bits, dtype=np.int64),
         packet_deadlines_json=np.asarray(deadline_json),
+        packet_sizes_bits_json=np.asarray(packet_sizes_json),
     )
     return scenario.scenario_id, _fingerprint_file(path)
 
@@ -212,6 +217,10 @@ def build_dataset(
         "observation_config": asdict(cfg.observations),
         "link_config": asdict(link_cfg),
         "traffic_config": asdict(traffic_cfg),
+        "packet_model": {
+            "size_mode": "fixed",
+            "packet_bits": link_cfg.packet_bits,
+        },
         "scientific_guards": {
             "scenario_level_split": True,
             "held_out_for_selection": False,
@@ -279,18 +288,36 @@ def validate_dataset(output_dir: str | Path) -> dict[str, object]:
                 "outage",
                 "link_lifetime_s",
                 "packet_arrivals",
+                "packet_size_bits",
                 "packet_deadlines_json",
+                "packet_sizes_bits_json",
             }
             if not required.issubset(data.files):
                 raise ValueError(f"scenario schema incomplete: {scenario_id}")
             length = data["t_s"].size
-            aligned = tuple(required - {"link_lifetime_s", "packet_deadlines_json"})
+            scalar_or_json = {
+                "link_lifetime_s",
+                "packet_size_bits",
+                "packet_deadlines_json",
+                "packet_sizes_bits_json",
+            }
+            aligned = tuple(required - scalar_or_json)
             if any(data[name].size != length for name in aligned):
                 raise ValueError(f"scenario arrays misaligned: {scenario_id}")
             numeric = tuple(name for name in aligned if name != "outage")
             if any(not np.all(np.isfinite(data[name])) for name in numeric):
                 raise ValueError(f"non-finite scenario values: {scenario_id}")
-            json.loads(str(data["packet_deadlines_json"]))
+            deadlines = json.loads(str(data["packet_deadlines_json"]))
+            sizes = json.loads(str(data["packet_sizes_bits_json"]))
+            if len(deadlines) != length or len(sizes) != length:
+                raise ValueError(f"packet rows misaligned: {scenario_id}")
+            if any(len(a) != len(b) for a, b in zip(deadlines, sizes, strict=True)):
+                raise ValueError(f"packet sizes/deadlines misaligned: {scenario_id}")
+            packet_bits = int(np.asarray(data["packet_size_bits"]).item())
+            if packet_bits != int(raw["link_config"]["packet_bits"]):
+                raise ValueError(f"packet-size provenance mismatch: {scenario_id}")
+            if any(any(int(value) != packet_bits for value in row) for row in sizes):
+                raise ValueError(f"packet-size rows are inconsistent: {scenario_id}")
     return {
         "status": "PASS",
         "protocol": raw["protocol"],
