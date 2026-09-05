@@ -60,6 +60,27 @@ def _fingerprint_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _validate_ood_regime(config: DatasetBuildConfig) -> None:
+    train = config.mobility
+    ood = config.ood_mobility
+    if ood.speed_mps[0] < train.speed_mps[1]:
+        raise ValueError(
+            "OOD speed lower bound must be at least the training speed upper bound"
+        )
+    harder_acceleration = (
+        ood.acceleration_mps2[0] < train.acceleration_mps2[0]
+        or ood.acceleration_mps2[1] > train.acceleration_mps2[1]
+    )
+    harder_lateral = (
+        ood.lateral_speed_mps[0] < train.lateral_speed_mps[0]
+        or ood.lateral_speed_mps[1] > train.lateral_speed_mps[1]
+    )
+    if not harder_acceleration or not harder_lateral:
+        raise ValueError(
+            "OOD mobility must extend both acceleration and lateral-speed severity"
+        )
+
+
 def _link_lifetime_seconds(outage: np.ndarray, dt_s: float) -> float:
     indices = np.flatnonzero(outage)
     return float(indices[0] * dt_s) if indices.size else float(outage.size * dt_s)
@@ -137,6 +158,7 @@ def build_dataset(
     cfg = config or DatasetBuildConfig()
     if cfg.scenarios_per_family < 1 or cfg.ood_scenarios_per_family < 1:
         raise ValueError("scenario counts must be positive")
+    _validate_ood_regime(cfg)
     output = Path(output_dir)
     scenario_dir = output / "scenarios"
     scenario_dir.mkdir(parents=True, exist_ok=True)
@@ -195,6 +217,7 @@ def build_dataset(
             "held_out_for_selection": False,
             "oracle_evaluation_only": True,
             "external_trajectory_dataset": False,
+            "ood_mobility_harder_than_training": True,
         },
     }
     manifest_path = output / "manifest.json"
@@ -252,6 +275,7 @@ def validate_dataset(output_dir: str | Path) -> dict[str, object]:
                 "snr_db",
                 "ber",
                 "per",
+                "goodput_bps",
                 "outage",
                 "link_lifetime_s",
                 "packet_arrivals",
