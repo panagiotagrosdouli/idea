@@ -5,7 +5,7 @@
   "required_inputs": ["configs/part_a_physical_layer.json"],
   "outputs": [
     "artifacts/paper_final/02_link/dbpsk_ber_lut.csv",
-    "artifacts/paper_final/02_link/paired_chirp_7_8_db.json",
+    "artifacts/paper_final/02_link/chirp_cluster_diagnostic.json",
     "artifacts/paper_final/02_link/link_verification.json"
   ],
   "verification_reports": [
@@ -15,7 +15,9 @@
     "31 SNR points on the frozen -5 to 25 dB waveform-sample SNR grid",
     "at least 250000 simulated bits per SNR point",
     "confidence-aware BER",
-    "no unresolved chirp-cluster-supported BER reversal with increasing SNR",
+    "carrier projection and midpoint compensation use one continuous FFT alias branch",
+    "no material raw-BER reversal with increasing SNR",
+    "no catastrophic chirp burst in the canonical 5/7/8/10 dB independent-chirp diagnostic",
     "monotone conservative LUT",
     "Part-A receiver and SNR semantics verified",
     "uncalibrated absolute power disclosed"
@@ -24,12 +26,14 @@
     [
       "python",
       "scripts/02_diagnose_part_a_receiver.py",
-      "--trials",
-      "100",
-      "--bootstrap-repetitions",
+      "--trials-per-snr",
+      "50",
+      "--decisions-per-trial",
+      "1000",
+      "--bootstrap-resamples",
       "10000",
       "--output",
-      "artifacts/paper_final/02_link/paired_chirp_7_8_db.json"
+      "artifacts/paper_final/02_link/chirp_cluster_diagnostic.json"
     ],
     [
       "python",
@@ -46,7 +50,7 @@
       "scripts/02_verify_part_a_link.py",
       "artifacts/paper_final/02_link/dbpsk_ber_lut.csv",
       "--chirp-diagnostic",
-      "artifacts/paper_final/02_link/paired_chirp_7_8_db.json",
+      "artifacts/paper_final/02_link/chirp_cluster_diagnostic.json",
       "--output",
       "artifacts/paper_final/02_link/link_verification.json"
     ]
