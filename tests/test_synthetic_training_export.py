@@ -6,6 +6,11 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from predictive_pc_fmcw.learning.ablation import (
+    CANONICAL_SEEDS,
+    OBJECTIVES,
+    build_training_ablation_plan,
+)
 from predictive_pc_fmcw.synthetic.dataset import DatasetBuildConfig, build_dataset
 from predictive_pc_fmcw.synthetic.training_export import (
     build_synthetic_training_npz,
@@ -70,9 +75,20 @@ def test_validator_rejects_forbidden_scenario(tmp_path: Path) -> None:
     forbidden_id = manifest["split"]["held_out_test"][0]
     with np.load(output, allow_pickle=False) as data:
         payload = {name: data[name] for name in data.files}
-    payload["scenario_id"] = payload["scenario_id"].copy()
-    payload["scenario_id"][0] = forbidden_id
+    scenario_ids = payload["scenario_id"].astype("<U128")
+    scenario_ids[0] = forbidden_id
+    payload["scenario_id"] = scenario_ids
     corrupted = tmp_path / "corrupted.npz"
     np.savez_compressed(corrupted, **payload)
     with pytest.raises(ValueError, match="held-out/OOD contamination"):
         validate_synthetic_training_npz(root, corrupted)
+
+
+def test_publication_ablation_plan_is_exactly_four_by_five(tmp_path: Path) -> None:
+    root = _small_dataset(tmp_path)
+    output = tmp_path / "training.npz"
+    build_synthetic_training_npz(root, output, history_steps=8, horizon_steps=4)
+    plan = build_training_ablation_plan(output, CANONICAL_SEEDS, epochs=2)
+    assert tuple(plan.objectives) == OBJECTIVES
+    assert tuple(plan.seeds) == CANONICAL_SEEDS
+    assert plan.planned_runs == 20
