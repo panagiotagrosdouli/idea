@@ -54,7 +54,8 @@ def test_history_is_derived_from_noisy_causal_observations(tmp_path: Path) -> No
         scenario_id = str(exported["scenario_id"][0])
         end_index = int(exported["sample_history_end_index"][0])
         history = exported["history_xy"][0]
-    with np.load(root / "scenarios" / f"{scenario_id}.npz", allow_pickle=False) as source:
+    scenario_path = root / "scenarios" / f"{scenario_id}.npz"
+    with np.load(scenario_path, allow_pickle=False) as source:
         observed_range = source["observed_range_m"]
         observed_bearing = source["observed_bearing_rad"]
         observed_xy = np.stack(
