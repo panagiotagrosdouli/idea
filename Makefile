@@ -5,7 +5,7 @@
 	canonical-full synthetic-dataset synthetic-dataset-validate \
 	synthetic-training synthetic-training-validate synthetic-baselines \
 	synthetic-link-eval synthetic-ablation-plan synthetic-ablation \
-	synthetic-pipeline
+	synthetic-pipeline synthetic-freeze
 
 install:
 	python -m pip install -e ".[dev]"
@@ -59,6 +59,9 @@ synthetic-ablation:
 synthetic-pipeline:
 	PYTHONPATH=src python scripts/run_synthetic_pipeline_v1.py \
 		--output artifacts/synthetic_dataset_v1
+
+synthetic-freeze:
+	PYTHONPATH=src python scripts/freeze_synthetic_publication_v1.py
 
 benchmark:
 	pcfmcw benchmark --config configs/default.json --output artifacts/synthetic_benchmark
