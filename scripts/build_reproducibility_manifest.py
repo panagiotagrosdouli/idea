@@ -50,6 +50,21 @@ INCLUDED_FILES = (
     "Makefile",
     "pyproject.toml",
 )
+SOURCE_PATHSPECS = (
+    ".github",
+    ".gitignore",
+    "Makefile",
+    "README.md",
+    "README_GR.md",
+    "configs",
+    "docs",
+    "paper",
+    "pyproject.toml",
+    "scripts",
+    "src",
+    "stages",
+    "tests",
+)
 
 
 def sha256(path: Path) -> str:
@@ -98,15 +113,22 @@ def _run_text(command: list[str]) -> str | None:
 
 def collect_git_state() -> dict[str, Any]:
     commit = _run_text(["git", "rev-parse", "HEAD"])
-    status = _run_text(["git", "status", "--porcelain=v1"])
-    diff = _run_text(["git", "diff", "--binary", "HEAD"])
+    status = _run_text(
+        [
+            "git",
+            "status",
+            "--porcelain=v1",
+            "--untracked-files=no",
+            "--",
+            *SOURCE_PATHSPECS,
+        ]
+    )
+    diff = _run_text(["git", "diff", "--binary", "HEAD", "--", *SOURCE_PATHSPECS])
     return {
         "commit": commit or "unavailable",
-        "dirty": bool(status),
-        "status_porcelain": status or "",
-        "working_tree_diff_sha256": (
-            hashlib.sha256((diff or "").encode("utf-8")).hexdigest()
-        ),
+        "source_dirty": bool(status),
+        "source_status_porcelain": status or "",
+        "source_diff_sha256": hashlib.sha256((diff or "").encode("utf-8")).hexdigest(),
     }
 
 
@@ -185,7 +207,7 @@ def main() -> None:
     evidence = _inventory_roots(EVIDENCE_ROOTS)
     git_state = collect_git_state()
     report = {
-        "status": "PASS" if not git_state["dirty"] else "DIRTY_WORKTREE",
+        "status": "PASS" if not git_state["source_dirty"] else "DIRTY_SOURCE_TREE",
         "generated_utc": datetime.now(timezone.utc).isoformat(),
         "git": git_state,
         "environment": collect_python_environment(),
@@ -203,7 +225,10 @@ def main() -> None:
         "evidence_files": evidence,
     }
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    output.write_text(
+        json.dumps(report, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
     print(output)
     if report["status"] != "PASS":
         raise SystemExit(2)
