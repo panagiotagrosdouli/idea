@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 
 @dataclass(frozen=True)
@@ -19,7 +19,9 @@ class SplitManifest:
 
 
 def _digest(payload: dict[str, object]) -> str:
-    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode(
+        "utf-8"
+    )
     return hashlib.sha256(encoded).hexdigest()
 
 
@@ -40,7 +42,9 @@ def build_split_manifest(
     if not (0.0 < train_fraction < 1.0 and 0.0 < development_fraction < 1.0):
         raise ValueError("split fractions must be strictly between zero and one")
     if train_fraction + development_fraction >= 1.0:
-        raise ValueError("train + development fractions must leave held-out test scenarios")
+        raise ValueError(
+            "train + development fractions must leave held-out test scenarios"
+        )
 
     import numpy as np
 
