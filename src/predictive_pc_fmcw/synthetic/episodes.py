@@ -37,7 +37,8 @@ def compose_synthetic_episodes(
     episode, rather than an individual timestep, as the independent unit.
     """
     if split not in {"development", "held_out_test", "ood_test"}:
-        raise ValueError("episode split must be development, held_out_test, or ood_test")
+        message = "episode split must be development, held_out_test, or ood_test"
+        raise ValueError(message)
     if vehicles_per_episode < 2:
         raise ValueError("scheduling episodes require at least two vehicles")
     if history_steps < 2:
@@ -107,5 +108,6 @@ def compose_synthetic_episodes(
 
     used = [member for episode in episodes for member in episode.member_scenario_ids]
     if len(used) != len(set(used)):
-        raise RuntimeError("source scenario reused across independent scheduling episodes")
+        message = "source scenario reused across independent scheduling episodes"
+        raise RuntimeError(message)
     return tuple(episodes)
