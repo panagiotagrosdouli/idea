@@ -16,6 +16,8 @@ class SyntheticMobilityConfig:
     acceleration_mps2: tuple[float, float] = (-4.0, 3.0)
     lateral_speed_mps: tuple[float, float] = (-3.0, 3.0)
     maneuver_duration_s: tuple[float, float] = (2.0, 6.0)
+    minimum_separation_m: float = 2.0
+    close_approach_policy: str = "lateral_translate"
 
 
 @dataclass(frozen=True)
@@ -44,6 +46,41 @@ def _integrate_velocity(velocity: np.ndarray, dt: float, x0: float) -> np.ndarra
         increments = 0.5 * (velocity[:-1] + velocity[1:]) * dt
         displacement[1:] = np.cumsum(increments)
     return x0 + displacement
+
+
+def _enforce_minimum_separation(
+    x: np.ndarray,
+    y: np.ndarray,
+    minimum_separation_m: float,
+) -> tuple[np.ndarray, float]:
+    """Translate a track laterally if its closest approach is too small.
+
+    A single constant translation preserves velocity/acceleration smoothness and
+    represents assignment to a neighboring lateral path rather than clipping a
+    trajectory at the ego position.
+    """
+    if minimum_separation_m <= 0.0:
+        return y, 0.0
+    radius = np.hypot(x, y)
+    if float(np.min(radius)) >= minimum_separation_m:
+        return y, 0.0
+
+    active = np.abs(x) < minimum_separation_m
+    threshold = np.sqrt(
+        np.maximum(minimum_separation_m**2 - x[active] ** 2, 0.0)
+    )
+    active_y = y[active]
+    positive_shift = float(np.max(threshold - active_y))
+    negative_shift = float(np.min(-threshold - active_y))
+    shift = (
+        positive_shift
+        if abs(positive_shift) <= abs(negative_shift)
+        else negative_shift
+    )
+    translated = y + shift
+    if float(np.min(np.hypot(x, translated))) + 1e-9 < minimum_separation_m:
+        raise RuntimeError("minimum-separation translation failed")
+    return translated, shift
 
 
 def _kinematics(x: np.ndarray, y: np.ndarray, dt: float) -> tuple[np.ndarray, ...]:
@@ -75,6 +112,10 @@ def generate_scenario(
         raise ValueError("duration_s and sampling_hz must be positive")
     if cfg.maneuver_duration_s[0] <= 0.0:
         raise ValueError("maneuver duration must be positive")
+    if cfg.minimum_separation_m < 0.0:
+        raise ValueError("minimum_separation_m must be non-negative")
+    if cfg.close_approach_policy != "lateral_translate":
+        raise ValueError("unsupported close_approach_policy")
     rng = np.random.default_rng(seed)
     dt = 1.0 / cfg.sampling_hz
     t = np.arange(0.0, cfg.duration_s + 0.5 * dt, dt)
@@ -142,8 +183,11 @@ def generate_scenario(
     else:
         raise ValueError(f"unsupported synthetic mobility family: {family}")
 
+    y, _ = _enforce_minimum_separation(x, y, cfg.minimum_separation_m)
     values = _kinematics(x, y, dt)
     vx, vy, ax, ay, speed_mps, heading, range_m, radial, bearing = values
+    if float(np.min(range_m)) + 1e-9 < cfg.minimum_separation_m:
+        raise RuntimeError("generated scenario violates minimum separation")
     scenario_id = f"{family}-seed-{seed}"
     return Scenario(
         scenario_id=scenario_id,
