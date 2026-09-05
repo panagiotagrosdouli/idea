@@ -4,9 +4,11 @@ import hashlib
 import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
+from typing import Any
 
 from ..config import LinkConfig
 from ..data.manifest import sha256_file
+from ..persistence import atomic_write_json, validate_completed_file
 from .train import TrainingResult, train_from_npz
 
 OBJECTIVES = (
@@ -28,11 +30,61 @@ class TrainingAblationPlan:
     planned_runs: int
 
 
+@dataclass(frozen=True)
+class ResumeValidation:
+    valid: bool
+    reason: str
+    result: TrainingResult | None
+
+
 def _link_config_sha256(link_config: LinkConfig) -> str:
     payload = json.dumps(
         asdict(link_config), sort_keys=True, separators=(",", ":")
     ).encode("utf-8")
     return hashlib.sha256(payload).hexdigest()
+
+
+def validate_training_resume(
+    result_path: str | Path,
+    *,
+    expected_objective: str,
+    expected_seed: int,
+    expected_dataset_sha256: str,
+    expected_run_dir: str | Path,
+) -> ResumeValidation:
+    source = Path(result_path)
+    if not source.is_file():
+        return ResumeValidation(False, "missing_result", None)
+    try:
+        payload = json.loads(source.read_text(encoding="utf-8"))
+        result = TrainingResult(**payload)
+    except (OSError, ValueError, TypeError, json.JSONDecodeError) as exc:
+        return ResumeValidation(False, f"invalid_result_json:{type(exc).__name__}", None)
+
+    if result.objective != expected_objective:
+        return ResumeValidation(False, "objective_mismatch", None)
+    if result.seed != expected_seed:
+        return ResumeValidation(False, "seed_mismatch", None)
+    if result.dataset_sha256 != expected_dataset_sha256:
+        return ResumeValidation(False, "dataset_hash_mismatch", None)
+
+    run_dir = Path(expected_run_dir).resolve()
+    checkpoint = Path(result.checkpoint)
+    if not checkpoint.is_absolute():
+        checkpoint = (Path.cwd() / checkpoint).resolve()
+    else:
+        checkpoint = checkpoint.resolve()
+    try:
+        checkpoint.relative_to(run_dir)
+    except ValueError:
+        return ResumeValidation(False, "checkpoint_outside_run_dir", None)
+
+    checkpoint_validation = validate_completed_file(checkpoint)
+    if not checkpoint_validation.valid:
+        return ResumeValidation(
+            False, f"checkpoint_{checkpoint_validation.reason}", None
+        )
+    return ResumeValidation(True, "verified_complete", result)
 
 
 def build_training_ablation_plan(
@@ -60,6 +112,34 @@ def build_training_ablation_plan(
     )
 
 
+def _write_execution_state(
+    destination: Path,
+    plan: TrainingAblationPlan,
+    runs: list[dict[str, Any]],
+) -> None:
+    statuses = [str(item["status"]) for item in runs]
+    state = {
+        "schema": "stage4_execution_state_v1",
+        "operational_only": True,
+        "scientific_completion_gate": "completion_manifest.json",
+        "stage": "stage4",
+        "status": (
+            "completed"
+            if len(runs) == plan.planned_runs and all(status == "completed" for status in statuses)
+            else "in_progress"
+        ),
+        "planned_runs": plan.planned_runs,
+        "completed_runs": sum(status == "completed" for status in statuses),
+        "pending_runs": plan.planned_runs - len(runs),
+        "invalid_runs": sum(status == "invalid" for status in statuses),
+        "rerun_required_runs": sum(status == "rerun_required" for status in statuses),
+        "dataset": plan.dataset,
+        "dataset_sha256": plan.dataset_sha256,
+        "runs": runs,
+    }
+    atomic_write_json(destination / "execution_state.json", state)
+
+
 def run_training_ablation(
     dataset_path: str | Path,
     output_dir: str | Path,
@@ -74,18 +154,38 @@ def run_training_ablation(
     plan = build_training_ablation_plan(dataset_path, seeds, epochs)
     destination = Path(output_dir)
     destination.mkdir(parents=True, exist_ok=True)
-    (destination / "ablation_plan.json").write_text(
-        json.dumps(asdict(plan), indent=2), encoding="utf-8"
-    )
+    atomic_write_json(destination / "ablation_plan.json", asdict(plan))
+
     results: list[TrainingResult] = []
+    run_states: list[dict[str, Any]] = []
+    _write_execution_state(destination, plan, run_states)
+
     for objective in OBJECTIVES:
         for seed in seeds:
             run_dir = destination / objective / f"seed_{seed}"
             completed_result = run_dir / "training_result.json"
-            if completed_result.is_file():
-                payload = json.loads(completed_result.read_text(encoding="utf-8"))
-                result = TrainingResult(**payload)
+            validation = validate_training_resume(
+                completed_result,
+                expected_objective=objective,
+                expected_seed=seed,
+                expected_dataset_sha256=plan.dataset_sha256,
+                expected_run_dir=run_dir,
+            )
+            if validation.valid and validation.result is not None:
+                result = validation.result
+                reason = validation.reason
             else:
+                run_states.append(
+                    {
+                        "objective": objective,
+                        "seed": seed,
+                        "status": "rerun_required",
+                        "result_path": str(completed_result),
+                        "checkpoint": None,
+                        "validation_reason": validation.reason,
+                    }
+                )
+                _write_execution_state(destination, plan, run_states)
                 result = train_from_npz(
                     dataset_path,
                     run_dir,
@@ -97,14 +197,52 @@ def run_training_ablation(
                     link_config=link_config,
                     seed=seed,
                 )
+                post_validation = validate_training_resume(
+                    completed_result,
+                    expected_objective=objective,
+                    expected_seed=seed,
+                    expected_dataset_sha256=plan.dataset_sha256,
+                    expected_run_dir=run_dir,
+                )
+                if not post_validation.valid or post_validation.result is None:
+                    run_states[-1].update(
+                        {
+                            "status": "invalid",
+                            "checkpoint": result.checkpoint,
+                            "validation_reason": post_validation.reason,
+                        }
+                    )
+                    _write_execution_state(destination, plan, run_states)
+                    raise RuntimeError(
+                        f"Stage 4 run {objective} seed {seed} failed completion validation: "
+                        f"{post_validation.reason}"
+                    )
+                run_states.pop()
+                result = post_validation.result
+                reason = f"rerun_after:{validation.reason}"
+
             results.append(result)
-            (destination / "ablation_results.json").write_text(
-                json.dumps([asdict(item) for item in results], indent=2),
-                encoding="utf-8",
+            run_states.append(
+                {
+                    "objective": objective,
+                    "seed": seed,
+                    "status": "completed",
+                    "result_path": str(completed_result),
+                    "checkpoint": result.checkpoint,
+                    "validation_reason": reason,
+                }
             )
+            atomic_write_json(
+                destination / "ablation_results.json",
+                [asdict(item) for item in results],
+            )
+            _write_execution_state(destination, plan, run_states)
+
     expected = len(OBJECTIVES) * len(seeds)
     checkpoints = [Path(result.checkpoint) for result in results]
-    if len(results) == expected and all(path.is_file() for path in checkpoints):
+    if len(results) == expected and all(
+        validate_completed_file(path).valid for path in checkpoints
+    ):
         completion = {
             "complete": True,
             "completed_runs": len(results),
@@ -120,7 +258,5 @@ def run_training_ablation(
             "lambda_outage": lambda_outage,
             "checkpoints": [str(path) for path in checkpoints],
         }
-        (destination / "completion_manifest.json").write_text(
-            json.dumps(completion, indent=2) + "\n", encoding="utf-8"
-        )
+        atomic_write_json(destination / "completion_manifest.json", completion)
     return results
