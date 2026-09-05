@@ -31,7 +31,9 @@ def verify_publication_training_freeze(
     if not manifest_path.is_file() or not training.is_file():
         raise FileNotFoundError("dataset manifest and training NPZ are required")
     if not completion_path.is_file():
-        raise PermissionError("20-run completion manifest is required before test freeze")
+        raise PermissionError(
+            "20-run completion manifest is required before test freeze"
+        )
 
     dataset_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     completion = json.loads(completion_path.read_text(encoding="utf-8"))
