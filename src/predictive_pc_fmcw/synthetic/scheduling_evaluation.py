@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 import json
-from dataclasses import replace
+from dataclasses import asdict, replace
 from pathlib import Path
 
 import numpy as np
 
-from ..config import ExperimentConfig, SensingConfig
+from ..config import ExperimentConfig, LinkConfig, SensingConfig
 from ..data.manifest import sha256_file
 from ..learning.ablation import CANONICAL_SEEDS, validate_training_resume
 from ..learning.inference import TorchCheckpointPredictor
@@ -114,15 +114,21 @@ def run_synthetic_scheduling_evaluation(
     output_path: str | Path,
     vehicles_per_episode: int = 5,
     history_steps: int = 20,
+    sensing_override: SensingConfig | None = None,
+    forecast_link_config: LinkConfig | None = None,
+    condition_label: str = "nominal",
 ) -> dict[str, object]:
     """Run the exact 8-family x 5-seed paired scheduling protocol.
 
     Held-out and OOD scheduling are inaccessible until all 20 training runs
     pass the publication freeze and the learned checkpoints were selected using
-    development data only.
+    development data only. Optional sensing/forecast-link overrides affect only
+    the deployable observation/forecast side; the actual link remains config.link.
     """
     if split not in {"held_out_test", "ood_test"}:
         raise ValueError("official scheduling split must be held_out_test or ood_test")
+    if not condition_label.strip():
+        raise ValueError("condition_label must be non-empty")
     destination = Path(output_path)
     if destination.exists():
         raise FileExistsError(f"refusing to overwrite official artifact: {destination}")
@@ -145,7 +151,8 @@ def run_synthetic_scheduling_evaluation(
         history_steps=history_steps,
     )
     plan = build_scheduling_plan(episode_count=len(episodes))
-    sensing = _sensing_from_dataset_manifest(manifest)
+    sensing = sensing_override or _sensing_from_dataset_manifest(manifest)
+    forecast_link = forecast_link_config or config.link
     rows: list[dict[str, object]] = []
 
     for episode in episodes:
@@ -182,6 +189,7 @@ def run_synthetic_scheduling_evaluation(
                     config=current_config,
                     seed=effective_seed,
                     learned_predictor=learned_predictor,
+                    forecast_link_config=forecast_link,
                 )
                 row = output.metrics.to_dict()
                 row.update(
@@ -197,6 +205,7 @@ def run_synthetic_scheduling_evaluation(
                             np.quantile(output.queue_packets, 0.95)
                         ),
                         "retransmission_attempts": int(output.metrics.failed_attempts),
+                        "condition_label": condition_label,
                     }
                 )
                 rows.append(row)
@@ -208,10 +217,14 @@ def run_synthetic_scheduling_evaluation(
         "status": "COMPLETED",
         "protocol": "synthetic_dataset_v1_stage6",
         "split": split,
+        "condition_label": condition_label,
         "plan": plan,
         "freeze": freeze,
         "dataset_manifest_sha256": sha256_file(manifest_path),
         "selection_manifest_sha256": sha256_file(selection_manifest),
+        "actual_link_config": asdict(config.link),
+        "forecast_link_config": asdict(forecast_link),
+        "sensing_config": asdict(sensing),
         "rows": rows,
         "scientific_guards": {
             "paired_traffic_trace_within_episode_seed": True,
@@ -219,6 +232,7 @@ def run_synthetic_scheduling_evaluation(
             "oracle_evaluation_only": True,
             "development_only_checkpoint_selection": True,
             "source_tracks_disjoint_across_episodes": True,
+            "actual_channel_separate_from_forecast_channel": True,
         },
         "known_limitation": (
             "radial-velocity observations are generated and retained by the dataset, "
