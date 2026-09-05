@@ -1,7 +1,10 @@
 import numpy as np
 import pytest
 
-from predictive_pc_fmcw.synthetic.mobility import SyntheticMobilityConfig, generate_scenario
+from predictive_pc_fmcw.synthetic.mobility import (
+    SyntheticMobilityConfig,
+    generate_scenario,
+)
 
 
 FAMILIES = (
