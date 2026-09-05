@@ -3,7 +3,8 @@
 	corrected-full paper-draft reproducibility reproduce split-audit stages stage \
 	stage2-diagnostic womd-preflight canonical-preflight canonical-stage1 \
 	canonical-full synthetic-dataset synthetic-dataset-validate \
-	synthetic-training synthetic-training-validate synthetic-baselines
+	synthetic-training synthetic-training-validate synthetic-baselines \
+	synthetic-ablation-plan synthetic-ablation
 
 install:
 	python -m pip install -e ".[dev]"
@@ -39,6 +40,15 @@ synthetic-baselines:
 	PYTHONPATH=src python scripts/evaluate_synthetic_baselines_v1.py \
 		--dataset artifacts/synthetic_dataset_v1 --split development \
 		--output artifacts/synthetic_dataset_v1/development_baselines.json
+
+synthetic-ablation-plan:
+	PYTHONPATH=src python scripts/train_synthetic_ablation_v1.py \
+		--dataset artifacts/synthetic_dataset_v1/training_dev.npz --plan-only
+
+synthetic-ablation:
+	PYTHONPATH=src python scripts/train_synthetic_ablation_v1.py \
+		--dataset artifacts/synthetic_dataset_v1/training_dev.npz \
+		--output artifacts/synthetic_dataset_v1/learned_ablation
 
 benchmark:
 	pcfmcw benchmark --config configs/default.json --output artifacts/synthetic_benchmark
