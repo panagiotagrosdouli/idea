@@ -4,12 +4,13 @@
 
 **NOT PAPER READY**
 
-This repository now contains the dataset-free simulation protocol and execution infrastructure, but publication readiness requires quantitative completion of the frozen experiments. Code existence or CI success is not scientific evidence.
+This repository contains the dataset-free simulation protocol and execution infrastructure, but publication readiness requires quantitative completion of the frozen experiments. Code existence or CI success is not scientific evidence.
 
 ## Completed infrastructure
 
 - Deterministic, seeded synthetic mobility generator with 11 scenario families.
 - Scenario-level train/development/held-out/OOD partitions with zero-overlap validation.
+- Explicit harder-than-training OOD mobility regime validation.
 - Causal noisy range/radial-velocity/bearing observation model.
 - Ground-truth x/y, velocity, acceleration, speed, heading, range, radial velocity, and bearing.
 - Frozen link-model mapping to SNR, BER, PER, outage, goodput, and link lifetime.
@@ -19,6 +20,8 @@ This repository now contains the dataset-free simulation protocol and execution 
 - Leakage-safe train/development export for learned models.
 - Frozen learned-objective plan: 4 objectives × 5 seeds = 20 runs.
 - Resume/checkpoint validation and a fail-closed publication freeze gate.
+- Freeze-gated held-out and OOD window exporters; neither can materialize before all 20 checkpoints verify.
+- Official exports refuse silent overwrite and retain freeze provenance hashes.
 
 ## Experiments not yet completed
 
@@ -51,9 +54,11 @@ The study is a controlled synthetic simulation. It is not real-world deployment 
 make synthetic-pipeline
 make synthetic-ablation
 make synthetic-freeze
+make synthetic-heldout
+make synthetic-ood
 ```
 
-The first command prepares and validates the synthetic protocol and development artifacts. The second performs the frozen 20-run learned ablation and may require an ML-capable machine/GPU. The third refuses to open publication evaluation unless all 20 objective/seed checkpoints validate against the frozen training artifact.
+`synthetic-pipeline` prepares and validates the synthetic protocol plus development artifacts. `synthetic-ablation` performs the frozen 20-run learned ablation and requires an ML-capable environment. `synthetic-freeze` refuses publication evaluation unless all 20 objective/seed checkpoints validate against the frozen training artifact. Only after that gate passes can `synthetic-heldout` and `synthetic-ood` materialize official evaluation windows.
 
 ## Completion rule
 
