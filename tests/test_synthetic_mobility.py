@@ -2,10 +2,9 @@ import numpy as np
 import pytest
 
 from predictive_pc_fmcw.synthetic.mobility import (
-    generate_scenario,
     SyntheticMobilityConfig,
+    generate_scenario,
 )
-
 
 FAMILIES = (
     "constant_velocity",
