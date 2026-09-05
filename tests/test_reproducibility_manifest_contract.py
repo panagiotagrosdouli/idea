@@ -8,7 +8,10 @@ SCRIPT = ROOT / "scripts" / "build_reproducibility_manifest.py"
 
 
 def load_manifest_module():
-    spec = importlib.util.spec_from_file_location("build_reproducibility_manifest", SCRIPT)
+    spec = importlib.util.spec_from_file_location(
+        "build_reproducibility_manifest",
+        SCRIPT,
+    )
     assert spec is not None
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
