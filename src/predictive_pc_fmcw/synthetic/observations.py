@@ -25,7 +25,7 @@ class CausalObservations:
     radial_velocity_mps: np.ndarray
     bearing_rad: np.ndarray
 
-    def history_through(self, index: int) -> "CausalObservations":
+    def history_through(self, index: int) -> CausalObservations:
         """Return only measurements available at or before ``index``."""
         if index < 0 or index >= self.t_s.size:
             raise IndexError("observation history index out of bounds")
@@ -55,7 +55,11 @@ def observe_scenario(
     if min(cfg.range_std_m, cfg.radial_velocity_std_mps, cfg.bearing_std_rad) < 0.0:
         raise ValueError("observation standard deviations must be non-negative")
     rng = np.random.default_rng(seed)
-    measured_range = scenario.range_m + rng.normal(0.0, cfg.range_std_m, scenario.t_s.size)
+    measured_range = scenario.range_m + rng.normal(
+        0.0,
+        cfg.range_std_m,
+        scenario.t_s.size,
+    )
     measured_range = np.maximum(measured_range, 0.0)
     measured_radial = scenario.radial_velocity_mps + rng.normal(
         0.0, cfg.radial_velocity_std_mps, scenario.t_s.size
@@ -63,7 +67,10 @@ def observe_scenario(
     measured_bearing = scenario.bearing_rad + rng.normal(
         0.0, cfg.bearing_std_rad, scenario.t_s.size
     )
-    measured_bearing = np.arctan2(np.sin(measured_bearing), np.cos(measured_bearing))
+    measured_bearing = np.arctan2(
+        np.sin(measured_bearing),
+        np.cos(measured_bearing),
+    )
     return CausalObservations(
         scenario_id=scenario.scenario_id,
         seed=seed,
