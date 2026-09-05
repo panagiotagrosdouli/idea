@@ -16,6 +16,7 @@ def main() -> None:
     parser.add_argument("--train-npz", required=True)
     parser.add_argument("--validation-npz", required=True)
     parser.add_argument("--validation-glob")
+    parser.add_argument("--full", action="store_true")
     parser.add_argument("--require-gpu", action="store_true")
     parser.add_argument("--min-free-gb", type=float, default=0.0)
     parser.add_argument(
@@ -30,6 +31,7 @@ def main() -> None:
         train_npz=args.train_npz,
         validation_npz=args.validation_npz,
         validation_glob=args.validation_glob,
+        full=args.full,
         require_gpu=args.require_gpu,
         min_free_gb=args.min_free_gb,
     )
