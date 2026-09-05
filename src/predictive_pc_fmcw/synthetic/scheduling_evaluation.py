@@ -192,6 +192,11 @@ def run_synthetic_scheduling_evaluation(
                         "traffic_seed": traffic_seed,
                         "effective_traffic_seed": effective_seed,
                         "member_scenario_ids": list(episode.member_scenario_ids),
+                        "mean_queue_packets": float(output.queue_packets.mean()),
+                        "p95_queue_packets": float(
+                            np.quantile(output.queue_packets, 0.95)
+                        ),
+                        "retransmission_attempts": int(output.metrics.failed_attempts),
                     }
                 )
                 rows.append(row)
