@@ -6,6 +6,7 @@ from .baselines import (
     save_baseline_results,
 )
 from .dataset import DatasetBuildConfig, build_dataset, validate_dataset
+from .freeze import verify_publication_training_freeze
 from .link_evaluation import (
     LinkPredictionMetrics,
     evaluate_synthetic_link_prediction,
@@ -40,4 +41,5 @@ __all__ = [
     "validate_dataset",
     "validate_split_manifest",
     "validate_synthetic_training_npz",
+    "verify_publication_training_freeze",
 ]
