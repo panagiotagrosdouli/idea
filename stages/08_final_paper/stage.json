@@ -34,9 +34,15 @@
     "scenario-level link-fidelity and scheduler-utility evidence exists",
     "claims follow versioned evidence",
     "model-based optical-channel limitation disclosed",
-    "clean reproduction manifest recorded"
+    "clean reproduction manifest is generated and semantically verified"
   ],
   "commands": [
+    [
+      "python",
+      "scripts/build_reproducibility_manifest.py",
+      "--output",
+      "artifacts/paper_final/08_release/reproducibility_manifest.json"
+    ],
     [
       "python",
       "scripts/08_verify_release_readiness.py",
@@ -57,14 +63,9 @@
       "artifacts/paper_final/07_analysis/statistics/ade_vs_scheduler_utility.csv",
       "artifacts/paper_final/07_analysis/statistics/ade_vs_scheduler_utility_by_scenario.csv",
       "artifacts/paper_final/07_analysis/statistics/ade_vs_realized_goodput.pdf",
+      "artifacts/paper_final/08_release/reproducibility_manifest.json",
       "--output",
       "artifacts/paper_final/08_release/release_readiness.json"
-    ],
-    [
-      "python",
-      "scripts/build_reproducibility_manifest.py",
-      "--output",
-      "artifacts/paper_final/08_release/reproducibility_manifest.json"
     ],
     [
       "python",

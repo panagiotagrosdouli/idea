@@ -38,6 +38,7 @@ class ReleaseReadinessSemanticsTest(unittest.TestCase):
             scheduling = root / "evaluation_manifest.json"
             learned = root / "learned_heldout_analysis.json"
             utility = root / "scheduler_utility_summary.json"
+            reproducibility = root / "reproducibility_manifest.json"
             scenario_csv = root / "heldout_link_fidelity_by_scenario.csv"
 
             write_json(
@@ -103,6 +104,24 @@ class ReleaseReadinessSemanticsTest(unittest.TestCase):
                     },
                 },
             )
+            write_json(
+                reproducibility,
+                {
+                    "status": "PASS",
+                    "git": {
+                        "commit": "1234567890abcdef",
+                        "source_dirty": False,
+                    },
+                    "environment": {
+                        "python": "3.11.0",
+                        "pip_freeze": ["numpy==2.0.0"],
+                    },
+                    "source_file_count": 1,
+                    "source_files": [{"path": "src/a.py", "sha256": "abc"}],
+                    "evidence_file_count": 1,
+                    "evidence_files": [{"path": "evidence.json", "sha256": "def"}],
+                },
+            )
             scenario_csv.write_text("scenario_id,ade_m\ns1,1.0\n", encoding="utf-8")
 
             evidence = [
@@ -114,6 +133,7 @@ class ReleaseReadinessSemanticsTest(unittest.TestCase):
                 scheduling,
                 learned,
                 utility,
+                reproducibility,
                 scenario_csv,
             ]
             passed = verify_release_readiness(manuscript, evidence)
@@ -129,6 +149,39 @@ class ReleaseReadinessSemanticsTest(unittest.TestCase):
                     {
                         "path": str(corpus),
                         "reason": "corpus_verification.json status is not PASS",
+                    }
+                ],
+            )
+
+    def test_dirty_reproducibility_manifest_blocks_release(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            manuscript = root / "paper.md"
+            manifest = root / "reproducibility_manifest.json"
+            manuscript.write_text("Canonical manuscript.", encoding="utf-8")
+            write_json(
+                manifest,
+                {
+                    "status": "DIRTY_SOURCE_TREE",
+                    "git": {"commit": "1234567890abcdef", "source_dirty": True},
+                    "environment": {"python": "3.11.0", "pip_freeze": []},
+                    "source_file_count": 1,
+                    "source_files": [{"path": "src/a.py"}],
+                    "evidence_file_count": 1,
+                    "evidence_files": [{"path": "evidence.json"}],
+                },
+            )
+
+            blocked = verify_release_readiness(manuscript, [manifest])
+            self.assertEqual(blocked["status"], "BLOCKED")
+            self.assertEqual(
+                blocked["invalid_evidence"],
+                [
+                    {
+                        "path": str(manifest),
+                        "reason": (
+                            "reproducibility manifest is not clean canonical evidence"
+                        ),
                     }
                 ],
             )

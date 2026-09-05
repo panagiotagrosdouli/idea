@@ -49,6 +49,8 @@ INCLUDED_FILES = (
     "README_GR.md",
     "Makefile",
     "pyproject.toml",
+    "requirements.txt",
+    "requirements.lock",
 )
 SOURCE_PATHSPECS = (
     ".github",
@@ -60,6 +62,8 @@ SOURCE_PATHSPECS = (
     "docs",
     "paper",
     "pyproject.toml",
+    "requirements.txt",
+    "requirements.lock",
     "scripts",
     "src",
     "stages",
