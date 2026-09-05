@@ -52,7 +52,7 @@ def build_synthetic_training_npz(
     futures: list[np.ndarray] = []
     scenario_ids: list[str] = []
     splits: list[str] = []
-    future_headings: list[np.ndarray] = []
+    future_ego_headings: list[np.ndarray] = []
     sample_end_indices: list[int] = []
     source_hashes: dict[str, str] = {}
 
@@ -77,14 +77,6 @@ def build_synthetic_training_npz(
                 ),
                 axis=-1,
             )
-            velocity = np.stack(
-                (
-                    np.asarray(data["vx_mps"], dtype=np.float64),
-                    np.asarray(data["vy_mps"], dtype=np.float64),
-                ),
-                axis=-1,
-            )
-            heading = np.arctan2(velocity[:, 1], velocity[:, 0])
             first_end = history_steps - 1
             last_end = truth.shape[0] - horizon_steps - 1
             for end_index in range(first_end, last_end + 1, stride):
@@ -93,7 +85,9 @@ def build_synthetic_training_npz(
                 future_stop = future_start + horizon_steps
                 histories.append(observed[history_start : end_index + 1])
                 futures.append(truth[future_start:future_stop])
-                future_headings.append(heading[future_start:future_stop])
+                future_ego_headings.append(
+                    np.zeros(horizon_steps, dtype=np.float64)
+                )
                 scenario_ids.append(scenario_id)
                 splits.append(split_name)
                 sample_end_indices.append(end_index)
@@ -116,7 +110,7 @@ def build_synthetic_training_npz(
         future_xy=np.stack(futures).astype(np.float32),
         scenario_id=np.asarray(scenario_ids),
         actor_id=np.asarray(["synthetic_target"] * len(scenario_ids)),
-        future_ego_heading_rad=np.stack(future_headings).astype(np.float32),
+        future_ego_heading_rad=np.stack(future_ego_headings).astype(np.float32),
         split=split_array,
         sample_history_end_index=np.asarray(sample_end_indices, dtype=np.int64),
         source=np.asarray("synthetic_dataset_v1_causal_noisy_observations"),
@@ -146,6 +140,7 @@ def validate_synthetic_training_npz(
         splits = np.asarray(data["split"]).astype(str)
         history = np.asarray(data["history_xy"])
         future = np.asarray(data["future_xy"])
+        future_ego_heading = np.asarray(data["future_ego_heading_rad"])
         if set(scenario_ids) & forbidden:
             raise ValueError("held-out/OOD contamination in synthetic training NPZ")
         if set(np.unique(splits)) != {"training", "development"}:
@@ -156,6 +151,10 @@ def validate_synthetic_training_npz(
             raise ValueError("history_xy/future_xy must be rank-3 arrays")
         if history.shape[0] != future.shape[0] or history.shape[-1] != 2:
             raise ValueError("synthetic training sample arrays are misaligned")
+        if future_ego_heading.shape != future.shape[:2]:
+            raise ValueError("future ego heading must align with future trajectory")
+        if not np.allclose(future_ego_heading, 0.0):
+            raise ValueError("ego-fixed synthetic frame requires zero ego heading")
         if not np.all(np.isfinite(history)) or not np.all(np.isfinite(future)):
             raise ValueError("synthetic training NPZ contains non-finite values")
         return {
