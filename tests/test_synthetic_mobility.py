@@ -32,6 +32,8 @@ def test_all_families_are_finite_and_well_shaped(family: str) -> None:
         scenario.vy_mps,
         scenario.ax_mps2,
         scenario.ay_mps2,
+        scenario.speed_mps,
+        scenario.heading_rad,
         scenario.range_m,
         scenario.radial_velocity_mps,
         scenario.bearing_rad,
@@ -39,6 +41,7 @@ def test_all_families_are_finite_and_well_shaped(family: str) -> None:
     assert len({array.shape for array in arrays}) == 1
     assert all(np.all(np.isfinite(array)) for array in arrays)
     assert np.all(scenario.range_m >= 0.0)
+    assert np.all(scenario.speed_mps >= 0.0)
 
 
 def test_generation_is_deterministic_for_seed() -> None:
@@ -70,3 +73,23 @@ def test_sampling_contract() -> None:
     scenario = generate_scenario("constant_velocity", seed=9, config=cfg)
     assert scenario.t_s.size == 11
     np.testing.assert_allclose(np.diff(scenario.t_s), 0.2)
+
+
+@pytest.mark.parametrize("family", ("stop_and_go", "accelerate_then_brake"))
+def test_integrated_maneuvers_preserve_initial_position(family: str) -> None:
+    scenario = generate_scenario(family, seed=123)
+    rng = np.random.default_rng(123)
+    expected_x0 = rng.uniform(30.0, 180.0)
+    assert scenario.x_m[0] == pytest.approx(expected_x0)
+
+
+def test_speed_and_heading_match_velocity_components() -> None:
+    scenario = generate_scenario("curved", seed=55)
+    np.testing.assert_allclose(
+        scenario.speed_mps,
+        np.hypot(scenario.vx_mps, scenario.vy_mps),
+    )
+    np.testing.assert_allclose(
+        np.sin(scenario.heading_rad),
+        np.sin(np.arctan2(scenario.vy_mps, scenario.vx_mps)),
+    )
