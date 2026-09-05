@@ -107,6 +107,8 @@ def _write_scenario(
         vy_mps=scenario.vy_mps,
         ax_mps2=scenario.ax_mps2,
         ay_mps2=scenario.ay_mps2,
+        speed_mps=scenario.speed_mps,
+        heading_rad=scenario.heading_rad,
         range_m=scenario.range_m,
         radial_velocity_mps=scenario.radial_velocity_mps,
         bearing_rad=scenario.bearing_rad,
@@ -235,9 +237,18 @@ def validate_dataset(output_dir: str | Path) -> dict[str, object]:
                 "t_s",
                 "x_m",
                 "y_m",
+                "vx_mps",
+                "vy_mps",
+                "ax_mps2",
+                "ay_mps2",
+                "speed_mps",
+                "heading_rad",
                 "range_m",
+                "radial_velocity_mps",
                 "bearing_rad",
                 "observed_range_m",
+                "observed_radial_velocity_mps",
+                "observed_bearing_rad",
                 "snr_db",
                 "ber",
                 "per",
@@ -249,19 +260,11 @@ def validate_dataset(output_dir: str | Path) -> dict[str, object]:
             if not required.issubset(data.files):
                 raise ValueError(f"scenario schema incomplete: {scenario_id}")
             length = data["t_s"].size
-            aligned = (
-                "x_m",
-                "y_m",
-                "range_m",
-                "bearing_rad",
-                "snr_db",
-                "ber",
-                "per",
-                "outage",
-            )
+            aligned = tuple(required - {"link_lifetime_s", "packet_deadlines_json"})
             if any(data[name].size != length for name in aligned):
                 raise ValueError(f"scenario arrays misaligned: {scenario_id}")
-            if any(not np.all(np.isfinite(data[name])) for name in aligned[:-1]):
+            numeric = tuple(name for name in aligned if name != "outage")
+            if any(not np.all(np.isfinite(data[name])) for name in numeric):
                 raise ValueError(f"non-finite scenario values: {scenario_id}")
             json.loads(str(data["packet_deadlines_json"]))
     return {
