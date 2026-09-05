@@ -46,7 +46,9 @@ class DatasetBuildConfig:
     observations: ObservationNoiseConfig = ObservationNoiseConfig()
 
 
-def _scenario_seed(master_seed: int, family_index: int, replicate: int, ood: bool) -> int:
+def _scenario_seed(
+    master_seed: int, family_index: int, replicate: int, ood: bool
+) -> int:
     return master_seed + (1_000_000 if ood else 0) + 10_000 * family_index + replicate
 
 
@@ -69,11 +71,14 @@ def _write_scenario(
     seed: int,
     mobility: SyntheticMobilityConfig,
     observation_seed: int,
+    observation_config: ObservationNoiseConfig,
     link_model: LinkModel,
     traffic_config: TrafficConfig,
 ) -> tuple[str, str]:
     scenario = generate_scenario(family, seed=seed, config=mobility)
-    observations = observe_scenario(scenario, seed=observation_seed)
+    observations = observe_scenario(
+        scenario, seed=observation_seed, config=observation_config
+    )
     link = link_model.evaluate_arrays(scenario.range_m, scenario.bearing_rad)
     dt_s = 1.0 / mobility.sampling_hz
     nominal_capacity = link_model.capacity_packets(dt_s)
@@ -84,6 +89,10 @@ def _write_scenario(
         nominal_capacity_packets=nominal_capacity,
         config=traffic_config,
         slot_duration_s=dt_s,
+    )
+    deadline_json = json.dumps(
+        [[int(value) for value in row[0]] for row in traffic.deadlines],
+        separators=(",", ":"),
     )
     path = output / f"{scenario.scenario_id}.npz"
     np.savez_compressed(
@@ -111,9 +120,7 @@ def _write_scenario(
         outage=link["outage"].astype(np.uint8),
         link_lifetime_s=np.asarray(_link_lifetime_seconds(link["outage"], dt_s)),
         packet_arrivals=traffic.arrivals[:, 0],
-        packet_deadlines=np.asarray(
-            [tuple(row[0]) for row in traffic.deadlines], dtype=object
-        ),
+        packet_deadlines_json=np.asarray(deadline_json),
     )
     return scenario.scenario_id, _fingerprint_file(path)
 
@@ -141,16 +148,28 @@ def build_dataset(
         for replicate in range(cfg.scenarios_per_family):
             seed = _scenario_seed(cfg.master_seed, family_index, replicate, False)
             scenario_id, sha = _write_scenario(
-                scenario_dir, family, seed, cfg.mobility, seed + 500_000,
-                link_model, traffic_cfg,
+                scenario_dir,
+                family,
+                seed,
+                cfg.mobility,
+                seed + 500_000,
+                cfg.observations,
+                link_model,
+                traffic_cfg,
             )
             in_ids.append(scenario_id)
             hashes[scenario_id] = sha
         for replicate in range(cfg.ood_scenarios_per_family):
             seed = _scenario_seed(cfg.master_seed, family_index, replicate, True)
             scenario_id, sha = _write_scenario(
-                scenario_dir, family, seed, cfg.ood_mobility, seed + 500_000,
-                link_model, traffic_cfg,
+                scenario_dir,
+                family,
+                seed,
+                cfg.ood_mobility,
+                seed + 500_000,
+                cfg.observations,
+                link_model,
+                traffic_cfg,
             )
             ood_ids.append(scenario_id)
             hashes[scenario_id] = sha
@@ -164,6 +183,9 @@ def build_dataset(
         "ood_count": len(ood_ids),
         "split": asdict(split),
         "scenario_sha256": dict(sorted(hashes.items())),
+        "mobility_config": asdict(cfg.mobility),
+        "ood_mobility_config": asdict(cfg.ood_mobility),
+        "observation_config": asdict(cfg.observations),
         "link_config": asdict(link_cfg),
         "traffic_config": asdict(traffic_cfg),
         "scientific_guards": {
@@ -174,7 +196,9 @@ def build_dataset(
         },
     }
     manifest_path = output / "manifest.json"
-    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
     manifest["manifest_sha256"] = _fingerprint_file(manifest_path)
     return manifest
 
@@ -183,7 +207,7 @@ def validate_dataset(output_dir: str | Path) -> dict[str, object]:
     """Verify split integrity and every materialized scenario fingerprint."""
     output = Path(output_dir)
     manifest_path = output / "manifest.json"
-    raw = json.loads(manifest_path.read_text())
+    raw = json.loads(manifest_path.read_text(encoding="utf-8"))
     split_raw = raw["split"]
     split = SplitManifest(
         master_seed=int(split_raw["master_seed"]),
@@ -195,7 +219,9 @@ def validate_dataset(output_dir: str | Path) -> dict[str, object]:
     )
     validate_split_manifest(split)
     hashes = raw["scenario_sha256"]
-    expected_ids = set(split.train + split.development + split.held_out_test + split.ood_test)
+    expected_ids = set(
+        split.train + split.development + split.held_out_test + split.ood_test
+    )
     if expected_ids != set(hashes):
         raise ValueError("manifest scenario IDs do not match split IDs")
     for scenario_id, expected in hashes.items():
@@ -204,20 +230,40 @@ def validate_dataset(output_dir: str | Path) -> dict[str, object]:
             raise FileNotFoundError(f"missing synthetic scenario: {scenario_id}")
         if _fingerprint_file(path) != expected:
             raise ValueError(f"scenario fingerprint mismatch: {scenario_id}")
-        with np.load(path, allow_pickle=True) as data:
+        with np.load(path, allow_pickle=False) as data:
             required = {
-                "t_s", "x_m", "y_m", "range_m", "bearing_rad",
-                "observed_range_m", "snr_db", "ber", "per", "outage",
-                "link_lifetime_s", "packet_arrivals", "packet_deadlines",
+                "t_s",
+                "x_m",
+                "y_m",
+                "range_m",
+                "bearing_rad",
+                "observed_range_m",
+                "snr_db",
+                "ber",
+                "per",
+                "outage",
+                "link_lifetime_s",
+                "packet_arrivals",
+                "packet_deadlines_json",
             }
             if not required.issubset(data.files):
                 raise ValueError(f"scenario schema incomplete: {scenario_id}")
             length = data["t_s"].size
-            aligned = ("x_m", "y_m", "range_m", "bearing_rad", "snr_db", "ber", "per", "outage")
+            aligned = (
+                "x_m",
+                "y_m",
+                "range_m",
+                "bearing_rad",
+                "snr_db",
+                "ber",
+                "per",
+                "outage",
+            )
             if any(data[name].size != length for name in aligned):
                 raise ValueError(f"scenario arrays misaligned: {scenario_id}")
             if any(not np.all(np.isfinite(data[name])) for name in aligned[:-1]):
                 raise ValueError(f"non-finite scenario values: {scenario_id}")
+            json.loads(str(data["packet_deadlines_json"]))
     return {
         "status": "PASS",
         "protocol": raw["protocol"],
