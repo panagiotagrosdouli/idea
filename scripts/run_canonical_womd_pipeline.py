@@ -257,13 +257,18 @@ def downstream(
         )
     completion = learned / "completion_manifest.json"
     require_file(completion, "Stage-4 completion manifest")
+    stage4_artifacts = [
+        str(selection),
+        str(completion),
+        str(learned / "execution_state.json"),
+    ]
     _set_stage(
         root,
         state,
         "stage4",
         "completed",
         reason=f"20_verified_checkpoints;lambda_selection={selection_reason}",
-        artifacts=[str(selection), str(completion), str(learned / "execution_state.json")],
+        artifacts=stage4_artifacts,
     )
 
     heldout = root / "artifacts/paper_final/05_heldout"
@@ -295,9 +300,7 @@ def downstream(
 
     tfrecords = [Path(path) for path in sorted(glob.glob(validation_glob))]
     if not tfrecords:
-        raise FileNotFoundError(
-            f"No validation TFRecords matched: {validation_glob}"
-        )
+        raise FileNotFoundError(f"No validation TFRecords matched: {validation_glob}")
     scheduling = root / "artifacts/paper_final/06_scheduling"
     run(
         [

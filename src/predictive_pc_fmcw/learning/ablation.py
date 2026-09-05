@@ -71,7 +71,8 @@ def validate_training_resume(
             raise TypeError("training result must be a JSON object")
         result = TrainingResult(**payload)
     except (OSError, ValueError, TypeError, json.JSONDecodeError) as exc:
-        return ResumeValidation(False, f"invalid_result_json:{type(exc).__name__}", None)
+        reason = f"invalid_result_json:{type(exc).__name__}"
+        return ResumeValidation(False, reason, None)
 
     if result.objective != expected_objective:
         return ResumeValidation(False, "objective_mismatch", None)
@@ -223,10 +224,12 @@ def run_training_ablation(
                         }
                     )
                     _write_execution_state(destination, plan, run_states)
-                    raise RuntimeError(
-                        f"Stage 4 run {objective} seed {seed} failed completion validation: "
+                    message = (
+                        f"Stage 4 run {objective} seed {seed} failed "
+                        "completion validation: "
                         f"{post_validation.reason}"
                     )
+                    raise RuntimeError(message)
                 run_states.pop()
                 result = post_validation.result
                 reason = f"rerun_after:{validation.reason}"

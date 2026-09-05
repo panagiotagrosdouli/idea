@@ -50,8 +50,10 @@ def persist_completed_file_atomic(
     if not source.is_file() or source.stat().st_size < 1:
         raise ValueError(f"Completed local file is missing or empty: {source}")
     if expected_size is not None and source.stat().st_size != expected_size:
+        actual_size = source.stat().st_size
         raise ValueError(
-            f"Completed local file has {source.stat().st_size} bytes; expected {expected_size}."
+            f"Completed local file has {actual_size} bytes; "
+            f"expected {expected_size}."
         )
 
     final = Path(final_path)

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -103,10 +102,12 @@ def run_lambda_sweep(
                     expected_run_dir=run_dir,
                 )
                 if not post_validation.valid or post_validation.result is None:
-                    raise RuntimeError(
-                        f"Lambda sweep run {setting.name} seed {seed} failed validation: "
+                    message = (
+                        f"Lambda sweep run {setting.name} seed {seed} "
+                        "failed validation: "
                         f"{post_validation.reason}"
                     )
+                    raise RuntimeError(message)
                 result = post_validation.result
                 reason = f"rerun_after:{validation.reason}"
             results.append(result)
