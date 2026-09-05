@@ -4,7 +4,7 @@
 	stage2-diagnostic womd-preflight canonical-preflight canonical-stage1 \
 	canonical-full synthetic-dataset synthetic-dataset-validate \
 	synthetic-training synthetic-training-validate synthetic-baselines \
-	synthetic-ablation-plan synthetic-ablation
+	synthetic-link-eval synthetic-ablation-plan synthetic-ablation
 
 install:
 	python -m pip install -e ".[dev]"
@@ -40,6 +40,11 @@ synthetic-baselines:
 	PYTHONPATH=src python scripts/evaluate_synthetic_baselines_v1.py \
 		--dataset artifacts/synthetic_dataset_v1 --split development \
 		--output artifacts/synthetic_dataset_v1/development_baselines.json
+
+synthetic-link-eval:
+	PYTHONPATH=src python scripts/evaluate_synthetic_link_v1.py \
+		--dataset artifacts/synthetic_dataset_v1 --split development \
+		--output artifacts/synthetic_dataset_v1/development_link_metrics.json
 
 synthetic-ablation-plan:
 	PYTHONPATH=src python scripts/train_synthetic_ablation_v1.py \
