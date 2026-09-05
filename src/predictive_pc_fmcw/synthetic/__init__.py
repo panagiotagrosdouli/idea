@@ -20,6 +20,13 @@ from .link_evaluation import (
 from .mobility import Scenario, SyntheticMobilityConfig, generate_scenario
 from .observations import CausalObservations, ObservationNoiseConfig, observe_scenario
 from .official_export import build_official_evaluation_npz
+from .robustness import (
+    ROBUSTNESS_CONDITIONS,
+    RobustnessCondition,
+    robustness_protocol_manifest,
+    run_synthetic_robustness_sweep,
+    validate_robustness_protocol,
+)
 from .scheduling_evaluation import (
     build_scheduling_plan,
     run_synthetic_scheduling_evaluation,
@@ -52,8 +59,10 @@ __all__ = [
     "ObservationNoiseConfig",
     "PAIRED_TRAFFIC_SEEDS",
     "PRIMARY_COMPARISONS",
+    "ROBUSTNESS_CONDITIONS",
     "SCHEDULER_FAMILIES",
     "SCHEDULING_METRICS",
+    "RobustnessCondition",
     "Scenario",
     "SchedulerFamily",
     "SplitManifest",
@@ -73,12 +82,15 @@ __all__ = [
     "evaluate_synthetic_link_prediction",
     "generate_scenario",
     "observe_scenario",
+    "robustness_protocol_manifest",
+    "run_synthetic_robustness_sweep",
     "run_synthetic_scheduling_evaluation",
     "save_baseline_results",
     "save_link_prediction_results",
     "scheduler_protocol_manifest",
     "select_representative_seed",
     "validate_dataset",
+    "validate_robustness_protocol",
     "validate_scheduler_protocol",
     "validate_split_manifest",
     "validate_synthetic_training_npz",
