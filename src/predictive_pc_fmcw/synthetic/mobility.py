@@ -93,13 +93,21 @@ def generate_scenario(
         x = x0 + radius * np.sin(angle)
         y = y0 + radius * (1.0 - np.cos(angle))
     elif family == "stop_and_go":
-        velocity = np.clip(speed + 0.45 * speed * np.sin(2.0 * np.pi * t / 6.0), 0.0, None)
+        velocity = np.clip(
+            speed + 0.45 * speed * np.sin(2.0 * np.pi * t / 6.0),
+            0.0,
+            None,
+        )
         x = x0 + np.cumsum(velocity) * dt
         y = np.full_like(t, y0)
     elif family == "accelerate_then_brake":
         midpoint = 0.5 * cfg.duration_s
         a = max(abs(accel), 1.0)
-        velocity = np.where(t <= midpoint, speed + a * t, speed + a * midpoint - a * (t - midpoint))
+        velocity = np.where(
+            t <= midpoint,
+            speed + a * t,
+            speed + a * midpoint - a * (t - midpoint),
+        )
         velocity = np.clip(velocity, 0.0, None)
         x = x0 + np.cumsum(velocity) * dt
         y = y0 + 0.2 * lateral * t
