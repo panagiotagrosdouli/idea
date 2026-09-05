@@ -14,6 +14,7 @@ from .link_evaluation import (
 )
 from .mobility import Scenario, SyntheticMobilityConfig, generate_scenario
 from .observations import CausalObservations, ObservationNoiseConfig, observe_scenario
+from .official_export import build_official_evaluation_npz
 from .splits import SplitManifest, build_split_manifest, validate_split_manifest
 from .training_export import (
     build_synthetic_training_npz,
@@ -30,6 +31,7 @@ __all__ = [
     "SplitManifest",
     "SyntheticMobilityConfig",
     "build_dataset",
+    "build_official_evaluation_npz",
     "build_split_manifest",
     "build_synthetic_training_npz",
     "evaluate_synthetic_baselines",
