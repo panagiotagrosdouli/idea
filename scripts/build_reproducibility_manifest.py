@@ -7,8 +7,10 @@ import json
 import os
 import platform
 import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 import numpy
 import scipy
@@ -47,8 +49,6 @@ INCLUDED_FILES = (
     "README_GR.md",
     "Makefile",
     "pyproject.toml",
-    "requirements.txt",
-    "requirements.lock",
 )
 
 
@@ -83,6 +83,79 @@ def _inventory_roots(roots: tuple[str, ...]) -> list[dict[str, object]]:
     return files
 
 
+def _run_text(command: list[str]) -> str | None:
+    result = subprocess.run(
+        command,
+        cwd=ROOT,
+        capture_output=True,
+        check=False,
+        text=True,
+    )
+    if result.returncode != 0:
+        return None
+    return result.stdout.strip()
+
+
+def collect_git_state() -> dict[str, Any]:
+    commit = _run_text(["git", "rev-parse", "HEAD"])
+    status = _run_text(["git", "status", "--porcelain=v1"])
+    diff = _run_text(["git", "diff", "--binary", "HEAD"])
+    return {
+        "commit": commit or "unavailable",
+        "dirty": bool(status),
+        "status_porcelain": status or "",
+        "working_tree_diff_sha256": (
+            hashlib.sha256((diff or "").encode("utf-8")).hexdigest()
+        ),
+    }
+
+
+def collect_python_environment() -> dict[str, Any]:
+    pip_freeze = _run_text([sys.executable, "-m", "pip", "freeze"])
+    return {
+        "python": platform.python_version(),
+        "python_executable": sys.executable,
+        "platform": platform.platform(),
+        "machine": platform.machine(),
+        "processor": platform.processor(),
+        "cpu_count": os.cpu_count(),
+        "numpy": numpy.__version__,
+        "scipy": scipy.__version__,
+        "matplotlib": matplotlib_version,
+        "pip_freeze": sorted((pip_freeze or "").splitlines()),
+    }
+
+
+def collect_torch_environment() -> dict[str, Any]:
+    if importlib.util.find_spec("torch") is None:
+        return {"available": False}
+
+    import torch
+
+    cuda_available = bool(torch.cuda.is_available())
+    devices = []
+    if cuda_available:
+        for index in range(torch.cuda.device_count()):
+            properties = torch.cuda.get_device_properties(index)
+            devices.append(
+                {
+                    "index": index,
+                    "name": properties.name,
+                    "total_memory_bytes": properties.total_memory,
+                    "compute_capability": [properties.major, properties.minor],
+                }
+            )
+    return {
+        "available": True,
+        "torch_version": torch.__version__,
+        "cuda_available": cuda_available,
+        "torch_cuda_version": torch.version.cuda,
+        "cudnn_version": torch.backends.cudnn.version(),
+        "device_count": len(devices),
+        "devices": devices,
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Hash the executable research package and canonical evidence."
@@ -110,36 +183,19 @@ def main() -> None:
             }
         )
     evidence = _inventory_roots(EVIDENCE_ROOTS)
-    git_result = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
-        cwd=ROOT,
-        capture_output=True,
-        check=False,
-        text=True,
-    )
+    git_state = collect_git_state()
     report = {
-        "status": "PASS",
+        "status": "PASS" if not git_state["dirty"] else "DIRTY_WORKTREE",
         "generated_utc": datetime.now(timezone.utc).isoformat(),
-        "git_commit": (
-            git_result.stdout.strip()
-            if git_result.returncode == 0
-            else "uncommitted-workspace"
-        ),
-        "environment": {
-            "python": platform.python_version(),
-            "platform": platform.platform(),
-            "machine": platform.machine(),
-            "cpu_count": os.cpu_count(),
-            "numpy": numpy.__version__,
-            "scipy": scipy.__version__,
-            "matplotlib": matplotlib_version,
-            "pytorch_available": importlib.util.find_spec("torch") is not None,
-        },
+        "git": git_state,
+        "environment": collect_python_environment(),
+        "torch": collect_torch_environment(),
         "scientific_scope": {
             "mobility": "official WOMD required for final empirical claims",
             "communication": "model-based PC-FMCW/DPSK simulation",
             "measured_optical_channel": False,
             "official_validation_required_for_final_claims": True,
+            "independent_statistical_unit": "WOMD scenario_id",
         },
         "source_file_count": len(files),
         "source_files": files,
@@ -147,8 +203,10 @@ def main() -> None:
         "evidence_files": evidence,
     }
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(output)
+    if report["status"] != "PASS":
+        raise SystemExit(2)
 
 
 if __name__ == "__main__":
