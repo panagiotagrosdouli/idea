@@ -15,6 +15,7 @@ def canonical_execution_preflight(
     train_npz: str | Path,
     validation_npz: str | Path,
     validation_glob: str | None = None,
+    full: bool = False,
     require_gpu: bool = False,
     min_free_gb: float = 0.0,
 ) -> dict[str, Any]:
@@ -26,9 +27,14 @@ def canonical_execution_preflight(
     required_repo_files = [
         root / "configs/womd_paper_corpus.json",
         root / "scripts/run_canonical_womd_pipeline.py",
-        root / "artifacts/paper_final/02_link/dbpsk_ber_lut.csv",
-        root / "artifacts/paper_final/02_link/link_verification.json",
     ]
+    if full:
+        required_repo_files.extend(
+            [
+                root / "artifacts/paper_final/02_link/dbpsk_ber_lut.csv",
+                root / "artifacts/paper_final/02_link/link_verification.json",
+            ]
+        )
     validation_files = sorted(glob.glob(validation_glob)) if validation_glob else []
     free_gb = shutil.disk_usage(root).free / (1024**3)
     torch_available = importlib.util.find_spec("torch") is not None
@@ -44,9 +50,9 @@ def canonical_execution_preflight(
         "data_root_present": data.is_dir(),
         "training_npz_present": train.is_file(),
         "validation_npz_present": validation.is_file(),
-        "validation_tfrecords_present": bool(validation_files)
-        if validation_glob
-        else True,
+        "validation_tfrecords_present": (
+            bool(validation_files) if full and validation_glob else not full
+        ),
         "torch_available": torch_available if require_gpu else True,
         "cuda_available": cuda_available if require_gpu else True,
         "free_disk_sufficient": free_gb >= min_free_gb,
@@ -54,6 +60,7 @@ def canonical_execution_preflight(
     missing_repo_files = [str(path) for path in required_repo_files if not path.is_file()]
     return {
         "status": "PASS" if all(checks.values()) else "BLOCKED",
+        "mode": "full" if full else "stage1",
         "checks": checks,
         "repo_root": str(root),
         "data_root": str(data),
