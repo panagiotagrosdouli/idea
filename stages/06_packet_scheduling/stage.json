@@ -18,11 +18,13 @@
     "artifacts/paper_final/06_scheduling/evaluation_manifest.json"
   ],
   "acceptance": [
+    "canonical mode is enabled",
     "exactly 20 frozen learned checkpoints verified",
     "raw validation TFRecord scenario IDs match Stage-5 heldout scenario IDs",
     "verified frozen Part-A BER LUT used",
-    "eight scheduler families",
-    "five paired traffic seeds",
+    "exactly eight frozen scheduler families",
+    "exactly five paired traffic seeds",
+    "no max-scenarios truncation in canonical evaluation",
     "ground-truth future used only for realized packet outcomes/oracle",
     "per-scenario raw metrics"
   ],
@@ -41,6 +43,7 @@
       "artifacts/paper_final/02_link/dbpsk_ber_lut.csv",
       "--heldout-metrics",
       "artifacts/paper_final/05_heldout/heldout_metrics_by_scenario.csv",
+      "--canonical",
       "--output",
       "artifacts/paper_final/06_scheduling"
     ]

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 from pathlib import Path
 
@@ -10,6 +11,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from predictive_pc_fmcw.learning.analysis import (
+    aggregate_scenario_metrics,
     load_heldout_rows,
     summarize_objectives,
     write_learned_analysis,
@@ -49,36 +51,36 @@ def main() -> None:
         "\n".join(lines) + "\n", encoding="utf-8"
     )
 
-    colors = {
-        name: color
-        for name, color in zip(
-            objectives, ["#2563eb", "#dc2626", "#0f766e", "#7c3aed"], strict=False
-        )
-    }
+    scenario_rows = aggregate_scenario_metrics(rows)
+    scenario_csv = destination / "heldout_link_fidelity_by_scenario.csv"
+    with scenario_csv.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=scenario_rows[0].keys())
+        writer.writeheader()
+        writer.writerows(scenario_rows)
+
     fig, axes = plt.subplots(1, 2, figsize=(10.2, 4.1))
-    for objective in objectives:
-        selected = [row for row in rows if row["objective"] == objective]
-        axes[0].scatter(
-            [row["ade_m"] for row in selected],
-            [row["snr_mae_db"] for row in selected],
-            s=13,
-            alpha=0.35,
-            color=colors[objective],
-            label=objective,
-        )
-        axes[1].scatter(
-            [row["ade_m"] for row in selected],
-            [row["goodput_mae_mbps"] for row in selected],
-            s=13,
-            alpha=0.35,
-            color=colors[objective],
-            label=objective,
-        )
-    axes[0].set(xlabel="ADE (m)", ylabel="Future-SNR MAE (dB)")
-    axes[1].set(xlabel="ADE (m)", ylabel="Future-goodput MAE (Mbps)")
+    axes[0].scatter(
+        [row["ade_m"] for row in scenario_rows],
+        [row["snr_mae_db"] for row in scenario_rows],
+        s=20,
+        alpha=0.65,
+    )
+    axes[1].scatter(
+        [row["ade_m"] for row in scenario_rows],
+        [row["goodput_mae_mbps"] for row in scenario_rows],
+        s=20,
+        alpha=0.65,
+    )
+    axes[0].set(
+        xlabel="Scenario-mean ADE (m)",
+        ylabel="Scenario-mean future-SNR MAE (dB)",
+    )
+    axes[1].set(
+        xlabel="Scenario-mean ADE (m)",
+        ylabel="Scenario-mean future-goodput MAE (Mbps)",
+    )
     for axis in axes:
         axis.grid(alpha=0.2)
-    axes[0].legend(frameon=False, fontsize=8)
     fig.suptitle("Trajectory accuracy versus held-out link-state fidelity")
     fig.tight_layout()
     for extension in ("png", "pdf"):
@@ -88,7 +90,17 @@ def main() -> None:
             bbox_inches="tight",
         )
     plt.close(fig)
-    print(json.dumps({"analysis": str(report_path), "rows": len(rows)}, indent=2))
+    print(
+        json.dumps(
+            {
+                "analysis": str(report_path),
+                "scenario_csv": str(scenario_csv),
+                "raw_rows": len(rows),
+                "independent_scenarios": len(scenario_rows),
+            },
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":

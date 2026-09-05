@@ -11,17 +11,21 @@
   "outputs": [
     "artifacts/paper_final/07_analysis/learned/learned_heldout_analysis.json",
     "artifacts/paper_final/07_analysis/learned/learned_heldout_table.tex",
+    "artifacts/paper_final/07_analysis/learned/heldout_link_fidelity_by_scenario.csv",
     "artifacts/paper_final/07_analysis/learned/ade_vs_link_fidelity.pdf",
     "artifacts/paper_final/07_analysis/statistics/scheduler_utility_summary.json",
     "artifacts/paper_final/07_analysis/statistics/ade_vs_scheduler_utility.csv",
+    "artifacts/paper_final/07_analysis/statistics/ade_vs_scheduler_utility_by_scenario.csv",
     "artifacts/paper_final/07_analysis/statistics/ade_vs_realized_goodput.pdf"
   ],
   "acceptance": [
     "scenario-cluster bootstrap",
     "paired Wilcoxon and t-test",
     "Holm correction within declared metric families",
-    "held-out trajectory-to-link fidelity analysis",
-    "ADE-to-realized-goodput join",
+    "all paired traffic realizations retained before scenario clustering",
+    "held-out trajectory-to-link correlations use one observation per scenario",
+    "ADE-to-realized-goodput correlation uses one observation per scenario",
+    "scenario-level evidence tables are persisted",
     "no synthetic operating-region study presented as official WOMD evidence"
   ],
   "commands": [

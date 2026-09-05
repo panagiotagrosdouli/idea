@@ -1,6 +1,7 @@
 import unittest
 
 from predictive_pc_fmcw.learning.analysis import (
+    accuracy_link_correlations,
     paired_full_vs_trajectory,
     summarize_objectives,
 )
@@ -38,6 +39,19 @@ class LearnedAnalysisTest(unittest.TestCase):
         self.assertGreater(
             paired["metrics"]["ade_m"]["favorable_mean_difference"], 0
         )
+
+    def test_accuracy_link_correlation_uses_one_row_per_scenario(self):
+        rows = [
+            _row("trajectory_only", 1, "a", 0.0),
+            _row("full", 1, "a", 0.2),
+            _row("trajectory_only", 2, "a", 0.4),
+            _row("full", 1, "b", 1.0),
+            _row("trajectory_only", 2, "b", 1.2),
+        ]
+        correlation = accuracy_link_correlations(rows)
+        self.assertEqual(correlation["model_seed_rows"], 5)
+        self.assertEqual(correlation["independent_scenarios"], 2)
+        self.assertIn("averaged", correlation["aggregation"])
 
 
 if __name__ == "__main__":

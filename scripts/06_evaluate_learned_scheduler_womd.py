@@ -16,6 +16,18 @@ from predictive_pc_fmcw.learning.completion import verify_completion_manifest
 from predictive_pc_fmcw.learning.inference import TorchCheckpointPredictor
 from predictive_pc_fmcw.link_verification import verify_lut
 
+CANONICAL_SCHEDULERS = [
+    "reactive_greedy",
+    "proportional_fair",
+    "cv_predictive",
+    "kalman_predictive",
+    "imm_predictive",
+    "link_lifetime",
+    "learned_predictive",
+    "oracle",
+]
+CANONICAL_TRAFFIC_SEEDS = [20260827, 20260828, 20260829, 20260830, 20260831]
+
 
 def _heldout_scenario_ids(path: str | Path) -> set[str]:
     with Path(path).open(newline="", encoding="utf-8") as handle:
@@ -23,6 +35,30 @@ def _heldout_scenario_ids(path: str | Path) -> set[str]:
         if reader.fieldnames is None or "scenario_id" not in reader.fieldnames:
             raise ValueError("Held-out metrics must contain a scenario_id column.")
         return {str(row["scenario_id"]) for row in reader}
+
+
+def _validate_canonical_args(args: argparse.Namespace) -> None:
+    if not args.canonical:
+        return
+    required = {
+        "training_npz": args.training_npz,
+        "completion_manifest": args.completion_manifest,
+        "ber_lut": args.ber_lut,
+        "heldout_metrics": args.heldout_metrics,
+    }
+    missing = [name for name, value in required.items() if not value]
+    if missing:
+        raise ValueError(f"Canonical Stage 6 requires: {', '.join(missing)}")
+    if len(args.checkpoints) != 20:
+        raise ValueError("Canonical Stage 6 requires exactly 20 checkpoints.")
+    if args.schedulers != CANONICAL_SCHEDULERS:
+        raise ValueError("Canonical Stage 6 scheduler family set was modified.")
+    if args.traffic_seeds != CANONICAL_TRAFFIC_SEEDS:
+        raise ValueError("Canonical Stage 6 traffic seeds were modified.")
+    if args.max_scenarios is not None:
+        raise ValueError("Canonical Stage 6 cannot use --max-scenarios.")
+    if args.max_vehicles != 16:
+        raise ValueError("Canonical Stage 6 requires --max-vehicles 16.")
 
 
 def main() -> None:
@@ -44,26 +80,23 @@ def main() -> None:
     parser.add_argument("--ber-lut")
     parser.add_argument("--heldout-metrics")
     parser.add_argument(
+        "--canonical",
+        action="store_true",
+        help="Enforce the frozen paper Stage-6 contract.",
+    )
+    parser.add_argument(
         "--schedulers",
         nargs="+",
-        default=[
-            "reactive_greedy",
-            "proportional_fair",
-            "cv_predictive",
-            "kalman_predictive",
-            "imm_predictive",
-            "link_lifetime",
-            "learned_predictive",
-            "oracle",
-        ],
+        default=CANONICAL_SCHEDULERS,
     )
     parser.add_argument(
         "--traffic-seeds",
         nargs="+",
         type=int,
-        default=[20260827, 20260828, 20260829, 20260830, 20260831],
+        default=CANONICAL_TRAFFIC_SEEDS,
     )
     args = parser.parse_args()
+    _validate_canonical_args(args)
     destination = Path(args.output)
     destination.mkdir(parents=True, exist_ok=True)
 
@@ -117,6 +150,7 @@ def main() -> None:
             )
 
     manifest = {
+        "canonical": bool(args.canonical),
         "scenario_ids": sorted(scenario_ids),
         "scenario_count": len(scenarios),
         "tfrecords": [str(path) for path in args.tfrecords],

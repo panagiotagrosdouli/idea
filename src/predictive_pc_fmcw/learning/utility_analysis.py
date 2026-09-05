@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import json
+from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -37,23 +38,31 @@ def join_accuracy_and_scheduler_utility(
     pattern = "*/seed_*/episode_metrics.csv"
     for metrics_path in sorted(Path(scheduler_root).glob(pattern)):
         objective = metrics_path.parent.parent.name
-        seed = int(metrics_path.parent.name.removeprefix("seed_"))
+        model_seed = int(metrics_path.parent.name.removeprefix("seed_"))
         rows = _read_csv(metrics_path)
-        indexed = {(row["scheduler"], row["scenario_id"]): row for row in rows}
-        scenarios = sorted(
-            scenario
-            for scheduler, scenario in indexed
+        if rows and "seed" not in rows[0]:
+            raise ValueError(
+                f"{metrics_path} is missing simulation seed required for pairing."
+            )
+        indexed = {
+            (row["scheduler"], row["scenario_id"], int(row["seed"])): row
+            for row in rows
+        }
+        learned_keys = sorted(
+            (scenario, simulation_seed)
+            for scheduler, scenario, simulation_seed in indexed
             if scheduler == "learned_predictive"
-            and ("reactive_greedy", scenario) in indexed
-            and (objective, seed, scenario) in accuracy
+            and ("reactive_greedy", scenario, simulation_seed) in indexed
+            and (objective, model_seed, scenario) in accuracy
         )
-        for scenario in scenarios:
-            learned = indexed[("learned_predictive", scenario)]
-            reactive = indexed[("reactive_greedy", scenario)]
-            motion = accuracy[(objective, seed, scenario)]
+        for scenario, simulation_seed in learned_keys:
+            learned = indexed[("learned_predictive", scenario, simulation_seed)]
+            reactive = indexed[("reactive_greedy", scenario, simulation_seed)]
+            motion = accuracy[(objective, model_seed, scenario)]
             item: dict[str, Any] = {
                 "objective": objective,
-                "seed": seed,
+                "seed": model_seed,
+                "simulation_seed": simulation_seed,
                 "scenario_id": scenario,
                 "ade_m": float(motion["ade_m"]),
                 "fde_m": float(motion["fde_m"]),
@@ -83,6 +92,30 @@ def _apply_holm_family(metrics: dict[str, dict[str, Any]]) -> None:
         metrics[name]["wilcoxon_holm_p_value"] = wilcoxon_value
 
 
+def aggregate_scenario_relationship(
+    rows: list[dict[str, Any]],
+) -> list[dict[str, float | str | int]]:
+    """Collapse model/traffic-seed rows to one observation per WOMD scenario."""
+
+    grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        grouped[str(row["scenario_id"])].append(row)
+    aggregated = []
+    for scenario_id in sorted(grouped):
+        selected = grouped[scenario_id]
+        aggregated.append(
+            {
+                "scenario_id": scenario_id,
+                "ade_m": float(np.mean([row["ade_m"] for row in selected])),
+                "delta_goodput_mbps": float(
+                    np.mean([row["delta_goodput_mbps"] for row in selected])
+                ),
+                "paired_model_traffic_rows": len(selected),
+            }
+        )
+    return aggregated
+
+
 def summarize_utility(rows: list[dict[str, Any]]) -> dict[str, Any]:
     summary = {}
     for objective in sorted({row["objective"] for row in rows}):
@@ -108,23 +141,38 @@ def summarize_utility(rows: list[dict[str, Any]]) -> dict[str, Any]:
             )
         _apply_holm_family(metrics)
         summary[objective] = {
-            "scenario_seed_rows": len(selected),
+            "paired_model_traffic_rows": len(selected),
             "independent_scenarios": len(
                 {row["scenario_id"] for row in selected}
             ),
             "metrics_vs_reactive": metrics,
         }
     if rows:
-        ade = np.asarray([row["ade_m"] for row in rows], dtype=float)
-        gain = np.asarray([row["delta_goodput_mbps"] for row in rows], dtype=float)
-        correlation = stats.spearmanr(ade, gain)
+        scenario_rows = aggregate_scenario_relationship(rows)
+        ade = np.asarray([row["ade_m"] for row in scenario_rows], dtype=float)
+        gain = np.asarray(
+            [row["delta_goodput_mbps"] for row in scenario_rows], dtype=float
+        )
+        if len(scenario_rows) > 1:
+            correlation = stats.spearmanr(ade, gain)
+            rho = float(correlation.statistic)
+            p_value = float(correlation.pvalue)
+        else:
+            rho = float("nan")
+            p_value = float("nan")
         summary["ade_vs_realized_goodput_gain"] = {
-            "spearman_rho": float(correlation.statistic),
-            "p_value": float(correlation.pvalue),
-            "rows": len(rows),
+            "spearman_rho": rho,
+            "p_value": p_value,
+            "paired_model_traffic_rows": len(rows),
+            "independent_scenarios": len(scenario_rows),
+            "aggregation": (
+                "ADE and goodput gain are averaged across model objectives/seeds "
+                "and paired traffic realizations within each WOMD scenario before "
+                "correlation."
+            ),
             "interpretation": (
-                "A non-monotonic or weak relationship supports non-equivalence; "
-                "it does not by itself prove a causal scheduler gain."
+                "This scenario-level association is descriptive and does not by "
+                "itself establish a causal scheduler gain."
             ),
         }
     return summary
@@ -142,9 +190,19 @@ def write_utility_analysis(
         writer = csv.DictWriter(handle, fieldnames=rows[0].keys())
         writer.writeheader()
         writer.writerows(rows)
+    scenario_csv = destination / "ade_vs_scheduler_utility_by_scenario.csv"
+    scenario_rows = aggregate_scenario_relationship(rows)
+    with scenario_csv.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=scenario_rows[0].keys())
+        writer.writeheader()
+        writer.writerows(scenario_rows)
     summary_path = destination / "scheduler_utility_summary.json"
     summary_path.write_text(
         json.dumps(summarize_utility(rows), indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
-    return {"csv": csv_path, "summary": summary_path}
+    return {
+        "csv": csv_path,
+        "scenario_csv": scenario_csv,
+        "summary": summary_path,
+    }

@@ -18,6 +18,47 @@ class ResearchStagesTest(unittest.TestCase):
         )
         self.assertEqual(stages[-1].depends_on, ("stage7",))
 
+    def test_canonical_stage1_and_stage6_contracts_are_frozen(self):
+        stages = {stage.stage_id: stage for stage in load_research_stages("stages")}
+        stage1 = stages["stage1"]
+        self.assertIn("${WOMD_DATA_ROOT}", stage1.required_inputs)
+        self.assertIn(
+            "artifacts/paper_final/01_data/source_shard_manifest.json",
+            stage1.outputs,
+        )
+        self.assertIn(
+            "artifacts/paper_final/01_data/historical_fingerprint.json",
+            stage1.outputs,
+        )
+
+        stage6 = stages["stage6"]
+        flattened = [token for command in stage6.commands for token in command]
+        self.assertIn("--canonical", flattened)
+        self.assertIn("exactly five paired traffic seeds", stage6.acceptance)
+        self.assertIn("exactly eight frozen scheduler families", stage6.acceptance)
+
+    def test_stage8_requires_end_to_end_provenance(self):
+        stages = {stage.stage_id: stage for stage in load_research_stages("stages")}
+        stage8 = stages["stage8"]
+        required = set(stage8.required_inputs)
+        self.assertIn(
+            "artifacts/paper_final/01_data/source_shard_manifest.json", required
+        )
+        self.assertIn(
+            "artifacts/paper_final/04_learning/learned_ablation/completion_manifest.json",
+            required,
+        )
+        self.assertIn(
+            "artifacts/paper_final/07_analysis/learned/"
+            "heldout_link_fidelity_by_scenario.csv",
+            required,
+        )
+        self.assertIn(
+            "artifacts/paper_final/07_analysis/statistics/"
+            "ade_vs_scheduler_utility_by_scenario.csv",
+            required,
+        )
+
     def test_status_blocks_unresolved_inputs_and_unlocks_in_order(self):
         payload = {
             "stages": [
