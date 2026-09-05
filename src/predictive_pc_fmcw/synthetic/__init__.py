@@ -31,6 +31,13 @@ from .scheduling_protocol import (
     scheduler_protocol_manifest,
     validate_scheduler_protocol,
 )
+from .scheduling_statistics import (
+    PRIMARY_COMPARISONS,
+    SCHEDULING_METRICS,
+    aggregate_traffic_seeds,
+    analyze_scheduling_file,
+    analyze_scheduling_rows,
+)
 from .splits import SplitManifest, build_split_manifest, validate_split_manifest
 from .training_export import (
     build_synthetic_training_npz,
@@ -44,12 +51,17 @@ __all__ = [
     "LinkPredictionMetrics",
     "ObservationNoiseConfig",
     "PAIRED_TRAFFIC_SEEDS",
+    "PRIMARY_COMPARISONS",
     "SCHEDULER_FAMILIES",
+    "SCHEDULING_METRICS",
     "Scenario",
     "SchedulerFamily",
     "SplitManifest",
     "SyntheticEpisode",
     "SyntheticMobilityConfig",
+    "aggregate_traffic_seeds",
+    "analyze_scheduling_file",
+    "analyze_scheduling_rows",
     "build_dataset",
     "build_development_checkpoint_selection",
     "build_official_evaluation_npz",
