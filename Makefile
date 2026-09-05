@@ -2,7 +2,8 @@
 	paper-full motion manifest paper-ablation staged corrected-quick \
 	corrected-full paper-draft reproducibility reproduce split-audit stages stage \
 	stage2-diagnostic womd-preflight canonical-preflight canonical-stage1 \
-	canonical-full synthetic-dataset synthetic-dataset-validate
+	canonical-full synthetic-dataset synthetic-dataset-validate \
+	synthetic-training synthetic-training-validate synthetic-baselines
 
 install:
 	python -m pip install -e ".[dev]"
@@ -23,6 +24,21 @@ synthetic-dataset:
 synthetic-dataset-validate:
 	PYTHONPATH=src python scripts/build_synthetic_dataset_v1.py \
 		--output artifacts/synthetic_dataset_v1 --validate-only
+
+synthetic-training:
+	PYTHONPATH=src python scripts/export_synthetic_training_v1.py \
+		--dataset artifacts/synthetic_dataset_v1 \
+		--output artifacts/synthetic_dataset_v1/training_dev.npz
+
+synthetic-training-validate:
+	PYTHONPATH=src python scripts/export_synthetic_training_v1.py \
+		--dataset artifacts/synthetic_dataset_v1 \
+		--output artifacts/synthetic_dataset_v1/training_dev.npz --validate-only
+
+synthetic-baselines:
+	PYTHONPATH=src python scripts/evaluate_synthetic_baselines_v1.py \
+		--dataset artifacts/synthetic_dataset_v1 --split development \
+		--output artifacts/synthetic_dataset_v1/development_baselines.json
 
 benchmark:
 	pcfmcw benchmark --config configs/default.json --output artifacts/synthetic_benchmark
