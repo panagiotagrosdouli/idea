@@ -55,7 +55,8 @@ def _load_selected_predictors(
         raise PermissionError("development checkpoint-selection manifest is required")
     raw = json.loads(path.read_text(encoding="utf-8"))
     if raw.get("selection_split") != "development":
-        raise PermissionError("learned scheduler checkpoints must be selected on development")
+        message = "learned scheduler checkpoints must be selected on development"
+        raise PermissionError(message)
     if raw.get("training_npz_sha256") != training_sha256:
         raise PermissionError("checkpoint-selection manifest training hash mismatch")
     selected = raw.get("selected")
@@ -211,7 +212,8 @@ def run_synthetic_scheduling_evaluation(
                 rows.append(row)
 
     if len(rows) != int(plan["planned_runs"]):
-        raise RuntimeError("scheduling execution cardinality does not match frozen plan")
+        message = "scheduling execution cardinality does not match frozen plan"
+        raise RuntimeError(message)
     destination.parent.mkdir(parents=True, exist_ok=True)
     report = {
         "status": "COMPLETED",
