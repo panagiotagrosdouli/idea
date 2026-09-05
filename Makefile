@@ -1,7 +1,8 @@
 .PHONY: install test lint validate benchmark womd ablation matrix paper-quick \
 	paper-full motion manifest paper-ablation staged corrected-quick \
 	corrected-full paper-draft reproducibility reproduce split-audit stages stage \
-	stage2-diagnostic womd-preflight
+	stage2-diagnostic womd-preflight canonical-preflight canonical-stage1 \
+	canonical-full
 
 install:
 	python -m pip install -e ".[dev]"
@@ -49,6 +50,28 @@ womd-preflight:
 	@test -n "$(WOMD_ROOTS)" || (echo "Set WOMD_ROOTS to files/directories"; exit 2)
 	PYTHONPATH=src python scripts/womd_preflight.py $(WOMD_ROOTS) \
 		--output womd_preflight.json
+
+canonical-preflight:
+	@test -n "$(WOMD_DATA_ROOT)" -a -n "$(TRAIN_NPZ)" -a -n "$(VALIDATION_NPZ)" || \
+		(echo "Set WOMD_DATA_ROOT, TRAIN_NPZ and VALIDATION_NPZ"; exit 2)
+	PYTHONPATH=src python scripts/00_preflight_canonical_execution.py \
+		--data-root "$(WOMD_DATA_ROOT)" --train-npz "$(TRAIN_NPZ)" \
+		--validation-npz "$(VALIDATION_NPZ)" $(CANONICAL_PREFLIGHT_ARGS)
+
+canonical-stage1: canonical-preflight
+	PYTHONPATH=src python scripts/run_canonical_womd_pipeline.py \
+		--data-root "$(WOMD_DATA_ROOT)" --train-npz "$(TRAIN_NPZ)" \
+		--validation-npz "$(VALIDATION_NPZ)" --mode stage1
+
+canonical-full:
+	@test -n "$(VALIDATION_GLOB)" || (echo "Set VALIDATION_GLOB"; exit 2)
+	$(MAKE) canonical-preflight CANONICAL_PREFLIGHT_ARGS='--full --require-gpu \
+		--validation-glob "$(VALIDATION_GLOB)" $(EXTRA_PREFLIGHT_ARGS)'
+	PYTHONPATH=src python scripts/run_canonical_womd_pipeline.py \
+		--data-root "$(WOMD_DATA_ROOT)" --train-npz "$(TRAIN_NPZ)" \
+		--validation-npz "$(VALIDATION_NPZ)" \
+		--validation-glob "$(VALIDATION_GLOB)" --mode full \
+		$(LAMBDA_ARGS)
 
 stages:
 	PYTHONPATH=src python scripts/run_research_stage.py
