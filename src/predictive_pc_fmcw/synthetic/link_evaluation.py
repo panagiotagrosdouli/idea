@@ -49,6 +49,10 @@ def _observed_xy(range_m: np.ndarray, bearing_rad: np.ndarray) -> np.ndarray:
     )
 
 
+def _mean_absolute(left: np.ndarray, right: np.ndarray) -> float:
+    return float(np.mean(np.abs(left - right)))
+
+
 def evaluate_synthetic_link_prediction(
     dataset_dir: str | Path,
     *,
@@ -73,6 +77,8 @@ def evaluate_synthetic_link_prediction(
     link_model = LinkModel(LinkConfig(**manifest["link_config"]))
     manifest_key = "train" if split == "training" else split
     scenario_ids = tuple(manifest["split"][manifest_key])
+    if not scenario_ids:
+        raise ValueError(f"synthetic split is empty: {split}")
     predictors = _predictors()
     rows = {
         predictor.name: {
@@ -119,22 +125,20 @@ def evaluate_synthetic_link_prediction(
                     )
                     bucket = rows[predictor.name]
                     bucket["snr"].append(
-                        float(np.mean(np.abs(predicted_link["snr_db"] - true_link["snr_db"])))
+                        _mean_absolute(
+                            predicted_link["snr_db"], true_link["snr_db"]
+                        )
                     )
                     bucket["ber"].append(
-                        float(np.mean(np.abs(predicted_link["ber"] - true_link["ber"])))
+                        _mean_absolute(predicted_link["ber"], true_link["ber"])
                     )
                     bucket["per"].append(
-                        float(np.mean(np.abs(predicted_link["per"] - true_link["per"])))
+                        _mean_absolute(predicted_link["per"], true_link["per"])
                     )
                     bucket["goodput"].append(
-                        float(
-                            np.mean(
-                                np.abs(
-                                    predicted_link["goodput_bps"]
-                                    - true_link["goodput_bps"]
-                                )
-                            )
+                        _mean_absolute(
+                            predicted_link["goodput_bps"],
+                            true_link["goodput_bps"],
                         )
                     )
                     bucket["outage"].append(
