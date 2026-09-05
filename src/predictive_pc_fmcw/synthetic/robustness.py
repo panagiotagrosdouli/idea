@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 
@@ -142,7 +143,8 @@ def run_synthetic_robustness_sweep(
     destination = Path(output_dir)
     manifest_path = destination / "robustness_manifest.json"
     if manifest_path.exists():
-        raise FileExistsError(f"refusing to overwrite robustness sweep: {manifest_path}")
+        message = f"refusing to overwrite robustness sweep: {manifest_path}"
+        raise FileExistsError(message)
     destination.mkdir(parents=True, exist_ok=True)
 
     dataset_manifest = json.loads(
@@ -151,11 +153,12 @@ def run_synthetic_robustness_sweep(
     observation = dataset_manifest["observation_config"]
     if not isinstance(observation, dict):
         raise ValueError("dataset observation_config is invalid")
+    bearing_std_deg = math.degrees(float(observation["bearing_std_rad"]))
     nominal_sensing = SensingConfig(
         model="range_bearing_assumed",
         range_std_base_m=float(observation["range_std_m"]),
         range_std_per_m=0.0,
-        bearing_std_deg=float(observation["bearing_std_rad"]) * 180.0 / 3.141592653589793,
+        bearing_std_deg=bearing_std_deg,
         temporal_correlation=0.0,
         covariance_aware=True,
         assumption_source="synthetic_dataset_v1 frozen observation configuration",
