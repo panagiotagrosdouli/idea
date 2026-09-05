@@ -5,7 +5,7 @@
 	canonical-full synthetic-dataset synthetic-dataset-validate \
 	synthetic-training synthetic-training-validate synthetic-baselines \
 	synthetic-link-eval synthetic-ablation-plan synthetic-ablation \
-	synthetic-pipeline synthetic-freeze
+	synthetic-pipeline synthetic-freeze synthetic-heldout synthetic-ood
 
 install:
 	python -m pip install -e ".[dev]"
@@ -62,6 +62,16 @@ synthetic-pipeline:
 
 synthetic-freeze:
 	PYTHONPATH=src python scripts/freeze_synthetic_publication_v1.py
+
+synthetic-heldout:
+	PYTHONPATH=src python scripts/export_synthetic_official_v1.py \
+		--split held_out_test \
+		--output artifacts/synthetic_dataset_v1/held_out_test.npz
+
+synthetic-ood:
+	PYTHONPATH=src python scripts/export_synthetic_official_v1.py \
+		--split ood_test \
+		--output artifacts/synthetic_dataset_v1/ood_test.npz
 
 benchmark:
 	pcfmcw benchmark --config configs/default.json --output artifacts/synthetic_benchmark
