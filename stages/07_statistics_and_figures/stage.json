@@ -9,14 +9,14 @@
     "artifacts/paper_final/06_scheduling/evaluation_manifest.json"
   ],
   "outputs": [
-    "artifacts/paper_final/07_analysis/learned/learned_heldout_analysis.json",
-    "artifacts/paper_final/07_analysis/learned/learned_heldout_table.tex",
-    "artifacts/paper_final/07_analysis/learned/heldout_link_fidelity_by_scenario.csv",
-    "artifacts/paper_final/07_analysis/learned/ade_vs_link_fidelity.pdf",
-    "artifacts/paper_final/07_analysis/statistics/scheduler_utility_summary.json",
-    "artifacts/paper_final/07_analysis/statistics/ade_vs_scheduler_utility.csv",
-    "artifacts/paper_final/07_analysis/statistics/ade_vs_scheduler_utility_by_scenario.csv",
-    "artifacts/paper_final/07_analysis/statistics/ade_vs_realized_goodput.pdf"
+    "artifacts/paper_final/07_statistics/learned/learned_heldout_analysis.json",
+    "artifacts/paper_final/07_statistics/learned/learned_heldout_table.tex",
+    "artifacts/paper_final/07_statistics/learned/heldout_link_fidelity_by_scenario.csv",
+    "artifacts/paper_final/07_statistics/learned/ade_vs_link_fidelity.pdf",
+    "artifacts/paper_final/07_statistics/scheduler/scheduler_utility_summary.json",
+    "artifacts/paper_final/07_statistics/scheduler/ade_vs_scheduler_utility.csv",
+    "artifacts/paper_final/07_statistics/scheduler/ade_vs_scheduler_utility_by_scenario.csv",
+    "artifacts/paper_final/07_statistics/scheduler/ade_vs_realized_goodput.pdf"
   ],
   "acceptance": [
     "scenario-cluster bootstrap",
@@ -34,7 +34,7 @@
       "scripts/07_analyze_learned_results.py",
       "artifacts/paper_final/05_heldout/heldout_metrics_by_scenario.csv",
       "--output",
-      "artifacts/paper_final/07_analysis/learned"
+      "artifacts/paper_final/07_statistics/learned"
     ],
     [
       "python",
@@ -42,7 +42,7 @@
       "artifacts/paper_final/05_heldout/heldout_metrics_by_scenario.csv",
       "artifacts/paper_final/06_scheduling",
       "--output",
-      "artifacts/paper_final/07_analysis/statistics"
+      "artifacts/paper_final/07_statistics/scheduler"
     ]
   ]
 }

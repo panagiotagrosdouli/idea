@@ -1,27 +1,29 @@
-# Stage 2 - PC-FMCW/DPSK link
+# Stage 2 — PC-FMCW/DPSK link
 
-Regenerates and freezes the Part-A receiver-derived BER mapping. It records the
-waveform-sample SNR semantics and retains the explicit limitation that absolute
-received optical power is not measurement-calibrated.
+## Scientific purpose
+Regenerate, verify and freeze the Part-A receiver-derived PC-FMCW/DPSK BER mapping used downstream. This stage owns physical-layer evidence, not prediction or scheduling logic.
 
-The canonical receiver uses one continuous unwrapped FFT-frequency alias branch
-for both per-symbol carrier projection and midpoint phase compensation. This
-avoids the deterministic pi-rotation failure that can occur when wrapped and
-unwrapped branches are mixed across the Part-A 13/14-sample symbol timing.
+## Required inputs
+- `configs/part_a_physical_layer.json`
+- frozen Stage-1/protocol context through the stage graph
 
-Raw bit decisions remain clustered within chirps because a chirp shares the
-receiver tracking process. The canonical stability diagnostic therefore uses
-independently seeded one-chirp trials at 5, 7, 8 and 10 dB and treats the chirp,
-not each bit, as the inferential unit. The targeted
-`scripts/02_diagnose_part_a_paired_reversal.py` utility remains available when a
-future regenerated LUT exhibits a material adjacent raw-BER reversal.
-
-Canonical outputs are:
-
+## Outputs
 - `artifacts/paper_final/02_link/dbpsk_ber_lut.csv`
 - `artifacts/paper_final/02_link/chirp_cluster_diagnostic.json`
 - `artifacts/paper_final/02_link/link_verification.json`
 
+## Acceptance criteria
+The frozen 31-point −5 to 25 dB waveform-sample SNR grid is used; each point has at least 250,000 simulated bits; zero-error points use a confidence-aware bound; the conservative LUT is monotone; Part-A receiver/SNR semantics verify; chirp-cluster diagnostics show no prohibited instability; model-based absolute optical power is disclosed.
+
+The receiver keeps one continuous unwrapped FFT-frequency alias branch for carrier projection and midpoint compensation. Chirps, not individual within-chirp bits, are the relevant independent unit for the stability diagnostic.
+
+## Canonical command
 ```bash
 python stages/02_pc_fmcw_dpsk_link/run.py
 ```
+
+## Forbidden
+Do not change frozen Stage-2 science to make downstream evidence pass. Do not interpret finite zero observed errors as proof that the true BER is exactly zero. Do not claim measured/calibrated optical power when it is model-based.
+
+## Dependencies
+Stage 1 in the formal stage graph. The Stage-1-only production path does not execute or require Stage 2; the full downstream path requires this frozen verified evidence.

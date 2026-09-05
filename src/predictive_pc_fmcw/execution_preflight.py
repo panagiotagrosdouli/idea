@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import glob
 import importlib.util
+import json
 import shutil
 import sys
 from pathlib import Path
 from typing import Any
+
+from .link_verification import verify_lut
 
 
 def canonical_execution_preflight(
@@ -28,13 +31,10 @@ def canonical_execution_preflight(
         root / "configs/womd_paper_corpus.json",
         root / "scripts/run_canonical_womd_pipeline.py",
     ]
+    link_lut = root / "artifacts/paper_final/02_link/dbpsk_ber_lut.csv"
+    link_report = root / "artifacts/paper_final/02_link/link_verification.json"
     if full:
-        required_repo_files.extend(
-            [
-                root / "artifacts/paper_final/02_link/dbpsk_ber_lut.csv",
-                root / "artifacts/paper_final/02_link/link_verification.json",
-            ]
-        )
+        required_repo_files.extend([link_lut, link_report])
     validation_files = sorted(glob.glob(validation_glob)) if validation_glob else []
     free_gb = shutil.disk_usage(root).free / (1024**3)
     torch_available = importlib.util.find_spec("torch") is not None
@@ -44,9 +44,28 @@ def canonical_execution_preflight(
 
         cuda_available = bool(torch.cuda.is_available())
 
-    repo_contract_files_present = all(
-        path.is_file() for path in required_repo_files
-    )
+    stage2_valid = True
+    stage2_reason = "not_required_for_stage1"
+    if full and link_lut.is_file() and link_report.is_file():
+        try:
+            verification = verify_lut(link_lut)
+            report = json.loads(link_report.read_text(encoding="utf-8"))
+            stage2_valid = (
+                verification.get("status") == "PASS"
+                and report.get("status") == "PASS"
+                and report.get("sha256") == verification.get("sha256")
+            )
+            stage2_reason = (
+                "frozen_stage2_verified" if stage2_valid else "stage2_verification_mismatch"
+            )
+        except (OSError, ValueError, TypeError, json.JSONDecodeError):
+            stage2_valid = False
+            stage2_reason = "stage2_verification_invalid"
+    elif full:
+        stage2_valid = False
+        stage2_reason = "stage2_evidence_missing"
+
+    repo_contract_files_present = all(path.is_file() for path in required_repo_files)
     checks = {
         "python_supported": sys.version_info >= (3, 10),
         "repo_contract_files_present": repo_contract_files_present,
@@ -56,17 +75,17 @@ def canonical_execution_preflight(
         "validation_tfrecords_present": (
             bool(validation_files) if full and validation_glob else not full
         ),
+        "frozen_stage2_valid": stage2_valid,
         "torch_available": torch_available if require_gpu else True,
         "cuda_available": cuda_available if require_gpu else True,
         "free_disk_sufficient": free_gb >= min_free_gb,
     }
-    missing_repo_files = [
-        str(path) for path in required_repo_files if not path.is_file()
-    ]
+    missing_repo_files = [str(path) for path in required_repo_files if not path.is_file()]
     return {
         "status": "PASS" if all(checks.values()) else "BLOCKED",
         "mode": "full" if full else "stage1",
         "checks": checks,
+        "stage2_validation_reason": stage2_reason,
         "repo_root": str(root),
         "data_root": str(data),
         "training_npz": str(train),

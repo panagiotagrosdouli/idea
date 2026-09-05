@@ -2,7 +2,7 @@
 
 **Causal trajectory forecasting for deadline-aware optical vehicle scheduling**
 
-**English** | [Ελληνικά](README_GR.md) · [Executable stages](stages) · [Paper draft](paper/PAPER_DRAFT.md)
+**English** | [Ελληνικά](README_GR.md) · [Executable stages](stages) · [Repository architecture](docs/REPOSITORY_ARCHITECTURE.md) · [Paper draft](paper/PAPER_DRAFT.md)
 
 ![Predictive PC-FMCW/DPSK system overview](docs/assets/readme-hero.webp)
 
@@ -23,45 +23,80 @@ it is **not** the separate joint beam/ADB project.
 
 ```mermaid
 flowchart LR
-    A["Observed WOMD history"] --> B["Causal predictor"]
-    B --> C["Future geometry"]
-    C --> D["PC-FMCW/DPSK link"]
-    D --> E["Queues and deadlines"]
-    E --> F["Predictive scheduler"]
-    F --> G["Packet KPIs and statistics"]
+    A["Stage 0-1: frozen WOMD provenance"] --> B["Stage 3-5: causal prediction"]
+    A --> C["Stage 2: frozen PC-FMCW/DPSK link"]
+    B --> D["Stage 6: packet scheduling"]
+    C --> D
+    D --> E["Stage 7: scenario-level statistics"]
+    E --> F["Stage 8: reproducibility release"]
 ```
 
 Ground-truth future motion is used only to realize and evaluate the link. A
 deployable predictor or scheduler never sees it.
 
-## Executable Stage 0-8 workflow
+## Canonical Stage 0-8 workflow
 
 The project is organized as nine gated folders under [`stages/`](stages).
-Every folder owns its `stage.json`, direct `run.py`, dependencies, commands,
-outputs and acceptance criteria.
+Every folder owns its `stage.json`, direct `run.py`, stage README, dependencies,
+commands, expected evidence and acceptance criteria. Reusable implementation
+remains under `src/predictive_pc_fmcw/`; stage folders do not duplicate science.
 
 | Stage | Folder | Purpose | Completion gate |
 |---:|---|---|---|
 | 0 | [`00_freeze_and_provenance`](stages/00_freeze_and_provenance) | Freeze protocol and split policy | Dataset hashes and zero scenario overlap |
-| 1 | [`01_womd_data_pipeline`](stages/01_womd_data_pipeline) | Audit causal true-SDC samples | Valid history/future arrays and split labels |
-| 2 | [`02_pc_fmcw_dpsk_link`](stages/02_pc_fmcw_dpsk_link) | Freeze the Part-A link mapping | 31-point confidence-aware BER LUT |
-| 3 | [`03_classical_baselines`](stages/03_classical_baselines) | Evaluate Last/CV/CA/Kalman/IMM | Reproducible trajectory and link metrics |
-| 4 | [`04_communication_aware_gru`](stages/04_communication_aware_gru) | Select loss weights and train GRUs | Four objectives × five seeds = 20 checkpoints |
-| 5 | [`05_official_predictor_evaluation`](stages/05_official_predictor_evaluation) | Evaluate untouched validation | ADE/FDE, link fidelity, NLL and coverage |
-| 6 | [`06_packet_scheduling`](stages/06_packet_scheduling) | Run paired packet experiments | Eight schedulers × five traffic seeds |
-| 7 | [`07_statistics_and_figures`](stages/07_statistics_and_figures) | Analyze operating regions | Cluster CI, Wilcoxon, Holm and ADE-goodput join |
-| 8 | [`08_final_paper`](stages/08_final_paper) | Build the release | Final figures, tables, paper and manifest |
+| 1 | [`01_womd_data_pipeline`](stages/01_womd_data_pipeline) | Materialize/audit the frozen WOMD corpora | Source hashes, causal arrays, split/provenance gates |
+| 2 | [`02_pc_fmcw_dpsk_link`](stages/02_pc_fmcw_dpsk_link) | Freeze the Part-A link mapping | Confidence-aware verified BER LUT |
+| 3 | [`03_classical_baselines`](stages/03_classical_baselines) | Evaluate Last/CV/CA/Kalman/IMM | Reproducible development trajectory/link metrics |
+| 4 | [`04_communication_aware_gru`](stages/04_communication_aware_gru) | Select loss weights and train GRUs | Four objectives × five seeds = 20 verified checkpoints |
+| 5 | [`05_official_predictor_evaluation`](stages/05_official_predictor_evaluation) | Evaluate untouched validation | Frozen predictors evaluated once on official validation |
+| 6 | [`06_packet_scheduling`](stages/06_packet_scheduling) | Run paired packet experiments | Eight schedulers × five paired traffic seeds |
+| 7 | [`07_statistics_and_figures`](stages/07_statistics_and_figures) | Analyze operating regions | Scenario/episode inference, multiplicity-aware statistics |
+| 8 | [`08_final_paper`](stages/08_final_paper) | Build the release | Final evidence, paper and reproducibility manifest |
 
-Generated evidence mirrors the stages:
+Canonical generated evidence mirrors stage ownership:
 
 ```text
 artifacts/paper_final/
-├── 00_freeze/       ├── 01_data/        ├── 02_link/
-├── 03_baselines/    ├── 04_learning/    ├── 05_heldout/
-├── 06_scheduling/   ├── 07_analysis/    └── 08_release/
+├── 00_freeze/
+├── 01_data/
+├── 02_link/
+├── 03_baselines/
+├── 04_learning/
+├── 05_heldout/
+├── 06_scheduling/
+├── 07_statistics/
+└── 08_release/
 ```
 
-Inspect, preview and execute:
+`artifacts/paper_final/execution_state.json` and Stage-4-local execution-state
+files are operational restart reports only. They never replace scientific
+completion manifests, provenance reports or acceptance gates.
+
+### One canonical operator path
+
+```bash
+# 1. Preflight: Stage 1 deliberately does not require Stage 2 or CUDA.
+make canonical-preflight \
+  WOMD_DATA_ROOT=/data/womd \
+  TRAIN_NPZ=/data/womd/womd_training_paper.npz \
+  VALIDATION_NPZ=/data/womd/womd_validation_paper.npz
+
+# 2. Stage 1 provenance/corpus verification.
+make canonical-stage1 \
+  WOMD_DATA_ROOT=/data/womd \
+  TRAIN_NPZ=/data/womd/womd_training_paper.npz \
+  VALIDATION_NPZ=/data/womd/womd_validation_paper.npz
+
+# 3. Full downstream canonical execution. This requires frozen Stage 2,
+#    official-validation TFRecords and CUDA through the full preflight.
+make canonical-full \
+  WOMD_DATA_ROOT=/data/womd \
+  TRAIN_NPZ=/data/womd/womd_training_paper.npz \
+  VALIDATION_NPZ=/data/womd/womd_validation_paper.npz \
+  VALIDATION_GLOB='/data/womd/validation/*.tfrecord'
+```
+
+For dependency-oriented inspection of individual research stages, use:
 
 ```bash
 make stages
@@ -74,19 +109,20 @@ make stage STAGE=stage0 EXECUTE=--execute
 | Evidence | State |
 |---|---|
 | Trajectory → link → packet simulation | Implemented and tested |
-| Scientific regression suite | **63/63 tests pass** |
 | Part-A receiver-derived LUT | Executed on a 31-point SNR grid |
-| Controlled scheduling study | 1,125 rows: 45 settings × 5 seeds × 5 policies |
-| Official WOMD training corpus | **249,137 samples, 24,182 scenarios** |
-| Training/development leakage audit | **0 overlapping scenario IDs** |
-| Earlier three-seed training attempt | 7/12 results and 8/12 checkpoints preserved |
-| Canonical learned archive | Pending: 20 verified checkpoints required |
-| Untouched official-validation corpus | Export implemented; artifact pending |
-| Official learned scheduling evidence | Pending validation data and checkpoints |
+| Controlled scheduling study | Existing non-canonical development evidence retained |
+| Historical WOMD training fingerprint | 249,137 samples / 24,182 scenarios; provenance fingerprint, not a target |
+| Training/development leakage audit | Zero overlap required by the canonical gate |
+| Earlier partial training attempt | Preserved as historical evidence; not canonical completion |
+| Canonical learned archive | Pending until 20 verified checkpoints exist |
+| Untouched official-validation corpus | Export supported; must remain outside model selection |
+| Official learned scheduling evidence | Requires real validation data and checkpoints |
 | Measured optical-channel validation | Not available and not claimed |
 
-Training corpus SHA-256:
+Historical training corpus SHA-256 recorded in prior evidence:
 `b47faf427487a7405531e4944c5bfff9ca56d4fcb9ce3f8495df3cce534347ee`.
+Historical counts and hashes are provenance fingerprints: the Stage-1 gate does
+not force a new run to manufacture those counts.
 
 ## Why ADE is not enough
 
@@ -108,7 +144,8 @@ The learned objective is
 \]
 
 Stage 4 separately trains trajectory-only, trajectory+link,
-trajectory+outage and full communication-aware GRUs.
+trajectory+outage and full communication-aware GRUs. Lambda selection is
+strictly development-only and is frozen before Stage 5.
 
 ## Included methods
 
@@ -119,29 +156,13 @@ Predictors:
 - deterministic GRU with four communication-loss objectives;
 - development-fitted residual Gaussian calibration for held-out NLL and
   50/90/95% coverage;
-- perfect-future information reference.
+- perfect-future information reference for evaluator-only bounds.
 
 Schedulers:
 
-- Random, Round Robin, Reactive Greedy and Proportional Fair;
-- CV, Kalman, IMM and Learned Predictive;
-- Predictive Utility and Link-Lifetime urgency;
-- information-oracle heuristic.
-
-The oracle is not a global optimum: it has perfect future information but uses
-the same heuristic scheduling family.
-
-## Existing controlled result
-
-The controlled benchmark does **not** establish a universal gain. Link-Lifetime
-minus Reactive gives only `+0.014 Mbps`, with 95% bootstrap interval
-`[-0.0319, +0.0593] Mbps`, while P95 latency is about 269 ms worse. Other loads
-and deadlines change the sign of the effect.
-
-![Controlled benchmark trade-off](artifacts/corrected_v2/figures/corrected_benchmark_tradeoff.png)
-
-The scientific question is therefore: **when does prediction help, and which
-prediction errors matter to communication?**
+- canonical Stage 6 uses exactly eight frozen scheduler families;
+- every family is paired over exactly five frozen traffic seeds;
+- information-oracle behavior remains evaluator-only and is not deployable.
 
 ## Installation and verification
 
@@ -165,6 +186,7 @@ PyTorch is needed only for learned-model stages.
 Copy [`stages/.env.example`](stages/.env.example) and set:
 
 ```bash
+export WOMD_DATA_ROOT=/data/womd
 export TRAIN_NPZ=/data/womd/womd_v131_training.npz
 export VALIDATION_NPZ=/data/womd/womd_v131_official_validation.npz
 export VALIDATION_TFRECORD='/data/womd/validation/*.tfrecord'
@@ -179,40 +201,52 @@ validation is opened.
 ## Repository layout
 
 ```text
-stages/                        gated research work packages
-src/predictive_pc_fmcw/        reusable scientific library
-├── data/                      WOMD adapters, exports and audits
-├── learning/                  GRU, objectives, calibration, evaluation
-├── scheduling/                reactive and predictive policies
-├── simulation/                packet-level realization
-├── ber.py / link.py           PC-FMCW/DPSK abstraction
-└── research_stages.py         dependency and gate engine
-scripts/                       executable experiments
+stages/                        canonical Stage 0-8 orchestration and contracts
+├── 00_freeze_and_provenance/
+├── 01_womd_data_pipeline/
+├── 02_pc_fmcw_dpsk_link/
+├── 03_classical_baselines/
+├── 04_communication_aware_gru/
+├── 05_official_predictor_evaluation/
+├── 06_packet_scheduling/
+├── 07_statistics_and_figures/
+└── 08_final_paper/
+src/predictive_pc_fmcw/        reusable scientific/software library
+scripts/                       canonical and auxiliary executable entrypoints
 configs/                       frozen physical/experimental assumptions
 tests/                         regression and scientific gates
-artifacts/                     evidence and generated results
+artifacts/paper_final/         canonical stage-aligned evidence
 paper/                         manuscript source
-notebooks/                     Colab GPU workflow
-reference/                     supplied-work provenance
+notebooks/                     Colab GPU/data-acquisition operator workflow
+reference/                     supplied-work provenance; not copied stage code
 ```
+
+See [`docs/REPOSITORY_ARCHITECTURE.md`](docs/REPOSITORY_ARCHITECTURE.md) for
+stage ownership, forbidden operations and the data → prediction → link →
+scheduler → statistics → release flow.
 
 ## Scientific guardrails
 
+- WOMD v1.3.1 protocol is frozen.
 - No future information enters deployable decisions.
 - Scenario overlap across data partitions is rejected.
-- Hyperparameters are frozen before official validation.
+- Hyperparameters are selected on development only; official validation is not model-selection data.
+- Stage 4 is exactly four objectives × five frozen seeds.
+- Stage 6 is exactly eight scheduler families × five paired traffic seeds.
 - Schedulers receive paired traffic and channel randomness.
-- Packet success uses the ground-truth-derived link.
-- WOMD scenario ID is the independent statistical cluster.
-- Confirmatory comparisons use confidence intervals and Holm correction.
+- Packet success uses the ground-truth-derived link only to realize/evaluate outcomes.
+- WOMD scenario/episode is the independent statistical unit.
+- Confirmatory comparisons use scenario-clustered uncertainty and multiplicity control.
+- Finite zero-error Monte Carlo is not evidence that the true BER is exactly zero.
 - Optical power is model-based unless measurements are supplied.
 - Negative results and latency/reliability trade-offs remain visible.
+- Frozen Stage-2 science is not changed for organizational convenience.
 
 ## Start here
 
+- [Repository architecture](docs/REPOSITORY_ARCHITECTURE.md)
 - [Executable stage workspace](stages)
 - [Greek execution guide](docs/STAGED_EXECUTION_GR.md)
-- [Progress — 2026-09-03](docs/PROGRESS_2026-09-03.md)
 - [Scientific audit and plan](docs/SCIENTIFIC_AUDIT_AND_PLAN.md)
 - [WOMD audit](docs/WOMD_DATASET_AUDIT.md)
 - [Data provenance](docs/DATA_PROVENANCE.md)
@@ -221,6 +255,6 @@ reference/                     supplied-work provenance
 ## Publication status
 
 This is a tested research implementation and a frozen publication protocol,
-not yet a submission-ready empirical paper. Stage 8 requires the 20-checkpoint
-archive, untouched official-validation results, paired packet experiments,
-scenario-clustered statistics and a clean reproducibility release.
+not a license to infer completion from file existence. Stage 8 requires the
+20-checkpoint archive, untouched official-validation results, paired packet
+experiments, scenario-clustered statistics and a clean reproducibility release.
