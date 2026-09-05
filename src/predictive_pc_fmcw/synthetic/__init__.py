@@ -12,6 +12,7 @@ from .checkpoint_selection import (
 from .dataset import DatasetBuildConfig, build_dataset, validate_dataset
 from .episodes import SyntheticEpisode, compose_synthetic_episodes
 from .freeze import verify_publication_training_freeze
+from .learned_evaluation import run_official_learned_evaluation
 from .link_evaluation import (
     LinkPredictionMetrics,
     evaluate_synthetic_link_prediction,
@@ -95,6 +96,7 @@ __all__ = [
     "observe_scenario",
     "operating_region_protocol_manifest",
     "robustness_protocol_manifest",
+    "run_official_learned_evaluation",
     "run_operating_region_sweep",
     "run_synthetic_robustness_sweep",
     "run_synthetic_scheduling_evaluation",
