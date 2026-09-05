@@ -154,31 +154,121 @@ class PartALinkVerificationTest(unittest.TestCase):
 
     def test_paired_chirp_diagnostic_can_clear_apparent_reversal(self):
         points = self._canonical_points()
-        points[12] = BERPoint(7.0, 0.008, 0.0, 250_000, 2_000, 0.009, 0.06,
-                              "supplied_part_a_fft_dpsk", "waveform_sample_snr_db")
-        points[13] = BERPoint(8.0, 0.05, 0.0, 250_000, 12_500, 0.052, 0.05,
-                              "supplied_part_a_fft_dpsk", "waveform_sample_snr_db")
+        points[12] = BERPoint(
+            7.0,
+            0.008,
+            0.0,
+            250_000,
+            2_000,
+            0.009,
+            0.06,
+            "supplied_part_a_fft_dpsk",
+            "waveform_sample_snr_db",
+        )
+        points[13] = BERPoint(
+            8.0,
+            0.05,
+            0.0,
+            250_000,
+            12_500,
+            0.052,
+            0.05,
+            "supplied_part_a_fft_dpsk",
+            "waveform_sample_snr_db",
+        )
         for index in range(14, len(points)):
             value = max(0.001, 0.04 - (index - 14) * 0.001)
             points[index] = BERPoint(
-                float(index - 5), value, 0.0, 250_000, round(value * 250_000),
-                value + 0.001, value, "supplied_part_a_fft_dpsk",
+                float(index - 5),
+                value,
+                0.0,
+                250_000,
+                round(value * 250_000),
+                value + 0.001,
+                value,
+                "supplied_part_a_fft_dpsk",
                 "waveform_sample_snr_db",
             )
         diagnostic = {
-            "schema": "paired_chirp_ber_reversal_v1", "lower_snr_db": 7.0,
-            "higher_snr_db": 8.0, "sampling_unit": "independent_chirp",
-            "common_random_numbers_within_pair": True, "trials": 100,
-            "bootstrap_repetitions": 10_000, "material_reversal_supported": False,
+            "schema": "paired_chirp_ber_reversal_v1",
+            "lower_snr_db": 7.0,
+            "higher_snr_db": 8.0,
+            "sampling_unit": "independent_chirp",
+            "common_random_numbers_within_pair": True,
+            "trials": 100,
+            "bootstrap_repetitions": 10_000,
+            "material_reversal_supported": False,
         }
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             lut = root / "lut.csv"
             diag = root / "diag.json"
             write_ber_lut(points, lut)
-            diag.write_text(json.dumps(diagnostic))
+            diag.write_text(json.dumps(diagnostic), encoding="utf-8")
             report = verify_lut(lut, chirp_diagnostic_path=diag)
             self.assertEqual(report["status"], "PASS")
+
+    def test_independent_chirp_stability_diagnostic_is_verified(self):
+        diagnostic = self._stability_diagnostic(catastrophic_chirps=0)
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            lut = root / "lut.csv"
+            diag = root / "diag.json"
+            write_ber_lut(self._canonical_points(), lut)
+            diag.write_text(json.dumps(diagnostic), encoding="utf-8")
+            report = verify_lut(lut, chirp_diagnostic_path=diag)
+            self.assertEqual(report["status"], "PASS")
+            self.assertTrue(report["checks"]["chirp_diagnostic_valid"])
+            self.assertEqual(
+                report["chirp_diagnostic"]["kind"],
+                "independent_chirp_stability",
+            )
+            self.assertNotIn(
+                "trials", report["chirp_diagnostic"]["summary"]["rows"][0]
+            )
+
+    def test_catastrophic_chirp_blocks_stability_diagnostic(self):
+        diagnostic = self._stability_diagnostic(catastrophic_chirps=1)
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            lut = root / "lut.csv"
+            diag = root / "diag.json"
+            write_ber_lut(self._canonical_points(), lut)
+            diag.write_text(json.dumps(diagnostic), encoding="utf-8")
+            report = verify_lut(lut, chirp_diagnostic_path=diag)
+            self.assertEqual(report["status"], "FAIL")
+            self.assertFalse(report["checks"]["chirp_diagnostic_valid"])
+
+    @staticmethod
+    def _stability_diagnostic(catastrophic_chirps: int) -> dict:
+        rows = []
+        for snr in (5.0, 7.0, 8.0, 10.0):
+            rows.append(
+                {
+                    "snr_db": snr,
+                    "independent_chirp_trials": 50,
+                    "decisions_per_trial": 1_000,
+                    "mean_ber": 0.0,
+                    "median_ber": 0.0,
+                    "std_ber_across_chirps": 0.0,
+                    "p95_chirp_ber": 0.0,
+                    "max_chirp_ber": 0.1 if catastrophic_chirps else 0.0,
+                    "cluster_bootstrap_ci_95": [0.0, 0.0],
+                    "catastrophic_chirps": catastrophic_chirps,
+                    "catastrophic_chirp_rate": catastrophic_chirps / 50,
+                    "trials": [],
+                }
+            )
+        return {
+            "method": "independent_one_chirp_trials_with_cluster_bootstrap",
+            "snr_semantics": "waveform_sample_snr_db",
+            "seed": 20260827,
+            "trials_per_snr": 50,
+            "decisions_per_trial": 1_000,
+            "bootstrap_resamples": 10_000,
+            "catastrophic_ber_threshold": 0.05,
+            "rows": rows,
+        }
 
 
 if __name__ == "__main__":
