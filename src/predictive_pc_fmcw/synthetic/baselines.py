@@ -14,6 +14,7 @@ from ..predictors import (
     InteractingMultipleModelPredictor,
     KalmanConstantVelocityPredictor,
     LastPositionPredictor,
+    TrajectoryPredictor,
 )
 
 
@@ -39,7 +40,7 @@ def _angle_error(left: np.ndarray, right: np.ndarray) -> np.ndarray:
     return np.arctan2(np.sin(left - right), np.cos(left - right))
 
 
-def _predictors() -> tuple[object, ...]:
+def _predictors() -> tuple[TrajectoryPredictor, ...]:
     return (
         LastPositionPredictor(),
         ConstantVelocityPredictor(),
@@ -75,8 +76,9 @@ def evaluate_synthetic_baselines(
     if not scenario_ids:
         raise ValueError(f"synthetic split is empty: {split}")
 
+    predictors = _predictors()
     rows: dict[str, dict[str, list[float] | int]] = {}
-    for predictor in _predictors():
+    for predictor in predictors:
         rows[predictor.name] = {
             "ade": [],
             "fde": [],
@@ -99,7 +101,8 @@ def evaluate_synthetic_baselines(
                 ),
                 axis=-1,
             )
-            dt_s = float(np.median(np.diff(np.asarray(data["t_s"], dtype=float))))
+            t_s = np.asarray(data["t_s"], dtype=np.float64)
+            dt_s = float(np.median(np.diff(t_s)))
             first_end = history_steps - 1
             last_end = truth.shape[0] - horizon_steps - 1
             for end_index in range(first_end, last_end + 1, stride):
@@ -107,11 +110,12 @@ def evaluate_synthetic_baselines(
                 target = truth[end_index + 1 : end_index + 1 + horizon_steps]
                 target_range = np.linalg.norm(target, axis=-1)
                 target_bearing = np.arctan2(target[:, 1], target[:, 0])
-                for predictor in _predictors():
+                for predictor in predictors:
                     predicted = predictor.predict(history, horizon_steps, dt_s)
                     error = np.linalg.norm(predicted - target, axis=-1)
                     predicted_range = np.linalg.norm(predicted, axis=-1)
                     predicted_bearing = np.arctan2(predicted[:, 1], predicted[:, 0])
+                    bearing_error = _angle_error(predicted_bearing, target_bearing)
                     bucket = rows[predictor.name]
                     bucket["ade"].append(float(np.mean(error)))
                     bucket["fde"].append(float(error[-1]))
@@ -119,12 +123,12 @@ def evaluate_synthetic_baselines(
                         float(np.mean(np.abs(predicted_range - target_range)))
                     )
                     bucket["bearing"].append(
-                        float(np.mean(np.abs(_angle_error(predicted_bearing, target_bearing))))
+                        float(np.mean(np.abs(bearing_error)))
                     )
                     bucket["windows"] = int(bucket["windows"]) + 1
 
     results: list[BaselineMetrics] = []
-    for predictor in _predictors():
+    for predictor in predictors:
         bucket = rows[predictor.name]
         results.append(
             BaselineMetrics(
@@ -146,8 +150,8 @@ def save_baseline_results(
 ) -> Path:
     destination = Path(output_path)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(
-        json.dumps([asdict(row) for row in results], indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
+    payload = json.dumps(
+        [asdict(row) for row in results], indent=2, sort_keys=True
     )
+    destination.write_text(payload + "\n", encoding="utf-8")
     return destination
