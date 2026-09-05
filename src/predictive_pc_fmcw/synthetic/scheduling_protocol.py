@@ -27,7 +27,7 @@ SCHEDULER_FAMILIES = (
         "S3",
         "learned_predictive",
         "communication_aware_gru",
-        learned_objective="full_communication_aware",
+        learned_objective="full",
     ),
     SchedulerFamily("S4", "oracle", "oracle_future", deployable=False),
 )
@@ -48,10 +48,7 @@ def validate_scheduler_protocol() -> None:
     learned = [item for item in SCHEDULER_FAMILIES if item.learned_objective]
     if len(learned) != 2:
         raise ValueError("publication protocol requires exactly two learned schedulers")
-    if {item.learned_objective for item in learned} != {
-        "trajectory_only",
-        "full_communication_aware",
-    }:
+    if {item.learned_objective for item in learned} != {"trajectory_only", "full"}:
         raise ValueError("learned scheduler objectives drifted from frozen protocol")
 
 
