@@ -6,7 +6,8 @@
 	synthetic-training synthetic-training-validate synthetic-baselines \
 	synthetic-link-eval synthetic-ablation-plan synthetic-ablation \
 	synthetic-pipeline synthetic-freeze synthetic-heldout synthetic-ood \
-	synthetic-select-checkpoints synthetic-scheduling-heldout synthetic-scheduling-ood
+	synthetic-select-checkpoints synthetic-scheduling-heldout synthetic-scheduling-ood \
+	synthetic-stats-heldout synthetic-stats-ood
 
 install:
 	python -m pip install -e ".[dev]"
@@ -84,6 +85,16 @@ synthetic-scheduling-heldout:
 synthetic-scheduling-ood:
 	PYTHONPATH=src python scripts/run_synthetic_scheduling_v1.py \
 		--split ood_test
+
+synthetic-stats-heldout:
+	PYTHONPATH=src python scripts/analyze_synthetic_scheduling_v1.py \
+		--input artifacts/synthetic_dataset_v1/scheduling_held_out_test.json \
+		--output artifacts/synthetic_dataset_v1/statistics_held_out_test.json
+
+synthetic-stats-ood:
+	PYTHONPATH=src python scripts/analyze_synthetic_scheduling_v1.py \
+		--input artifacts/synthetic_dataset_v1/scheduling_ood_test.json \
+		--output artifacts/synthetic_dataset_v1/statistics_ood_test.json
 
 benchmark:
 	pcfmcw benchmark --config configs/default.json --output artifacts/synthetic_benchmark
