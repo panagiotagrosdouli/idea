@@ -5,7 +5,8 @@
 	canonical-full synthetic-dataset synthetic-dataset-validate \
 	synthetic-training synthetic-training-validate synthetic-baselines \
 	synthetic-link-eval synthetic-ablation-plan synthetic-ablation \
-	synthetic-pipeline synthetic-freeze synthetic-heldout synthetic-ood
+	synthetic-pipeline synthetic-freeze synthetic-heldout synthetic-ood \
+	synthetic-select-checkpoints synthetic-scheduling-heldout synthetic-scheduling-ood
 
 install:
 	python -m pip install -e ".[dev]"
@@ -63,6 +64,9 @@ synthetic-pipeline:
 synthetic-freeze:
 	PYTHONPATH=src python scripts/freeze_synthetic_publication_v1.py
 
+synthetic-select-checkpoints:
+	PYTHONPATH=src python scripts/select_synthetic_scheduler_checkpoints_v1.py
+
 synthetic-heldout:
 	PYTHONPATH=src python scripts/export_synthetic_official_v1.py \
 		--split held_out_test \
@@ -72,6 +76,14 @@ synthetic-ood:
 	PYTHONPATH=src python scripts/export_synthetic_official_v1.py \
 		--split ood_test \
 		--output artifacts/synthetic_dataset_v1/ood_test.npz
+
+synthetic-scheduling-heldout:
+	PYTHONPATH=src python scripts/run_synthetic_scheduling_v1.py \
+		--split held_out_test
+
+synthetic-scheduling-ood:
+	PYTHONPATH=src python scripts/run_synthetic_scheduling_v1.py \
+		--split ood_test
 
 benchmark:
 	pcfmcw benchmark --config configs/default.json --output artifacts/synthetic_benchmark
