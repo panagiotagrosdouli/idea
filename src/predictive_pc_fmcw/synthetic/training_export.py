@@ -44,7 +44,9 @@ def build_synthetic_training_npz(
     }
     forbidden = set(split["held_out_test"]) | set(split["ood_test"])
     if set(allowed) & forbidden:
-        raise ValueError("synthetic manifest leaks held-out/OOD scenarios into training")
+        raise ValueError(
+            "synthetic manifest leaks held-out/OOD scenarios into training"
+        )
 
     histories: list[np.ndarray] = []
     futures: list[np.ndarray] = []
@@ -147,7 +149,9 @@ def validate_synthetic_training_npz(
         if set(scenario_ids) & forbidden:
             raise ValueError("held-out/OOD contamination in synthetic training NPZ")
         if set(np.unique(splits)) != {"training", "development"}:
-            raise ValueError("synthetic training NPZ must contain only train/development")
+            raise ValueError(
+                "synthetic training NPZ must contain only train/development"
+            )
         if history.ndim != 3 or future.ndim != 3:
             raise ValueError("history_xy/future_xy must be rank-3 arrays")
         if history.shape[0] != future.shape[0] or history.shape[-1] != 2:
