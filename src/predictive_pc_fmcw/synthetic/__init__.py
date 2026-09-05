@@ -5,7 +5,12 @@ from .baselines import (
     evaluate_synthetic_baselines,
     save_baseline_results,
 )
+from .checkpoint_selection import (
+    build_development_checkpoint_selection,
+    select_representative_seed,
+)
 from .dataset import DatasetBuildConfig, build_dataset, validate_dataset
+from .episodes import SyntheticEpisode, compose_synthetic_episodes
 from .freeze import verify_publication_training_freeze
 from .link_evaluation import (
     LinkPredictionMetrics,
@@ -15,7 +20,12 @@ from .link_evaluation import (
 from .mobility import Scenario, SyntheticMobilityConfig, generate_scenario
 from .observations import CausalObservations, ObservationNoiseConfig, observe_scenario
 from .official_export import build_official_evaluation_npz
+from .scheduling_evaluation import (
+    build_scheduling_plan,
+    run_synthetic_scheduling_evaluation,
+)
 from .scheduling_protocol import (
+    PAIRED_TRAFFIC_SEEDS,
     SCHEDULER_FAMILIES,
     SchedulerFamily,
     scheduler_protocol_manifest,
@@ -33,22 +43,29 @@ __all__ = [
     "DatasetBuildConfig",
     "LinkPredictionMetrics",
     "ObservationNoiseConfig",
+    "PAIRED_TRAFFIC_SEEDS",
     "SCHEDULER_FAMILIES",
     "Scenario",
     "SchedulerFamily",
     "SplitManifest",
+    "SyntheticEpisode",
     "SyntheticMobilityConfig",
     "build_dataset",
+    "build_development_checkpoint_selection",
     "build_official_evaluation_npz",
+    "build_scheduling_plan",
     "build_split_manifest",
     "build_synthetic_training_npz",
+    "compose_synthetic_episodes",
     "evaluate_synthetic_baselines",
     "evaluate_synthetic_link_prediction",
     "generate_scenario",
     "observe_scenario",
+    "run_synthetic_scheduling_evaluation",
     "save_baseline_results",
     "save_link_prediction_results",
     "scheduler_protocol_manifest",
+    "select_representative_seed",
     "validate_dataset",
     "validate_scheduler_protocol",
     "validate_split_manifest",
