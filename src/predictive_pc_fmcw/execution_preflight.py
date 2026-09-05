@@ -56,7 +56,9 @@ def canonical_execution_preflight(
                 and report.get("sha256") == verification.get("sha256")
             )
             stage2_reason = (
-                "frozen_stage2_verified" if stage2_valid else "stage2_verification_mismatch"
+                "frozen_stage2_verified"
+                if stage2_valid
+                else "stage2_verification_mismatch"
             )
         except (OSError, ValueError, TypeError, json.JSONDecodeError):
             stage2_valid = False
@@ -80,7 +82,9 @@ def canonical_execution_preflight(
         "cuda_available": cuda_available if require_gpu else True,
         "free_disk_sufficient": free_gb >= min_free_gb,
     }
-    missing_repo_files = [str(path) for path in required_repo_files if not path.is_file()]
+    missing_repo_files = [
+        str(path) for path in required_repo_files if not path.is_file()
+    ]
     return {
         "status": "PASS" if all(checks.values()) else "BLOCKED",
         "mode": "full" if full else "stage1",
