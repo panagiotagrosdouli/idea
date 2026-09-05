@@ -26,7 +26,9 @@ class ReleaseReadinessSemanticsTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             manuscript = root / "paper.md"
-            manuscript.write_text("Canonical evidence-backed manuscript.", encoding="utf-8")
+            manuscript.write_text(
+                "Canonical evidence-backed manuscript.", encoding="utf-8"
+            )
 
             source = root / "source_shard_manifest.json"
             corpus = root / "corpus_verification.json"
