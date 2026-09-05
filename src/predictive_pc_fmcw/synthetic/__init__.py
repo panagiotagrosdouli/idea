@@ -20,6 +20,14 @@ from .link_evaluation import (
 from .mobility import Scenario, SyntheticMobilityConfig, generate_scenario
 from .observations import CausalObservations, ObservationNoiseConfig, observe_scenario
 from .official_export import build_official_evaluation_npz
+from .operating_region import (
+    OPERATING_CONDITIONS,
+    OperatingCondition,
+    analyze_operating_region,
+    operating_region_protocol_manifest,
+    run_operating_region_sweep,
+    validate_operating_region_protocol,
+)
 from .robustness import (
     ROBUSTNESS_CONDITIONS,
     RobustnessCondition,
@@ -56,7 +64,9 @@ __all__ = [
     "CausalObservations",
     "DatasetBuildConfig",
     "LinkPredictionMetrics",
+    "OPERATING_CONDITIONS",
     "ObservationNoiseConfig",
+    "OperatingCondition",
     "PAIRED_TRAFFIC_SEEDS",
     "PRIMARY_COMPARISONS",
     "ROBUSTNESS_CONDITIONS",
@@ -69,6 +79,7 @@ __all__ = [
     "SyntheticEpisode",
     "SyntheticMobilityConfig",
     "aggregate_traffic_seeds",
+    "analyze_operating_region",
     "analyze_scheduling_file",
     "analyze_scheduling_rows",
     "build_dataset",
@@ -82,7 +93,9 @@ __all__ = [
     "evaluate_synthetic_link_prediction",
     "generate_scenario",
     "observe_scenario",
+    "operating_region_protocol_manifest",
     "robustness_protocol_manifest",
+    "run_operating_region_sweep",
     "run_synthetic_robustness_sweep",
     "run_synthetic_scheduling_evaluation",
     "save_baseline_results",
@@ -90,6 +103,7 @@ __all__ = [
     "scheduler_protocol_manifest",
     "select_representative_seed",
     "validate_dataset",
+    "validate_operating_region_protocol",
     "validate_robustness_protocol",
     "validate_scheduler_protocol",
     "validate_split_manifest",
