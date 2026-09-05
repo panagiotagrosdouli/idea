@@ -4,8 +4,14 @@ import numpy as np
 import pytest
 
 from predictive_pc_fmcw.synthetic.mobility import generate_scenario
-from predictive_pc_fmcw.synthetic.observations import ObservationNoiseConfig, observe_scenario
-from predictive_pc_fmcw.synthetic.splits import build_split_manifest, validate_split_manifest
+from predictive_pc_fmcw.synthetic.observations import (
+    ObservationNoiseConfig,
+    observe_scenario,
+)
+from predictive_pc_fmcw.synthetic.splits import (
+    build_split_manifest,
+    validate_split_manifest,
+)
 
 
 def test_observations_are_seed_deterministic() -> None:
@@ -13,7 +19,10 @@ def test_observations_are_seed_deterministic() -> None:
     first = observe_scenario(scenario, seed=20)
     second = observe_scenario(scenario, seed=20)
     np.testing.assert_array_equal(first.range_m, second.range_m)
-    np.testing.assert_array_equal(first.radial_velocity_mps, second.radial_velocity_mps)
+    np.testing.assert_array_equal(
+        first.radial_velocity_mps,
+        second.radial_velocity_mps,
+    )
     np.testing.assert_array_equal(first.bearing_rad, second.bearing_rad)
 
 
@@ -22,7 +31,10 @@ def test_zero_noise_recovers_observable_ground_truth() -> None:
     noise = ObservationNoiseConfig(0.0, 0.0, 0.0)
     observations = observe_scenario(scenario, seed=4, config=noise)
     np.testing.assert_allclose(observations.range_m, scenario.range_m)
-    np.testing.assert_allclose(observations.radial_velocity_mps, scenario.radial_velocity_mps)
+    np.testing.assert_allclose(
+        observations.radial_velocity_mps,
+        scenario.radial_velocity_mps,
+    )
     np.testing.assert_allclose(observations.bearing_rad, scenario.bearing_rad)
 
 
@@ -33,13 +45,20 @@ def test_history_through_contains_no_future_samples() -> None:
     history = observations.history_through(index)
     assert history.t_s.size == index + 1
     assert history.t_s[-1] == observations.t_s[index]
-    np.testing.assert_array_equal(history.range_m, observations.range_m[: index + 1])
+    np.testing.assert_array_equal(
+        history.range_m,
+        observations.range_m[: index + 1],
+    )
 
 
 def test_negative_observation_noise_is_rejected() -> None:
     scenario = generate_scenario("receding", seed=1)
     with pytest.raises(ValueError, match="non-negative"):
-        observe_scenario(scenario, seed=2, config=ObservationNoiseConfig(range_std_m=-1.0))
+        observe_scenario(
+            scenario,
+            seed=2,
+            config=ObservationNoiseConfig(range_std_m=-1.0),
+        )
 
 
 def test_split_manifest_is_deterministic_disjoint_and_fingerprinted() -> None:
