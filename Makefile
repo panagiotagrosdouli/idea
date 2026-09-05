@@ -4,7 +4,8 @@
 	stage2-diagnostic womd-preflight canonical-preflight canonical-stage1 \
 	canonical-full synthetic-dataset synthetic-dataset-validate \
 	synthetic-training synthetic-training-validate synthetic-baselines \
-	synthetic-link-eval synthetic-ablation-plan synthetic-ablation
+	synthetic-link-eval synthetic-ablation-plan synthetic-ablation \
+	synthetic-pipeline
 
 install:
 	python -m pip install -e ".[dev]"
@@ -54,6 +55,10 @@ synthetic-ablation:
 	PYTHONPATH=src python scripts/train_synthetic_ablation_v1.py \
 		--dataset artifacts/synthetic_dataset_v1/training_dev.npz \
 		--output artifacts/synthetic_dataset_v1/learned_ablation
+
+synthetic-pipeline:
+	PYTHONPATH=src python scripts/run_synthetic_pipeline_v1.py \
+		--output artifacts/synthetic_dataset_v1
 
 benchmark:
 	pcfmcw benchmark --config configs/default.json --output artifacts/synthetic_benchmark
