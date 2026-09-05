@@ -115,6 +115,25 @@ def _semantic_error(path: Path) -> str | None:
             and objective_keys == CANONICAL_OBJECTIVES
         ):
             return "scheduler utility summary lacks canonical scenario evidence"
+    elif name == "reproducibility_manifest.json":
+        git_state = payload.get("git") or {}
+        environment = payload.get("environment") or {}
+        source_files = payload.get("source_files") or []
+        evidence_files = payload.get("evidence_files") or []
+        commit = str(git_state.get("commit", ""))
+        if not (
+            payload.get("status") == "PASS"
+            and git_state.get("source_dirty") is False
+            and len(commit) >= 7
+            and commit != "unavailable"
+            and int(payload.get("source_file_count", 0)) == len(source_files)
+            and int(payload.get("evidence_file_count", 0)) == len(evidence_files)
+            and len(source_files) > 0
+            and len(evidence_files) > 0
+            and bool(environment.get("python"))
+            and isinstance(environment.get("pip_freeze"), list)
+        ):
+            return "reproducibility manifest is not clean canonical evidence"
     return None
 
 
