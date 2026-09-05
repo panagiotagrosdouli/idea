@@ -4,10 +4,12 @@ import csv
 import hashlib
 import json
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 
 CANONICAL_MIN_BITS_PER_POINT = 250_000
+CANONICAL_STABILITY_SNR_DB = {5.0, 7.0, 8.0, 10.0}
 
 
 def _material_raw_increases(
@@ -21,11 +23,9 @@ def _material_raw_increases(
 
     The Part-A decisions are clustered within chirps, so bit-level binomial
     intervals are not valid evidence of statistical significance. This gate is
-    deliberately an effect-size diagnostic: it rejects an adjacent increase
-    only when both its absolute magnitude and multiplicative ratio are large.
-    Statistical inference belongs to a chirp-cluster-aware artifact.
+    deliberately an effect-size diagnostic. Statistical inference belongs to
+    a chirp-cluster-aware artifact.
     """
-
     increases: list[dict[str, float | int]] = []
     for index in range(1, len(snr)):
         previous = float(simulated[index - 1])
@@ -65,6 +65,97 @@ def _base_report(source: Path) -> dict[str, object]:
             "lut_axis": "waveform-sample SNR in dB; legacy column name ebn0_db",
         },
     }
+
+
+def _paired_diagnostic_clears_reversal(
+    diagnostic: dict[str, Any],
+    material_increases: list[dict[str, float | int]],
+) -> bool:
+    pairs = {
+        (item["lower_snr_db"], item["higher_snr_db"])
+        for item in material_increases
+    }
+    diagnostic_pair = (
+        diagnostic.get("lower_snr_db"),
+        diagnostic.get("higher_snr_db"),
+    )
+    return bool(
+        pairs == {diagnostic_pair}
+        and diagnostic.get("schema") == "paired_chirp_ber_reversal_v1"
+        and diagnostic.get("sampling_unit") == "independent_chirp"
+        and diagnostic.get("common_random_numbers_within_pair") is True
+        and int(diagnostic.get("trials", 0)) >= 100
+        and int(diagnostic.get("bootstrap_repetitions", 0)) >= 10_000
+        and diagnostic.get("material_reversal_supported") is False
+    )
+
+
+def _stability_diagnostic_valid(diagnostic: dict[str, Any]) -> bool:
+    rows = diagnostic.get("rows")
+    if not isinstance(rows, list) or not rows:
+        return False
+    if not (
+        diagnostic.get("method")
+        == "independent_one_chirp_trials_with_cluster_bootstrap"
+        and diagnostic.get("snr_semantics") == "waveform_sample_snr_db"
+        and int(diagnostic.get("trials_per_snr", 0)) >= 50
+        and 1_000 <= int(diagnostic.get("decisions_per_trial", 0)) <= 9_999
+        and int(diagnostic.get("bootstrap_resamples", 0)) >= 10_000
+        and 0.0 < float(diagnostic.get("catastrophic_ber_threshold", 0.0)) <= 0.05
+    ):
+        return False
+
+    try:
+        snr_values = {float(row["snr_db"]) for row in rows}
+        row_checks = [
+            int(row.get("independent_chirp_trials", 0)) >= 50
+            and 1_000 <= int(row.get("decisions_per_trial", 0)) <= 9_999
+            and int(row.get("catastrophic_chirps", -1)) == 0
+            and float(row.get("max_chirp_ber", 1.0))
+            < float(diagnostic["catastrophic_ber_threshold"])
+            for row in rows
+        ]
+    except (KeyError, TypeError, ValueError):
+        return False
+    return CANONICAL_STABILITY_SNR_DB.issubset(snr_values) and all(row_checks)
+
+
+def _diagnostic_summary(diagnostic: dict[str, Any]) -> dict[str, Any]:
+    if (
+        diagnostic.get("method")
+        == "independent_one_chirp_trials_with_cluster_bootstrap"
+    ):
+        row_keys = (
+            "snr_db",
+            "independent_chirp_trials",
+            "decisions_per_trial",
+            "mean_ber",
+            "median_ber",
+            "std_ber_across_chirps",
+            "p95_chirp_ber",
+            "max_chirp_ber",
+            "cluster_bootstrap_ci_95",
+            "catastrophic_chirps",
+            "catastrophic_chirp_rate",
+        )
+        return {
+            "method": diagnostic.get("method"),
+            "snr_semantics": diagnostic.get("snr_semantics"),
+            "seed": diagnostic.get("seed"),
+            "trials_per_snr": diagnostic.get("trials_per_snr"),
+            "decisions_per_trial": diagnostic.get("decisions_per_trial"),
+            "bootstrap_resamples": diagnostic.get("bootstrap_resamples"),
+            "catastrophic_ber_threshold": diagnostic.get(
+                "catastrophic_ber_threshold"
+            ),
+            "rows": [
+                {key: row.get(key) for key in row_keys}
+                for row in diagnostic.get("rows", [])
+            ],
+        }
+
+    excluded = {"trial_lower_ber", "trial_higher_ber"}
+    return {key: value for key, value in diagnostic.items() if key not in excluded}
 
 
 def verify_lut(
@@ -122,27 +213,29 @@ def verify_lut(
     receivers = {row["receiver"] for row in rows}
     semantics = {row["snr_semantics"] for row in rows}
     material_increases = _material_raw_increases(snr, simulated)
-    diagnostic = None
+
+    diagnostic: dict[str, Any] | None = None
+    diagnostic_valid = True
+    diagnostic_kind = None
     diagnostic_clears_reversals = not material_increases
     if chirp_diagnostic_path is not None:
         diagnostic_source = Path(chirp_diagnostic_path)
         diagnostic = json.loads(diagnostic_source.read_text(encoding="utf-8"))
-        pairs = {
-            (item["lower_snr_db"], item["higher_snr_db"])
-            for item in material_increases
-        }
-        diagnostic_pair = (
-            diagnostic.get("lower_snr_db"), diagnostic.get("higher_snr_db")
-        )
-        diagnostic_clears_reversals = bool(
-            pairs == {diagnostic_pair}
-            and diagnostic.get("schema") == "paired_chirp_ber_reversal_v1"
-            and diagnostic.get("sampling_unit") == "independent_chirp"
-            and diagnostic.get("common_random_numbers_within_pair") is True
-            and int(diagnostic.get("trials", 0)) >= 100
-            and int(diagnostic.get("bootstrap_repetitions", 0)) >= 10_000
-            and diagnostic.get("material_reversal_supported") is False
-        )
+        if diagnostic.get("schema") == "paired_chirp_ber_reversal_v1":
+            diagnostic_kind = "paired_reversal"
+            diagnostic_valid = _paired_diagnostic_clears_reversal(
+                diagnostic, material_increases
+            )
+            if material_increases:
+                diagnostic_clears_reversals = diagnostic_valid
+        elif (
+            diagnostic.get("method")
+            == "independent_one_chirp_trials_with_cluster_bootstrap"
+        ):
+            diagnostic_kind = "independent_chirp_stability"
+            diagnostic_valid = _stability_diagnostic_valid(diagnostic)
+        else:
+            diagnostic_valid = False
 
     checks = {
         "required_columns": True,
@@ -157,6 +250,7 @@ def verify_lut(
             ((0.0 <= simulated) & (simulated <= 0.5)).all()
         ),
         "raw_ber_no_unresolved_material_reversal": diagnostic_clears_reversals,
+        "chirp_diagnostic_valid": diagnostic_valid,
         "lut_in_probability_range": bool(((0.0 <= lut) & (lut <= 0.5)).all()),
         "monotone_nonincreasing": bool(np.all(np.diff(lut) <= 1e-15)),
         "zero_error_points_use_confidence_bound": bool(
@@ -184,7 +278,8 @@ def verify_lut(
                 {
                     "path": str(chirp_diagnostic_path),
                     "sha256": _sha256(Path(chirp_diagnostic_path)),
-                    "summary": diagnostic,
+                    "kind": diagnostic_kind,
+                    "summary": _diagnostic_summary(diagnostic),
                 }
                 if diagnostic is not None
                 else None
