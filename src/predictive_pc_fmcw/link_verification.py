@@ -121,7 +121,10 @@ def _stability_diagnostic_valid(diagnostic: dict[str, Any]) -> bool:
 
 
 def _diagnostic_summary(diagnostic: dict[str, Any]) -> dict[str, Any]:
-    if diagnostic.get("method") == "independent_one_chirp_trials_with_cluster_bootstrap":
+    if (
+        diagnostic.get("method")
+        == "independent_one_chirp_trials_with_cluster_bootstrap"
+    ):
         row_keys = (
             "snr_db",
             "independent_chirp_trials",
