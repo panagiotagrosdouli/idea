@@ -1,8 +1,10 @@
-"""Frozen scheduler-family mapping for the dataset-free publication protocol."""
+"""Frozen eight-family scheduling protocol for synthetic evaluation."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+
+PAIRED_TRAFFIC_SEEDS = (20260901, 20260902, 20260903, 20260904, 20260905)
 
 
 @dataclass(frozen=True)
@@ -16,38 +18,36 @@ class SchedulerFamily:
 
 SCHEDULER_FAMILIES = (
     SchedulerFamily("S0", "reactive_greedy", "current_link"),
-    SchedulerFamily("S1", "cv_predictive", "constant_velocity"),
+    SchedulerFamily("S1", "proportional_fair", "current_link"),
+    SchedulerFamily("S2", "cv_predictive", "constant_velocity"),
+    SchedulerFamily("S3", "kalman_predictive", "kalman_cv"),
+    SchedulerFamily("S4", "imm_predictive", "imm"),
     SchedulerFamily(
-        "S2",
+        "S5",
         "learned_predictive",
         "trajectory_gru",
         learned_objective="trajectory_only",
     ),
     SchedulerFamily(
-        "S3",
+        "S6",
         "learned_predictive",
         "communication_aware_gru",
         learned_objective="full",
     ),
-    SchedulerFamily("S4", "oracle", "oracle_future", deployable=False),
+    SchedulerFamily("S7", "oracle", "oracle_future", deployable=False),
 )
 
 
 def validate_scheduler_protocol() -> None:
-    """Fail closed if the publication scheduler family drifts."""
-    if tuple(item.protocol_id for item in SCHEDULER_FAMILIES) != (
-        "S0",
-        "S1",
-        "S2",
-        "S3",
-        "S4",
-    ):
-        raise ValueError("publication scheduler IDs must remain S0-S4")
+    """Fail closed if the publication scheduler protocol drifts."""
+    expected_ids = tuple(f"S{index}" for index in range(8))
+    if tuple(item.protocol_id for item in SCHEDULER_FAMILIES) != expected_ids:
+        raise ValueError("publication scheduler IDs must remain S0-S7")
+    if len(PAIRED_TRAFFIC_SEEDS) != 5:
+        raise ValueError("publication scheduling requires exactly five traffic seeds")
     if SCHEDULER_FAMILIES[-1].deployable:
         raise ValueError("oracle scheduler must remain evaluator-only")
     learned = [item for item in SCHEDULER_FAMILIES if item.learned_objective]
-    if len(learned) != 2:
-        raise ValueError("publication protocol requires exactly two learned schedulers")
     if {item.learned_objective for item in learned} != {"trajectory_only", "full"}:
         raise ValueError("learned scheduler objectives drifted from frozen protocol")
 
@@ -62,6 +62,7 @@ def scheduler_protocol_manifest() -> dict[str, object]:
             "packet_deadlines",
             "traffic_seed",
         ),
+        "traffic_seeds": PAIRED_TRAFFIC_SEEDS,
         "inferential_unit": "scenario_episode",
         "families": [
             {
