@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-from dataclasses import asdict
 from pathlib import Path
 
 import numpy as np
@@ -148,7 +147,8 @@ def build_development_checkpoint_selection(
     destination = Path(output_path)
     destination.parent.mkdir(parents=True, exist_ok=True)
     if destination.exists():
-        raise FileExistsError(f"refusing to overwrite selection artifact: {destination}")
+        message = f"refusing to overwrite selection artifact: {destination}"
+        raise FileExistsError(message)
     destination.write_text(
         json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
